@@ -9,7 +9,7 @@ import {
   HStack,
   Text,
   Box,
-Stat,
+  Stat,
   Divider,
   Heading,
   Grid,
@@ -21,6 +21,11 @@ Stat,
   StatNumber,
   StatHelpText,
   useColorModeValue,
+  SimpleGrid,
+  Flex,
+  Wrap,
+  WrapItem,
+  useBreakpointValue,
 } from '@chakra-ui/react'
 
 const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
@@ -28,27 +33,20 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
   const italianGold = '#c8a882'
   const italianGreen = '#2d5a27'
   
+  // Responsive breakpoints
+  const modalSize = useBreakpointValue({ base: 'full', md: '6xl' })
+  const gridColumns = useBreakpointValue({ base: 1, sm: 2, md: 3, lg: 4 })
+  const cardGridColumns = useBreakpointValue({ base: 1, md: 2 })
+  const fontSize = useBreakpointValue({ base: 'sm', md: 'md' })
+  const headerSize = useBreakpointValue({ base: 'md', md: 'lg' })
+  const numberSize = useBreakpointValue({ base: '2xl', md: '3xl' })
+  
   if (!familyData) return null
 
   // Calculate comprehensive statistics
   const totalMembers = familyData.length
   const livingMembers = familyData.filter(person => !person.data.death).length
   const deceasedMembers = totalMembers - livingMembers
-  const livingPercentage = Math.round((livingMembers / totalMembers) * 100)
-
-  // Generation stats
-  const generations = {}
-  familyData.forEach(person => {
-    if (!generations[person.data.generation]) {
-      generations[person.data.generation] = { total: 0, living: 0, deceased: 0 }
-    }
-    generations[person.data.generation].total++
-    if (person.data.death) {
-      generations[person.data.generation].deceased++
-    } else {
-      generations[person.data.generation].living++
-    }
-  })
 
   // Family branch stats
   const families = {}
@@ -74,29 +72,31 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
     families[familyName].avgAge = Math.round(totalAge / familyMembers.length)
   })
 
-  // Age distribution
+  // Enhanced age distribution with more granular ranges
   const ageRanges = {
-    '0-20': 0,
-    '21-40': 0,
-    '41-60': 0,
-    '61-80': 0,
-    '80+': 0
+    'Enfants (0-17)': 0,
+    'Jeunes (18-35)': 0,
+    'Adultes (36-55)': 0,
+    'Seniors (56-75)': 0,
+    'Aînés (76+)': 0
   }
 
   familyData.forEach(person => {
     const age = person.data.death ? person.data.death - person.data.birthday : new Date().getFullYear() - person.data.birthday
-    if (age <= 20) ageRanges['0-20']++
-    else if (age <= 40) ageRanges['21-40']++
-    else if (age <= 60) ageRanges['41-60']++
-    else if (age <= 80) ageRanges['61-80']++
-    else ageRanges['80+']++
+    if (age <= 17) ageRanges['Enfants (0-17)']++
+    else if (age <= 35) ageRanges['Jeunes (18-35)']++
+    else if (age <= 55) ageRanges['Adultes (36-55)']++
+    else if (age <= 75) ageRanges['Seniors (56-75)']++
+    else ageRanges['Aînés (76+)']++
   })
-
-  // Birth decades
+  // Birth decades (handling NaN values)
   const birthDecades = {}
   familyData.forEach(person => {
-    const decade = Math.floor(person.data.birthday / 10) * 10
-    birthDecades[decade] = (birthDecades[decade] || 0) + 1
+    const birthday = person.data.birthday
+    if (birthday && !isNaN(birthday) && birthday > 1800) {
+      const decade = Math.floor(birthday / 10) * 10
+      birthDecades[decade] = (birthDecades[decade] || 0) + 1
+    }
   })
 
   // Marriage and children stats
@@ -105,21 +105,64 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
   const totalChildren = familyData.reduce((sum, person) => sum + (person.rels.children ? person.rels.children.length : 0), 0)
   const avgChildrenPerParent = parentsCount > 0 ? Math.round((totalChildren / parentsCount) * 10) / 10 : 0
 
+  // Advanced family statistics
+  // Average age at first child
+  const parentsWithAgeData = familyData.filter(person => 
+    person.rels.children && 
+    person.rels.children.length > 0 && 
+    person.data.birthday && 
+    !isNaN(person.data.birthday)
+  )
+  
+  let totalAgeAtFirstChild = 0
+  let validParents = 0
+  parentsWithAgeData.forEach(parent => {
+    if (parent.rels.children && parent.rels.children.length > 0) {
+      // Find the oldest child (assuming first child)
+      const children = parent.rels.children.map(childId => 
+        familyData.find(person => person.id === childId)
+      ).filter(child => child && child.data.birthday && !isNaN(child.data.birthday))
+      
+      if (children.length > 0) {
+        const oldestChild = children.reduce((oldest, child) => 
+          child.data.birthday < oldest.data.birthday ? child : oldest
+        )
+        const ageAtFirstChild = oldestChild.data.birthday - parent.data.birthday
+        if (ageAtFirstChild > 0 && ageAtFirstChild < 100) {
+          totalAgeAtFirstChild += ageAtFirstChild
+          validParents++
+        }
+      }
+    }
+  })
+  const avgAgeAtFirstChild = validParents > 0 ? Math.round(totalAgeAtFirstChild / validParents) : 0
+  // Longevity statistics
+  const deceasedMembersWithData = familyData.filter(person => person.data.death && !isNaN(person.data.death) && person.data.birthday && !isNaN(person.data.birthday))
+  const longevityData = deceasedMembersWithData.map(person => person.data.death - person.data.birthday).filter(age => age > 0 && age < 120)
+  const avgLifespan = longevityData.length > 0 ? Math.round(longevityData.reduce((sum, age) => sum + age, 0) / longevityData.length) : 0
+  const maxLifespan = longevityData.length > 0 ? Math.max(...longevityData) : 0
+  // Gender distribution
+  const maleCount = familyData.filter(person => person.data.gender === 'M').length
+  const femaleCount = familyData.filter(person => person.data.gender === 'F').length
+
   const formatFamilyName = (name) => {
     return name.split('-').map(part => 
       part.charAt(0).toUpperCase() + part.slice(1)
     ).join(' ')
   }
+  
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="6xl" scrollBehavior="inside">
+    <Modal isOpen={isOpen} onClose={onClose} size={modalSize} scrollBehavior="inside">
       <ModalOverlay bg="rgba(45, 90, 39, 0.4)" backdropFilter="blur(10px)" />
       <ModalContent 
-        maxW="1200px"
+        maxW={modalSize === 'full' ? 'full' : '1200px'}
         bg="linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)"
         border={`3px solid ${italianGold}`}
-        borderRadius="xl"
+        borderRadius={modalSize === 'full' ? 'none' : 'xl'}
         overflow="hidden"
         position="relative"
+        mx={modalSize === 'full' ? 0 : 4}
+        my={modalSize === 'full' ? 0 : 4}
       >
         {/* Italian flag accent */}
         <Box
@@ -132,20 +175,20 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
           zIndex={2}
         />
         
-        <ModalHeader pt={6}>
+        <ModalHeader pt={6} px={{ base: 4, md: 6 }}>
           <HStack spacing={3} mb={2}>
-            <Box fontSize="2xl">📊</Box>
+            <Box fontSize={{ base: 'xl', md: '2xl' }}>📊</Box>
             <VStack align="start" spacing={0}>
               <Heading 
-                size="lg" 
+                size={headerSize}
                 color={italianGreen}
                 fontFamily="serif"
                 textShadow="1px 1px 2px rgba(0,0,0,0.1)"
               >
-                Colanero Family Statistics
+                Statistiques Famille Colanero
               </Heading>
-              <Text fontSize="md" color="gray.600" fontStyle="italic">
-                Heritage analysis from the Abruzzo mountains
+              <Text fontSize={fontSize} color="gray.600" fontStyle="italic">
+                Analyse de notre héritage des montagnes d'Abruzzo
               </Text>
             </VStack>
           </HStack>
@@ -161,12 +204,15 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
           color={italianGreen}
           _hover={{ bg: "rgba(200, 168, 130, 0.2)" }}
           mt={2}
-        />        <ModalBody pb={6}>
-          <VStack spacing={8} align="stretch">
-            {/* Overview Stats */}
+          fontSize={{ base: 'lg', md: 'xl' }}
+        />
+          <ModalBody pb={6} px={{ base: 4, md: 6 }}>
+          <VStack spacing={{ base: 6, md: 8 }} align="stretch">
+            
+            {/* Demographics - Enhanced Age Distribution */}
             <Box>
               <Heading 
-                size="md" 
+                size={{ base: 'sm', md: 'md' }}
                 mb={4} 
                 color={italianGreen}
                 fontFamily="serif"
@@ -180,85 +226,173 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
                   bg={`linear-gradient(to bottom, ${italianGold}, #d4af37)`}
                   borderRadius="full"
                 />
-                Family Overview
+                Répartition par âge
               </Heading>
-              <Grid templateColumns="repeat(4, 1fr)" gap={4}>
+              <Card 
+                bg={cardBg}
+                border={`1px solid ${italianGold}`}
+                borderRadius="lg"
+              >
+                <CardBody>
+                  <VStack spacing={4} align="stretch">
+                    {Object.entries(ageRanges).map(([range, count]) => {
+                      const percentage = ((count / totalMembers) * 100).toFixed(1)
+                      const [ageGroup, ages] = range.split(' ')
+                      
+                      return (
+                        <Box key={range}>
+                          <Flex justify="space-between" align="center" mb={2}>
+                            <VStack align="start" spacing={0}>
+                              <Text fontSize={fontSize} fontWeight="bold" color={italianGreen}>
+                                {ageGroup}
+                              </Text>
+                              <Text fontSize="xs" color="gray.500">{ages}</Text>
+                            </VStack>
+                            <HStack spacing={2}>
+                              <Badge 
+                                bg="linear-gradient(135deg, #e3f2fd, #f3e5f5)"
+                                color={italianGreen}
+                                border={`1px solid ${italianGold}`}
+                                fontSize="xs"
+                              >
+                                {count} pers.
+                              </Badge>
+                              <Text fontSize="sm" fontWeight="bold" color="gray.600">
+                                {percentage}%
+                              </Text>
+                            </HStack>
+                          </Flex>
+                          <Progress
+                            value={(count / totalMembers) * 100}
+                            colorScheme="blue"
+                            size="md"
+                            borderRadius="md"
+                            bg="gray.100"
+                            sx={{
+                              '& > div': {
+                                background: `linear-gradient(90deg, ${italianGold}, #d4af37)`
+                              }
+                            }}
+                          />
+                        </Box>
+                      )
+                    })}
+                  </VStack>
+                </CardBody>
+              </Card>
+            </Box>
+
+            {/* Advanced Family Statistics */}
+            <Box>
+              <Heading 
+                size={{ base: 'sm', md: 'md' }}
+                mb={4} 
+                color={italianGreen}
+                fontFamily="serif"
+                display="flex"
+                alignItems="center"
+                gap={2}
+              >
+                <Box
+                  w={1}
+                  h={5}
+                  bg={`linear-gradient(to bottom, ${italianGold}, #d4af37)`}
+                  borderRadius="full"
+                />
+                Statistiques familiales
+              </Heading>
+              <SimpleGrid columns={cardGridColumns} spacing={6}>
                 <Card 
                   bg={cardBg}
                   border={`1px solid ${italianGold}`}
                   borderRadius="lg"
-                  _hover={{ transform: 'translateY(-2px)', boxShadow: '0 8px 25px rgba(200, 168, 130, 0.2)' }}
-                  transition="all 0.3s ease"
                 >
-                  <CardBody textAlign="center">
-                    <Text fontSize="3xl" fontWeight="bold" color={italianGreen}>
-                      {totalMembers}
-                    </Text>
-                    <Text color="gray.600" fontWeight="medium">Total Members</Text>
+                  <CardBody>
+                    <VStack spacing={4} align="stretch">
+                      <Stat textAlign="center">
+                        <StatLabel fontSize={fontSize}>Âge moyen au 1er enfant</StatLabel>
+                        <StatNumber fontSize={{ base: '2xl', md: '3xl' }} color={italianGreen}>
+                          {avgAgeAtFirstChild > 0 ? `${avgAgeAtFirstChild} ans` : 'N/A'}
+                        </StatNumber>
+                        <StatHelpText fontSize="xs">
+                          {validParents > 0 ? `Basé sur ${validParents} parents` : 'Données insuffisantes'}
+                        </StatHelpText>
+                      </Stat>
+                      
+                      <Box>
+                        <Text fontSize="sm" fontWeight="bold" mb={2} color={italianGreen}>
+                          Structure familiale
+                        </Text>
+                        <VStack spacing={2}>
+                          <HStack justify="space-between" w="full">
+                            <Text fontSize="sm">Total membres</Text>
+                            <Badge colorScheme="blue">{totalMembers}</Badge>
+                          </HStack>
+                          <HStack justify="space-between" w="full">
+                            <Text fontSize="sm">Vivants</Text>
+                            <Badge colorScheme="green">{livingMembers}</Badge>
+                          </HStack>
+                          <HStack justify="space-between" w="full">
+                            <Text fontSize="sm">Mariés</Text>
+                            <Badge colorScheme="purple">{marriedMembers}</Badge>
+                          </HStack>
+                          <HStack justify="space-between" w="full">
+                            <Text fontSize="sm">Parents</Text>
+                            <Badge colorScheme="orange">{parentsCount}</Badge>
+                          </HStack>
+                        </VStack>
+                      </Box>
+                    </VStack>
                   </CardBody>
                 </Card>
-                <Card 
-                  bg="linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%)"
-                  border="1px solid #81c784"
-                  borderRadius="lg"
-                  _hover={{ transform: 'translateY(-2px)', boxShadow: '0 8px 25px rgba(76, 175, 80, 0.2)' }}
-                  transition="all 0.3s ease"
-                >
-                  <CardBody textAlign="center">
-                    <Text fontSize="3xl" fontWeight="bold" color="green.600">
-                      {livingMembers}
-                    </Text>
-                    <Text color="gray.600" fontWeight="medium">Living Members</Text>
-                    <Text fontSize="sm" color="green.600" fontWeight="bold">
-                      {livingPercentage}% of family
-                    </Text>
-                  </CardBody>
-                </Card>
-                <Card 
-                  bg="linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%)"
-                  border="1px solid #bdbdbd"
-                  borderRadius="lg"
-                  _hover={{ transform: 'translateY(-2px)', boxShadow: '0 8px 25px rgba(158, 158, 158, 0.2)' }}
-                  transition="all 0.3s ease"
-                >
-                  <CardBody textAlign="center">
-                    <Text fontSize="3xl" fontWeight="bold" color="gray.600">
-                      {deceasedMembers}
-                    </Text>
-                    <Text color="gray.600" fontWeight="medium">Remembered Members</Text>
-                    <Text fontSize="sm" color="gray.500" fontWeight="bold">
-                      {100 - livingPercentage}% of family
-                    </Text>
-                  </CardBody>
-                </Card>
-                <Card 
-                  bg="linear-gradient(135deg, #e3f2fd 0%, #e1bee7 100%)"
-                  border="1px solid #7986cb"
-                  borderRadius="lg"
-                  _hover={{ transform: 'translateY(-2px)', boxShadow: '0 8px 25px rgba(63, 81, 181, 0.2)' }}
-                  transition="all 0.3s ease"
-                >
-                  <CardBody textAlign="center">
-                    <Text fontSize="3xl" fontWeight="bold" color="indigo.600">
-                      {Object.keys(generations).length}
-                    </Text>
-                    <Text color="gray.600" fontWeight="medium">Generations</Text>
-                  </CardBody>
-                </Card>
-              </Grid>
-            </Box>
 
-            {/* Decorative separator */}
-            <Box
-              h="1px"
-              bg={`linear-gradient(90deg, transparent 0%, ${italianGold} 20%, #d4af37 50%, ${italianGold} 80%, transparent 100%)`}
-              borderRadius="full"
-            />
-
-            {/* Generation Breakdown */}
+                <Card 
+                  bg={cardBg}
+                  border={`1px solid ${italianGold}`}
+                  borderRadius="lg"
+                >
+                  <CardBody>
+                    <VStack spacing={4} align="stretch">
+                      <Stat textAlign="center">
+                        <StatLabel fontSize={fontSize}>Espérance de vie moyenne</StatLabel>
+                        <StatNumber fontSize={{ base: '2xl', md: '3xl' }} color={italianGreen}>
+                          {avgLifespan > 0 ? `${avgLifespan} ans` : 'N/A'}
+                        </StatNumber>
+                        <StatHelpText fontSize="xs">
+                          Record: {maxLifespan > 0 ? `${maxLifespan} ans` : 'N/A'}
+                        </StatHelpText>
+                      </Stat>
+                      
+                      <Box>
+                        <Text fontSize="sm" fontWeight="bold" mb={2} color={italianGreen}>
+                          Répartition par genre
+                        </Text>
+                        <VStack spacing={2}>
+                          <HStack justify="space-between" w="full">
+                            <Text fontSize="sm">Hommes</Text>
+                            <Badge colorScheme="blue">{maleCount}</Badge>
+                          </HStack>
+                          <HStack justify="space-between" w="full">
+                            <Text fontSize="sm">Femmes</Text>
+                            <Badge colorScheme="pink">{femaleCount}</Badge>
+                          </HStack>
+                          <Progress
+                            value={(maleCount / (maleCount + femaleCount)) * 100}
+                            colorScheme="blue"
+                            size="sm"
+                            borderRadius="md"
+                            mt={2}
+                          />
+                        </VStack>
+                      </Box>
+                    </VStack>
+                  </CardBody>
+                </Card>
+              </SimpleGrid>
+            </Box>            {/* Birth Timeline */}
             <Box>
               <Heading 
-                size="md" 
+                size={{ base: 'sm', md: 'md' }}
                 mb={4} 
                 color={italianGreen}
                 fontFamily="serif"
@@ -272,206 +406,59 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
                   bg={`linear-gradient(to bottom, ${italianGold}, #d4af37)`}
                   borderRadius="full"
                 />
-                Generation Analysis
+                Chronologie des naissances par décennie
               </Heading>
-              <Grid templateColumns="repeat(auto-fit, minmax(300px, 1fr))" gap={4}>
-                {Object.entries(generations).map(([gen, stats]) => (
-                  <Card 
-                    key={gen} 
-                    bg={cardBg}
-                    border={`1px solid ${italianGold}`}
-                    borderRadius="lg"
-                    _hover={{ transform: 'translateY(-1px)', boxShadow: '0 6px 20px rgba(200, 168, 130, 0.15)' }}
-                    transition="all 0.3s ease"
-                  >
-                    <CardBody>
-                      <VStack align="stretch" spacing={3}>
-                        <HStack justify="space-between">
-                          <Heading size="sm" color={italianGreen} fontFamily="serif">
-                            {gen === '0' ? 'Family Founder' : `Generation ${gen}`}
-                          </Heading>
-                          <Badge 
-                            bg="linear-gradient(135deg, #e3f2fd, #f3e5f5)"
-                            color={italianGreen}
-                            border={`1px solid ${italianGold}`}
-                          >
-                            {stats.total} members
-                          </Badge>
-                        </HStack>
-                        <Box>
-                          <HStack justify="space-between" mb={2}>
-                            <Text fontSize="sm" fontWeight="medium">Living vs Remembered</Text>
-                            <Text fontSize="sm" color="gray.600" fontWeight="bold">
-                              {Math.round((stats.living / stats.total) * 100)}% living
-                            </Text>
-                          </HStack>
-                          <Progress
-                            value={(stats.living / stats.total) * 100}
-                            colorScheme="green"
-                            size="sm"
-                            borderRadius="md"
-                          />
-                        </Box>
-                        <HStack justify="space-between" fontSize="sm">
-                          <Text color="green.600">Living: {stats.living}</Text>
-                          <Text color="gray.500">Deceased: {stats.deceased}</Text>
-                        </HStack>
-                      </VStack>
-                    </CardBody>
-                  </Card>
-                ))}
-              </Grid>
-            </Box>
-
-            <Divider />
-
-            {/* Family Branches
-            <Box>
-              <Heading size="md" mb={4} color="blue.600">
-                Family Branches
-              </Heading>
-              <Grid templateColumns="repeat(auto-fit, minmax(250px, 1fr))" gap={4}>
-                {Object.entries(families)
-                  .sort(([,a], [,b]) => b.total - a.total)
-                  .map(([familyName, stats]) => (
-                  <Card key={familyName} bg={cardBg}>
-                    <CardBody>
-                      <VStack align="stretch" spacing={3}>
-                        <VStack align="start" spacing={1}>
-                          <Heading size="sm" color="blue.700">
-                            {formatFamilyName(familyName)}
-                          </Heading>
-                          <Badge colorScheme="blue" size="sm">
-                            {stats.total} members
-                          </Badge>
-                        </VStack>
-                        
-                        <Grid templateColumns="repeat(2, 1fr)" gap={2} fontSize="sm">
-                          <Box>
-                            <Text fontWeight="bold" color="green.600">
-                              {stats.living}
-                            </Text>
-                            <Text color="gray.600">Living</Text>
-                          </Box>
-                          <Box>
-                            <Text fontWeight="bold" color="gray.500">
-                              {stats.deceased}
-                            </Text>
-                            <Text color="gray.600">Deceased</Text>
-                          </Box>
-                        </Grid>
-
-                        <Box>
-                          <Text fontSize="sm" color="gray.600" mb={1}>
-                            Average Age: <Text as="span" fontWeight="bold">{stats.avgAge}</Text>
-                          </Text>
-                          <Progress
-                            value={Math.min((stats.avgAge / 80) * 100, 100)}
-                            colorScheme="orange"
-                            size="sm"
-                            borderRadius="md"
-                          />
-                        </Box>
-                      </VStack>
-                    </CardBody>
-                  </Card>
-                ))}
-              </Grid>
-            </Box>
-
-            <Divider /> */}
-
-            {/* Demographics */}
-            <Box>
-              <Heading size="md" mb={4} color="blue.600">
-                Demographics
-              </Heading>
-              <Grid templateColumns="repeat(2, 1fr)" gap={6}>
-                {/* Age Distribution */}
-                <Card bg={cardBg}>
-                  <CardBody>
-                    <Heading size="sm" mb={4}>Age Distribution</Heading>
-                    <VStack spacing={3} align="stretch">
-                      {Object.entries(ageRanges).map(([range, count]) => (
-                        <Box key={range}>
-                          <HStack justify="space-between" mb={1}>
-                            <Text fontSize="sm">{range} years</Text>
-                            <Badge>{count}</Badge>
-                          </HStack>
-                          <Progress
-                            value={(count / totalMembers) * 100}
-                            colorScheme="purple"
-                            size="sm"
-                            borderRadius="md"
-                          />
-                        </Box>
-                      ))}
-                    </VStack>
-                  </CardBody>
-                </Card>
-
-                {/* Family Stats */}
-                <Card bg={cardBg}>
-                  <CardBody>
-                    <Heading size="sm" mb={4}>Family Structure</Heading>
-                    <VStack spacing={4} align="stretch">
-                      <Stat>
-                        <StatLabel>Married Members</StatLabel>
-                        <StatNumber>{marriedMembers}</StatNumber>
-                        <StatHelpText>
-                          {Math.round((marriedMembers / totalMembers) * 100)}% of family
-                        </StatHelpText>
-                      </Stat>
-                      
-                      <Stat>
-                        <StatLabel>Parents</StatLabel>
-                        <StatNumber>{parentsCount}</StatNumber>
-                        <StatHelpText>
-                          Members with children
-                        </StatHelpText>
-                      </Stat>
-                      
-                      <Stat>
-                        <StatLabel>Average Children</StatLabel>
-                        <StatNumber>{avgChildrenPerParent}</StatNumber>
-                        <StatHelpText>
-                          Per parent in family
-                        </StatHelpText>
-                      </Stat>
-                    </VStack>
-                  </CardBody>
-                </Card>
-              </Grid>
-            </Box>
-
-            {/* birthday Timeline */}
-            <Box>
-              <Heading size="md" mb={4} color="blue.600">
-                birthday Timeline by Decade
-              </Heading>
-              <Card bg={cardBg}>
+              <Card 
+                bg={cardBg}
+                border={`1px solid ${italianGold}`}
+                borderRadius="lg"
+              >
                 <CardBody>
-                  <Grid templateColumns="repeat(auto-fit, minmax(120px, 1fr))" gap={4}>
-                    {Object.entries(birthDecades)
-                      .sort(([a], [b]) => Number(a) - Number(b))
-                      .map(([decade, count]) => (
-                      <Box key={decade} textAlign="center">
-                        <Text fontSize="2xl" fontWeight="bold" color="blue.500">
-                          {count}
-                        </Text>
-                        <Text fontSize="sm" color="gray.600">
-                          {decade}s
-                        </Text>
-                        <Progress
-                          value={(count / totalMembers) * 100}
-                          colorScheme="blue"
-                          size="sm"
-                          borderRadius="md"
-                          mt={2}
-                        />
-                      </Box>
-                    ))}
-                  </Grid>
+                  {Object.keys(birthDecades).length > 0 ? (
+                    <SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 5 }} spacing={4}>
+                      {Object.entries(birthDecades)
+                        .sort(([a], [b]) => Number(a) - Number(b))
+                        .map(([decade, count]) => {
+                          const percentage = ((count / totalMembers) * 100).toFixed(1)
+                          return (
+                            <VStack key={decade} spacing={2} align="center">
+                              <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color="green.600">
+                                {count}
+                              </Text>
+                              <Text fontSize={{ base: 'sm', md: 'md' }} fontWeight="medium" color={italianGreen}>
+                                {decade}s
+                              </Text>
+                              <Text fontSize="xs" color="gray.500">
+                                {percentage}%
+                              </Text>
+                              <Progress
+                                value={(count / totalMembers) * 100}
+                                colorScheme="green"
+                                size="md"
+                                borderRadius="md"
+                                w="full"
+                                bg="gray.100"
+                                sx={{
+                                  '& > div': {
+                                    background: 'linear-gradient(90deg, #38a169, #48bb78)'
+                                  }
+                                }}
+                              />
+                            </VStack>
+                          )
+                        })}
+                    </SimpleGrid>
+                  ) : (
+                    <Text fontSize="sm" color="gray.500" fontStyle="italic" textAlign="center">
+                      Données de naissance insuffisantes
+                    </Text>
+                  )}
+                  
+                  <Box mt={6} pt={4} borderTop="1px solid" borderColor="gray.200">
+                    <Text fontSize="sm" fontWeight="bold" color={italianGreen} textAlign="center">
+                      Moyenne d'enfants par parent: {avgChildrenPerParent}
+                    </Text>
+                  </Box>
                 </CardBody>
               </Card>
             </Box>

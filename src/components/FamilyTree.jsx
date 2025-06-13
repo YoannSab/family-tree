@@ -30,12 +30,17 @@ export default function FamilyTree({ onPersonClick, familyData }) {
         .setCardXSpacing(cardXSpacing)
         .setCardYSpacing(cardYSpacing)
 
-      const f3Card = f3Chart.setCard(f3.CardHtml)
-        .setCardInnerHtmlCreator(d => {
+      const f3Card = f3Chart.setCard(f3.CardHtml)        
+      .setCardInnerHtmlCreator(d => {
           const fontSize = isMobile ? '12px' : '14px'
           const cardWidth = isMobile ? '140px' : '180px'
-          
-          return `<div class="card-inner italian-card" style="width: ${cardWidth}; font-size: ${fontSize}; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border: 2px solid #c8a882; border-radius: 8px; padding: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+          const isReliable = d.data.data.reliable
+          const reliabilityIndicator = isReliable === false ? 
+            `<div style="position: absolute; top: 4px; right: 4px; width: 12px; height: 12px; background: #f56565; border-radius: 50%; border: 1px solid white;" title="Unreliable information"></div>` : 
+            `<div style="position: absolute; top: 4px; right: 4px; width: 12px; height: 12px; background: #48bb78; border-radius: 50%; border: 1px solid white;" title="Reliable information"></div>`
+
+          return `<div class="card-inner italian-card" style="position: relative; width: ${cardWidth}; font-size: ${fontSize}; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border: 2px solid #c8a882; border-radius: 8px; padding: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+            ${reliabilityIndicator}
             <div class="card-name" style="font-weight: bold; margin-bottom: 4px; font-size: ${isMobile ? '13px' : '15px'}; color: #2d5a27; text-align: center;">
               ${d.data.data.firstName} ${d.data.data.lastName}
             </div>

@@ -101,11 +101,21 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
                     name={relatedPerson.data.firstName}
                     ring={2}
                     ringColor={italianGold}
-                  />
-                  <VStack align="start" spacing={1} flex={1}>
-                    <Text fontSize="sm" fontWeight="bold" color={italianGreen} fontFamily="serif">
-                      {relatedPerson.data.firstName} {relatedPerson.data.lastName} {relatedPerson.data.death ? "✞" : ""}
-                    </Text>
+                  />                  <VStack align="start" spacing={1} flex={1}>
+                    <HStack spacing={2} align="center">
+                      <Text fontSize="sm" fontWeight="bold" color={italianGreen} fontFamily="serif">
+                        {relatedPerson.data.firstName} {relatedPerson.data.lastName} {relatedPerson.data.death ? "✞" : ""}
+                      </Text>
+                      <Box
+                        w={2}
+                        h={2}
+                        bg={relatedPerson.data.reliable === false ? '#f56565' : '#48bb78'}
+                        borderRadius="50%"
+                        border="0.5px solid white"
+                        title={relatedPerson.data.reliable === false ? 'Unreliable information' : 'Reliable information'}
+                        flexShrink={0}
+                      />
+                    </HStack>
                     {relatedPerson.data.death ? (
                       <Text fontSize="xs" color="gray.600">
                         {relatedPerson.data.birthday} - {relatedPerson.data.death}
@@ -119,7 +129,8 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
                 </HStack>
               </CardBody>
             </Card>
-          ))}        </Grid>
+          ))}        
+          </Grid>
       ) : (
         <Text fontSize="sm" color="gray.500" fontStyle="italic">
           None recorded
@@ -150,28 +161,48 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
 
       <VStack spacing={isMobile ? 4 : 6} align="stretch" position="relative" zIndex={2}>
         {/* Header with person details */}
-        <Box>
-          <Flex direction={{ base: 'column', sm: 'row' }} align={{ base: 'center', sm: 'center' }} gap={4}>
-            <Avatar
-              size={isMobile ? "xl" : "lg"}
-              src={person.data.image}
-              name={person.data.firstName}
-              ring={3}
-              ringColor={italianGold}
-              bg="linear-gradient(135deg, #2d5a27, #1e3a1a)"
-            />
+        <Box>            <Flex direction={{ base: 'column', sm: 'row' }} align={{ base: 'center', sm: 'center' }} gap={4}>
+              <Avatar
+                size={isMobile ? "xl" : "lg"}
+                src={person.data.image}
+                name={person.data.firstName}
+                ring={3}
+                ringColor={italianGold}
+                bg="linear-gradient(135deg, #2d5a27, #1e3a1a)"
+              />
 
-            <Heading
-              size={isMobile ? "md" : "lg"}
-              textAlign={{ base: 'center', sm: 'left' }}
-              color={italianGreen}
-              fontFamily="serif"
-              textShadow="1px 1px 2px rgba(0,0,0,0.1)"
-            >
-              {person.data.firstName} {person.data.lastName}
-            </Heading>
-
-          </Flex>
+              <VStack align={{ base: 'center', sm: 'start' }} spacing={2}>
+                <HStack spacing={3} align="center">
+                  <Heading
+                    size={isMobile ? "md" : "lg"}
+                    textAlign={{ base: 'center', sm: 'left' }}
+                    color={italianGreen}
+                    fontFamily="serif"
+                    textShadow="1px 1px 2px rgba(0,0,0,0.1)"
+                  >
+                    {person.data.firstName} {person.data.lastName}
+                  </Heading>
+                  
+                  {/* Reliability indicator */}
+                  <Box
+                    w={3}
+                    h={3}
+                    bg={person.data.reliable === false ? '#f56565' : '#48bb78'}
+                    borderRadius="50%"
+                    border="1px solid white"
+                    boxShadow="0 1px 3px rgba(0,0,0,0.2)"
+                    title={person.data.reliable === false ? 'Unreliable information' : 'Reliable information'}
+                    cursor="help"
+                  />
+                </HStack>
+                
+                {person.data.reliable === false && (
+                  <Text fontSize="xs" color="orange.600" fontStyle="italic">
+                    ⚠️ Information to verify
+                  </Text>
+                )}
+              </VStack>
+            </Flex>
         </Box>
 
         <VStack spacing={isMobile ? 4 : 6} align="stretch">
@@ -234,7 +265,7 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
                   </Box>
                   <VStack align="start" spacing={0}>
                     <Text fontSize="xs" color="gray.500">Age</Text>
-                    <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">{age} years{isLiving ? '' : ' (deceased)'}</Text>
+                    <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">{age} y.o.</Text>
                   </VStack>
                 </Flex>
               </GridItem>
