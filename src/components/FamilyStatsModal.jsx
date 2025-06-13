@@ -10,9 +10,7 @@ import {
   Text,
   Box,
   Stat,
-  Divider,
   Heading,
-  Grid,
   Card,
   CardBody,
   Progress,
@@ -23,8 +21,6 @@ import {
   useColorModeValue,
   SimpleGrid,
   Flex,
-  Wrap,
-  WrapItem,
   useBreakpointValue,
 } from '@chakra-ui/react'
 
@@ -35,18 +31,15 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
   
   // Responsive breakpoints
   const modalSize = useBreakpointValue({ base: 'full', md: '6xl' })
-  const gridColumns = useBreakpointValue({ base: 1, sm: 2, md: 3, lg: 4 })
   const cardGridColumns = useBreakpointValue({ base: 1, md: 2 })
   const fontSize = useBreakpointValue({ base: 'sm', md: 'md' })
   const headerSize = useBreakpointValue({ base: 'md', md: 'lg' })
-  const numberSize = useBreakpointValue({ base: '2xl', md: '3xl' })
   
   if (!familyData) return null
 
   // Calculate comprehensive statistics
   const totalMembers = familyData.length
   const livingMembers = familyData.filter(person => !person.data.death).length
-  const deceasedMembers = totalMembers - livingMembers
 
   // Family branch stats
   const families = {}
@@ -71,23 +64,21 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
     }, 0)
     families[familyName].avgAge = Math.round(totalAge / familyMembers.length)
   })
-
   // Enhanced age distribution with more granular ranges
   const ageRanges = {
-    'Enfants (0-17)': 0,
-    'Jeunes (18-35)': 0,
-    'Adultes (36-55)': 0,
+    'Children (0-17)': 0,
+    'Young Adults (18-35)': 0,
+    'Adults (36-55)': 0,
     'Seniors (56-75)': 0,
-    'Aînés (76+)': 0
+    'Elders (76+)': 0
   }
-
   familyData.forEach(person => {
     const age = person.data.death ? person.data.death - person.data.birthday : new Date().getFullYear() - person.data.birthday
-    if (age <= 17) ageRanges['Enfants (0-17)']++
-    else if (age <= 35) ageRanges['Jeunes (18-35)']++
-    else if (age <= 55) ageRanges['Adultes (36-55)']++
+    if (age <= 17) ageRanges['Children (0-17)']++
+    else if (age <= 35) ageRanges['Young Adults (18-35)']++
+    else if (age <= 55) ageRanges['Adults (36-55)']++
     else if (age <= 75) ageRanges['Seniors (56-75)']++
-    else ageRanges['Aînés (76+)']++
+    else ageRanges['Elders (76+)']++
   })
   // Birth decades (handling NaN values)
   const birthDecades = {}
@@ -144,12 +135,6 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
   // Gender distribution
   const maleCount = familyData.filter(person => person.data.gender === 'M').length
   const femaleCount = familyData.filter(person => person.data.gender === 'F').length
-
-  const formatFamilyName = (name) => {
-    return name.split('-').map(part => 
-      part.charAt(0).toUpperCase() + part.slice(1)
-    ).join(' ')
-  }
   
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={modalSize} scrollBehavior="inside">
@@ -183,12 +168,11 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
                 size={headerSize}
                 color={italianGreen}
                 fontFamily="serif"
-                textShadow="1px 1px 2px rgba(0,0,0,0.1)"
-              >
-                Statistiques Famille Colanero
+                textShadow="1px 1px 2px rgba(0,0,0,0.1)"              >
+                Family Statistics
               </Heading>
               <Text fontSize={fontSize} color="gray.600" fontStyle="italic">
-                Analyse de notre héritage des montagnes d'Abruzzo
+                Explore the rich history and statistics of your family tree
               </Text>
             </VStack>
           </HStack>
@@ -224,9 +208,8 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
                   w={1}
                   h={5}
                   bg={`linear-gradient(to bottom, ${italianGold}, #d4af37)`}
-                  borderRadius="full"
-                />
-                Répartition par âge
+                  borderRadius="full"                />
+                Age Distribution
               </Heading>
               <Card 
                 bg={cardBg}
@@ -248,14 +231,13 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
                               </Text>
                               <Text fontSize="xs" color="gray.500">{ages}</Text>
                             </VStack>
-                            <HStack spacing={2}>
-                              <Badge 
+                            <HStack spacing={2}>                              <Badge 
                                 bg="linear-gradient(135deg, #e3f2fd, #f3e5f5)"
                                 color={italianGreen}
                                 border={`1px solid ${italianGold}`}
                                 fontSize="xs"
                               >
-                                {count} pers.
+                                {count} people
                               </Badge>
                               <Text fontSize="sm" fontWeight="bold" color="gray.600">
                                 {percentage}%
@@ -297,9 +279,8 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
                   w={1}
                   h={5}
                   bg={`linear-gradient(to bottom, ${italianGold}, #d4af37)`}
-                  borderRadius="full"
-                />
-                Statistiques familiales
+                  borderRadius="full"                />
+                Family Statistics
               </Heading>
               <SimpleGrid columns={cardGridColumns} spacing={6}>
                 <Card 
@@ -308,32 +289,30 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
                   borderRadius="lg"
                 >
                   <CardBody>
-                    <VStack spacing={4} align="stretch">
-                      <Stat textAlign="center">
-                        <StatLabel fontSize={fontSize}>Âge moyen au 1er enfant</StatLabel>
+                    <VStack spacing={4} align="stretch">                      <Stat textAlign="center">
+                        <StatLabel fontSize={fontSize}>Average age at 1st child</StatLabel>
                         <StatNumber fontSize={{ base: '2xl', md: '3xl' }} color={italianGreen}>
-                          {avgAgeAtFirstChild > 0 ? `${avgAgeAtFirstChild} ans` : 'N/A'}
+                          {avgAgeAtFirstChild > 0 ? `${avgAgeAtFirstChild} years` : 'N/A'}
                         </StatNumber>
                         <StatHelpText fontSize="xs">
-                          {validParents > 0 ? `Basé sur ${validParents} parents` : 'Données insuffisantes'}
+                          {validParents > 0 ? `Based on ${validParents} parents` : 'Insufficient data'}
                         </StatHelpText>
                       </Stat>
-                      
-                      <Box>
+                        <Box>
                         <Text fontSize="sm" fontWeight="bold" mb={2} color={italianGreen}>
-                          Structure familiale
+                          Family structure
                         </Text>
                         <VStack spacing={2}>
                           <HStack justify="space-between" w="full">
-                            <Text fontSize="sm">Total membres</Text>
+                            <Text fontSize="sm">Total members</Text>
                             <Badge colorScheme="blue">{totalMembers}</Badge>
                           </HStack>
                           <HStack justify="space-between" w="full">
-                            <Text fontSize="sm">Vivants</Text>
+                            <Text fontSize="sm">Living</Text>
                             <Badge colorScheme="green">{livingMembers}</Badge>
                           </HStack>
                           <HStack justify="space-between" w="full">
-                            <Text fontSize="sm">Mariés</Text>
+                            <Text fontSize="sm">Married</Text>
                             <Badge colorScheme="purple">{marriedMembers}</Badge>
                           </HStack>
                           <HStack justify="space-between" w="full">
@@ -352,28 +331,26 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
                   borderRadius="lg"
                 >
                   <CardBody>
-                    <VStack spacing={4} align="stretch">
-                      <Stat textAlign="center">
-                        <StatLabel fontSize={fontSize}>Espérance de vie moyenne</StatLabel>
+                    <VStack spacing={4} align="stretch">                      <Stat textAlign="center">
+                        <StatLabel fontSize={fontSize}>Average life expectancy</StatLabel>
                         <StatNumber fontSize={{ base: '2xl', md: '3xl' }} color={italianGreen}>
-                          {avgLifespan > 0 ? `${avgLifespan} ans` : 'N/A'}
+                          {avgLifespan > 0 ? `${avgLifespan} years` : 'N/A'}
                         </StatNumber>
                         <StatHelpText fontSize="xs">
-                          Record: {maxLifespan > 0 ? `${maxLifespan} ans` : 'N/A'}
+                          Record: {maxLifespan > 0 ? `${maxLifespan} years` : 'N/A'}
                         </StatHelpText>
                       </Stat>
-                      
-                      <Box>
+                        <Box>
                         <Text fontSize="sm" fontWeight="bold" mb={2} color={italianGreen}>
-                          Répartition par genre
+                          Gender distribution
                         </Text>
                         <VStack spacing={2}>
                           <HStack justify="space-between" w="full">
-                            <Text fontSize="sm">Hommes</Text>
+                            <Text fontSize="sm">Men</Text>
                             <Badge colorScheme="blue">{maleCount}</Badge>
                           </HStack>
                           <HStack justify="space-between" w="full">
-                            <Text fontSize="sm">Femmes</Text>
+                            <Text fontSize="sm">Women</Text>
                             <Badge colorScheme="pink">{femaleCount}</Badge>
                           </HStack>
                           <Progress
@@ -404,9 +381,8 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
                   w={1}
                   h={5}
                   bg={`linear-gradient(to bottom, ${italianGold}, #d4af37)`}
-                  borderRadius="full"
-                />
-                Chronologie des naissances par décennie
+                  borderRadius="full"                />
+                Birth timeline by decade
               </Heading>
               <Card 
                 bg={cardBg}
@@ -448,15 +424,13 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
                           )
                         })}
                     </SimpleGrid>
-                  ) : (
-                    <Text fontSize="sm" color="gray.500" fontStyle="italic" textAlign="center">
-                      Données de naissance insuffisantes
+                  ) : (                    <Text fontSize="sm" color="gray.500" fontStyle="italic" textAlign="center">
+                      Insufficient birth data
                     </Text>
                   )}
-                  
-                  <Box mt={6} pt={4} borderTop="1px solid" borderColor="gray.200">
+                    <Box mt={6} pt={4} borderTop="1px solid" borderColor="gray.200">
                     <Text fontSize="sm" fontWeight="bold" color={italianGreen} textAlign="center">
-                      Moyenne d'enfants par parent: {avgChildrenPerParent}
+                      Average children per parent: {avgChildrenPerParent}
                     </Text>
                   </Box>
                 </CardBody>

@@ -26,3 +26,4 @@ dist-ssr
 # Sensitive data files
 src/assets/data.js
 test.html
+public/images/*

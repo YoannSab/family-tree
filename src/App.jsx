@@ -12,24 +12,17 @@ import {
   HStack,
   useDisclosure,
   Container,
-  useBreakpointValue,
-  Badge,
-  Card,
-  CardBody,
   IconButton,
   Drawer,
   DrawerBody,
   DrawerHeader,
   DrawerOverlay,
   DrawerContent,
-  DrawerCloseButton,
   useColorModeValue,
   Spacer,
   Input,
   InputGroup,
   InputLeftElement,
-  InputRightElement,
-  CloseButton,
   List,
   ListItem,
   Collapse,
@@ -37,7 +30,7 @@ import {
 } from '@chakra-ui/react'
 import { InfoIcon, ChevronLeftIcon, ViewIcon, SearchIcon } from '@chakra-ui/icons'
 import { useState, useEffect } from 'react'
-import { data } from './assets/mock_data.js'
+import { data } from './assets/data.js'
 
 // Custom hook for responsive design that updates in real-time
 const useResponsive = () => {
@@ -130,13 +123,6 @@ export default function App() {
     setShowSearchResults(false)
     setSearchResults([])
   }
-
-  const clearSearch = () => {
-    setSearchQuery('')
-    setShowSearchResults(false)
-    setSearchResults([])
-  }
-
   // Calculate quick stats
   const totalMembers = familyData.length
   const livingMembers = familyData.filter(p => !p.data.death || p.data.death === "").length

@@ -457,10 +457,6 @@
   stroke-width: 4px;
 }
 
-
-
-
-
 .f3-form-cont {
   position: relative;
   z-index: 4;
@@ -651,7 +647,7 @@
   
   .italian-family-tree {
     /* min-height: 300px !important; */
-    height: 400px!important;
+    height: 30vh!important;
   }
   
   .italian-card {
