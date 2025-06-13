@@ -37,14 +37,8 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
     p.id !== person.id &&
     parents.some(parent => parent.rels.children && parent.rels.children.includes(p.id))
   )
-  const formatFamilyName = (name) => {
-    if (!name) return ''
-    return name.split('-').map(part =>
-      part.charAt(0).toUpperCase() + part.slice(1)
-    ).join(' ')
-  }
 
-  const RelatedPersonsList = ({ title, people, colorScheme }) => (
+  const RelatedPersonsList = ({ title, people }) => (
     <Box>
       <Heading
         size={isMobile ? "xs" : "sm"}
@@ -110,20 +104,17 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
                   />
                   <VStack align="start" spacing={1} flex={1}>
                     <Text fontSize="sm" fontWeight="bold" color={italianGreen} fontFamily="serif">
-                      {relatedPerson.data.firstName} {relatedPerson.data.lastName}
+                      {relatedPerson.data.firstName} {relatedPerson.data.lastName} {relatedPerson.data.death ? "✞" : ""}
                     </Text>
-                    <Text fontSize="xs" color="gray.600">
-                      Born {relatedPerson.data.birthday}
-                    </Text>
-                    <Badge
-                      size="xs"
-                      colorScheme={relatedPerson.data.death ? 'gray' : 'green'}
-                      bg={relatedPerson.data.death ? 'gray.100' : 'green.50'}
-                      color={relatedPerson.data.death ? 'gray.600' : 'green.700'}
-                      border={`1px solid ${relatedPerson.data.death ? '#e2e8f0' : '#9ae6b4'}`}
-                    >
-                      {relatedPerson.data.death ? `Died ${relatedPerson.data.death}` : 'Living'}
-                    </Badge>
+                    {relatedPerson.data.death ? (
+                      <Text fontSize="xs" color="gray.600">
+                        {relatedPerson.data.birthday} - {relatedPerson.data.death}
+                      </Text>
+                    ) : (
+                      <Text fontSize="xs" color="gray.600">
+                        Born {relatedPerson.data.birthday}
+                      </Text>
+                    )}
                   </VStack>
                 </HStack>
               </CardBody>
@@ -160,7 +151,7 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
       <VStack spacing={isMobile ? 4 : 6} align="stretch" position="relative" zIndex={2}>
         {/* Header with person details */}
         <Box>
-          <Flex direction={{ base: 'column', sm: 'row' }} align={{ base: 'center', sm: 'start' }} gap={4}>
+          <Flex direction={{ base: 'column', sm: 'row' }} align={{ base: 'center', sm: 'center' }} gap={4}>
             <Avatar
               size={isMobile ? "xl" : "lg"}
               src={person.data.image}
@@ -169,50 +160,17 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
               ringColor={italianGold}
               bg="linear-gradient(135deg, #2d5a27, #1e3a1a)"
             />
-            <VStack align={{ base: 'center', sm: 'start' }} spacing={2} flex={1}>
-              <VStack align={{ base: 'center', sm: 'start' }} spacing={1}>
-                <HStack spacing={2} flexWrap="wrap" justify={{ base: 'center', sm: 'start' }}>
-                  <Heading
-                    size={isMobile ? "md" : "lg"}
-                    textAlign={{ base: 'center', sm: 'left' }}
-                    color={italianGreen}
-                    fontFamily="serif"
-                    textShadow="1px 1px 2px rgba(0,0,0,0.1)"
-                  >
-                    {person.data.firstName} {person.data.lastName}
-                  </Heading>
-                  {person.generation === 0 && (
-                    <Icon as={StarIcon} color="#d4af37" boxSize={5} />
-                  )}
-                </HStack>
-                <HStack spacing={2} flexWrap="wrap" justify={{ base: 'center', sm: 'start' }}>
-                  {/* <Badge
-                    bg="linear-gradient(135deg, #e3f2fd, #f3e5f5)"
-                    color={italianGreen}
-                    fontSize="xs"
-                    border={`1px solid ${italianGold}`}
-                  >
-                    {formatFamilyName(person.data.family)} Family
-                  </Badge> */}
-                  <Badge
-                    bg="linear-gradient(135deg, #f3e5f5, #e8f5e8)"
-                    color="purple.700"
-                    fontSize="xs"
-                    border="1px solid #ce93d8"
-                  >
-                    Generation {person.data.generation}
-                  </Badge>
-                  <Badge
-                    bg={isLiving ? 'linear-gradient(135deg, #e8f5e8, #c8e6c9)' : 'linear-gradient(135deg, #f5f5f5, #e0e0e0)'}
-                    color={isLiving ? 'green.700' : 'gray.600'}
-                    fontSize="xs"
-                    border={`1px solid ${isLiving ? '#81c784' : '#bdbdbd'}`}
-                  >
-                    {isLiving ? `Age ${age}` : `Died at ${age}`}
-                  </Badge>
-                </HStack>
-              </VStack>
-            </VStack>
+
+            <Heading
+              size={isMobile ? "md" : "lg"}
+              textAlign={{ base: 'center', sm: 'left' }}
+              color={italianGreen}
+              fontFamily="serif"
+              textShadow="1px 1px 2px rgba(0,0,0,0.1)"
+            >
+              {person.data.firstName} {person.data.lastName}
+            </Heading>
+
           </Flex>
         </Box>
 
@@ -236,39 +194,66 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
               />
               Basic Information
             </Heading>
-            <Grid templateColumns={isMobile ? "1fr" : "repeat(2, 1fr)"} gap={4}>
+
+            <Grid
+              templateColumns={isMobile ? "1fr" : "repeat(2, 1fr)"}
+              gap={4}
+              p={3}
+              bg={useColorModeValue('white', 'gray.800')}
+              borderRadius="md"
+              boxShadow="sm"
+              border="1px solid"
+              borderColor={useColorModeValue('gray.200', 'gray.700')}
+            >
               <GridItem>
-                <HStack spacing={2}>
-                  <CalendarIcon color={italianGold} />
-                  <Text fontWeight="bold" fontSize={isMobile ? "sm" : "md"} color={italianGreen}>Birth:</Text>
-                  <Text fontSize={isMobile ? "sm" : "md"}>{person.data.birthday}</Text>
-                </HStack>
+                <Flex align="center" gap={3}>
+                  <Icon as={CalendarIcon} color={italianGreen} boxSize={5} />
+                  <VStack align="start" spacing={0}>
+                    <Text fontSize="xs" color="gray.500">Birth Year</Text>
+                    <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">{person.data.birthday}</Text>
+                  </VStack>
+                </Flex>
               </GridItem>
+
               {person.data.death && (
                 <GridItem>
-                  <HStack spacing={2}>
-                    <CalendarIcon color={italianGold} />
-                    <Text fontWeight="bold" fontSize={isMobile ? "sm" : "md"} color={italianGreen}>Death:</Text>
-                    <Text fontSize={isMobile ? "sm" : "md"}>{person.data.death}</Text>
-                  </HStack>
+                  <Flex align="center" gap={3}>
+                    <Text fontSize="xl">🕊️</Text>
+                    <VStack align="start" spacing={0}>
+                      <Text fontSize="xs" color="gray.500">Death Year</Text>
+                      <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">{person.data.death}</Text>
+                    </VStack>
+                  </Flex>
                 </GridItem>
               )}
+
               <GridItem>
-                <HStack spacing={2}>
-                  <Text fontWeight="bold" fontSize={isMobile ? "sm" : "md"} color={italianGreen}>Age:</Text>
-                  <Text fontSize={isMobile ? "sm" : "md"}>{age} years old</Text>
-                </HStack>
+                <Flex align="center" gap={3}>
+                  <Box p={1} borderRadius="full" bg={`rgba(${isLiving ? '45, 90, 39, 0.1' : '200, 168, 130, 0.1'})`}>
+                    <Text fontSize="sm">{isLiving ? '👤' : '⌛'}</Text>
+                  </Box>
+                  <VStack align="start" spacing={0}>
+                    <Text fontSize="xs" color="gray.500">Age</Text>
+                    <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">{age} years{isLiving ? '' : ' (deceased)'}</Text>
+                  </VStack>
+                </Flex>
               </GridItem>
-              <GridItem>
-                <HStack spacing={2}>
-                  <Text fontWeight="bold" fontSize={isMobile ? "sm" : "md"} color={italianGreen}>Generation:</Text>
-                  <Text fontSize={isMobile ? "sm" : "md"}>{person.data.generation}</Text>
-                </HStack>
-              </GridItem>
+
+              {person.data.occupation && (
+                <GridItem>
+                  <Flex align="center" gap={3}>
+                    <Box p={1} borderRadius="full" bg="rgba(200, 168, 130, 0.1)">
+                      <Text fontSize="sm">💼</Text>
+                    </Box>
+                    <VStack align="start" spacing={0}>
+                      <Text fontSize="xs" color="gray.500">Occupation</Text>
+                      <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">{person.data.occupation}</Text>
+                    </VStack>
+                  </Flex>
+                </GridItem>
+              )}
             </Grid>
           </Box>
-
-          {/* Decorative separator */}
           <Box
             h="1px"
             bg={`linear-gradient(90deg, transparent 0%, ${italianGold} 20%, #d4af37 50%, ${italianGold} 80%, transparent 100%)`}

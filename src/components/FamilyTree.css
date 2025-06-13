@@ -649,6 +649,11 @@
     min-width: 150px !important;
   }
   
+  .italian-family-tree {
+    /* min-height: 300px !important; */
+    height: 400px!important;
+  }
+  
   .italian-card {
     padding: 6px !important;
   }

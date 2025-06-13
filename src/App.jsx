@@ -30,28 +30,71 @@ import { InfoIcon, ChevronLeftIcon, ViewIcon } from '@chakra-ui/icons'
 import { useState, useEffect } from 'react'
 import { data } from './assets/data'
 
+// Custom hook for responsive design that updates in real-time
+const useResponsive = () => {
+  const [screenSize, setScreenSize] = useState({
+    isMobile: false,
+    isTablet: false,
+    isDesktop: false
+  })
+
+  useEffect(() => {
+    const updateScreenSize = () => {
+      const width = window.innerWidth
+      setScreenSize({
+        isMobile: width < 768,
+        isTablet: width >= 768 && width < 1024,
+        isDesktop: width >= 1024
+      })
+    }
+
+    // Set initial size
+    updateScreenSize()
+
+    // Add event listener for resize
+    window.addEventListener('resize', updateScreenSize)
+
+    // Cleanup
+    return () => window.removeEventListener('resize', updateScreenSize)
+  }, [])
+
+  return screenSize
+}
+
 export default function App() {
   const [selectedPerson, setSelectedPerson] = useState(null)
   const [familyData, setFamilyData] = useState([])
   const { isOpen: isStatsModalOpen, onOpen: onStatsModalOpen, onClose: onStatsModalClose } = useDisclosure()
   const { isOpen: isPersonDrawerOpen, onOpen: onPersonDrawerOpen, onClose: onPersonDrawerClose } = useDisclosure()
 
-  const isMobile = useBreakpointValue({ base: true, md: false })
-  const isTablet = useBreakpointValue({ base: false, md: true, lg: false })
+  // Use custom responsive hook instead of Chakra's useBreakpointValue
+  const { isMobile, isTablet, isDesktop } = useResponsive()
   
   const headerBg = useColorModeValue('white', 'gray.800')
   const bgColor = useColorModeValue('gray.50', 'gray.900')
   const cardBg = useColorModeValue('white', 'gray.800')
 
+  // Helper function to format names
+  const formatFamilyName = (name) => {
+    if (!name) return ''
+    return name.split('-').map(part =>
+      part.charAt(0).toUpperCase() + part.slice(1)
+    ).join(' ')
+  }
+
   useEffect(() => {
     setFamilyData(data())
   }, [])
 
+  // Close drawer when screen becomes desktop
+  useEffect(() => {
+    if (isDesktop && isPersonDrawerOpen) {
+      onPersonDrawerClose()
+    }
+  }, [isDesktop, isPersonDrawerOpen, onPersonDrawerClose])
   const handlePersonClick = (person) => {
     setSelectedPerson(person)
-    if (isMobile) {
-      onPersonDrawerOpen()
-    }
+    // Don't automatically open drawer on mobile anymore
   }
 
   // Calculate quick stats
@@ -102,20 +145,6 @@ export default function App() {
               </HStack>
 
               <HStack spacing={2}>
-                {selectedPerson && isMobile && (
-                  <IconButton
-                    icon={<ViewIcon />}
-                    onClick={onPersonDrawerOpen}
-                    colorScheme="green"
-                    variant="solid"
-                    size="sm"
-                    aria-label="View person details"
-                    bg="rgba(255,255,255,0.15)"
-                    color="white"
-                    _hover={{ bg: "rgba(255,255,255,0.25)" }}
-                    backdropFilter="blur(10px)"
-                  />
-                )}
                 <IconButton
                   icon={<InfoIcon />}
                   onClick={onStatsModalOpen}
@@ -203,9 +232,9 @@ export default function App() {
             </Box>
           </VStack>
         </Container>
-      </Box>      {/* Main Content */}
+      </Box>        {/* Main Content */}
       <Container maxW="full" px={0}>
-        <Flex direction={{ base: 'column', lg: 'row' }} minH="calc(100vh - 200px)">
+        <Flex direction={{ base: 'column', lg: 'row' }} minH={{ base: "calc(100vh - 150px)", lg: "calc(100vh - 200px)" }}>
           {/* Family Tree Section */}
           <Box
             flex="1"
@@ -230,7 +259,8 @@ export default function App() {
                     >
                       <Text fontSize="2xl">🌳</Text>
                     </Box>
-                    <VStack align="start" spacing={1}>                      <Heading 
+                    <VStack align="start" spacing={1}>                      
+                      <Heading 
                         size={{ base: 'md', md: 'lg' }} 
                         color="gray.800"
                         fontFamily="serif"
@@ -256,22 +286,42 @@ export default function App() {
                     h="1px"
                     bg="linear-gradient(90deg, transparent 0%, #c8a882 20%, #d4af37 50%, #c8a882 80%, transparent 100%)"
                     borderRadius="full"
-                  />
-                </VStack>
+                  />                
+                  </VStack>
               </Box>
               
               <Flex flexDirection={{ base: 'column', lg: 'row' }} gap={6} alignItems="stretch">
-                <Box 
-                  flex={1} 
-                  overflow="auto" 
-                  maxHeight="calc(100vh - 350px)" 
-                  borderRadius="xl" 
-                  boxShadow="0 8px 32px rgba(0,0,0,0.1)"
-                  border="2px solid #e0e0e0"
-                  bg="white"
-                >
+                <VStack spacing={4} alignItems="stretch" flex={1}>
                   <FamilyTree onPersonClick={handlePersonClick} familyData={familyData} />
-                </Box>
+                  {/* Mobile "See more" button */}
+                  {isMobile && selectedPerson && (
+                    <Box w="full" px={2}>
+                      <Button
+                        onClick={onPersonDrawerOpen}
+                        size="lg"
+                        w="full"
+                        bg="linear-gradient(135deg, #2d5a27 0%, #1e3a1a 100%)"
+                        color="white"
+                        _hover={{ 
+                          bg: "linear-gradient(135deg, #1e3a1a 0%, #0f2e0d 100%)",
+                          transform: "translateY(-1px)",
+                          boxShadow: "0 6px 20px rgba(45, 90, 39, 0.4)"
+                        }}
+                        _active={{ transform: "translateY(0)" }}
+                        boxShadow="0 4px 12px rgba(45, 90, 39, 0.3)"
+                        borderRadius="xl"
+                        leftIcon={<ViewIcon />}
+                        transition="all 0.2s"
+                        fontWeight="bold"
+                        border="1px solid rgba(255,255,255,0.1)"
+                      >
+                        <VStack spacing={0}>
+                          <Text fontSize="sm">See Details on {selectedPerson.data.firstName} {selectedPerson.data.lastName}</Text>
+                        </VStack>
+                      </Button>
+                    </Box>
+                  )}
+                </VStack>
                 
                 {/* Desktop Person Info */}
                 {!isMobile && (
@@ -298,6 +348,7 @@ export default function App() {
                     <Box 
                       w={{ lg: '420px' }} 
                       p={8} 
+                      h="calc(100vh - 350px)"
                       bg="linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)"
                       borderRadius="xl" 
                       boxShadow="0 8px 32px rgba(0,0,0,0.08)"
@@ -307,7 +358,8 @@ export default function App() {
                       border="2px dashed #d0d0d0"
                     >
                       <VStack spacing={3} textAlign="center">
-                        <Box fontSize="4xl" opacity={0.6}>👤</Box>                      <Text fontSize="md" color="gray.600" fontWeight="medium">
+                        <Box fontSize="4xl" opacity={0.6}>👤</Box>                      
+                        <Text fontSize="md" color="gray.600" fontWeight="medium">
                         Select a member
                       </Text>
                       <Text fontSize="sm" color="gray.500">
@@ -321,7 +373,8 @@ export default function App() {
             </VStack>
           </Box>
         </Flex>
-      </Container>      {/* Mobile Person Details Drawer */}
+      </Container>      
+      {/* Mobile Person Details Drawer */}
       <Drawer isOpen={isPersonDrawerOpen} placement="bottom" onClose={onPersonDrawerClose} size="full">
         <DrawerOverlay />
         <DrawerContent borderTopRadius="xl" maxH="90vh" bg="linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)">

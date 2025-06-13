@@ -62,16 +62,13 @@ export default function FamilyTree({ onPersonClick, familyData }) {
     create(familyData);
 
   }, [familyData, isMobile, isTablet]);
-
-  const chartHeight = isMobile ? '600px' : isTablet ? '750px' : '900px'
-
   return (
     <div 
       id="FamilyChart" 
       className="f3 italian-family-tree" 
       style={{ 
         width: '100%', 
-        height: chartHeight, 
+        height: '100%',
         margin: 'auto', 
         background: 'linear-gradient(135deg, #2d5a27 0%, #1e3a1a 100%)',
         color: '#fff',
