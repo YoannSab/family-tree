@@ -1,91 +1,86 @@
-import { useEffect, useRef, useState } from 'react'
-import { data } from '../assets/data'
+import { useEffect, useRef} from 'react'
+import { useBreakpointValue } from '@chakra-ui/react'
 import './FamilyTree.css';
 import f3 from 'family-chart';
 
-export default function FamilyTree() {
-  const cont = useRef(null);
-  const [isMobile, setIsMobile] = useState(false);
 
-  // Check if device is mobile
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkIsMobile();
-    window.addEventListener('resize', checkIsMobile);
-    
-    return () => window.removeEventListener('resize', checkIsMobile);
-  }, []);
+export default function FamilyTree({ onPersonClick, familyData }) {
+  const chartRef = useRef(null)
+  const isMobile = useBreakpointValue({ base: true, md: false })
+  const isTablet = useBreakpointValue({ base: false, md: true, lg: false })
 
   useEffect(() => {
-    if (!cont.current) return;
-      // Responsive configuration based on screen size
-    const getConfig = () => {
-      if (isMobile) {
-        return {
-          node_separation: 120,
-          level_separation: 80,
-          card_dim: { w: 140, h: 50, text_x: 45, text_y: 10, img_w: 35, img_h: 35, img_x: 5, img_y: 7 }
-        };
-      } else if (window.innerWidth < 1024) {
-        return {
-          node_separation: 150,
-          level_separation: 100,
-          card_dim: { w: 160, h: 55, text_x: 55, text_y: 12, img_w: 40, img_h: 40, img_x: 5, img_y: 7 }
-        };
-      } else {
-        return {
-          node_separation: 180,
-          level_separation: 120,
-          card_dim: { w: 180, h: 60, text_x: 65, text_y: 13, img_w: 45, img_h: 45, img_x: 5, img_y: 7 }
-        };
-      }
-    };
-
-    const config = getConfig();
-    
-    const store = f3.createStore({
-      data: data(),
-      node_separation: config.node_separation,
-      level_separation: config.level_separation
-    });
-
-    const svg = f3.createSvg(document.querySelector("#FamilyChart"));
-    
-    const Card = f3.elements.Card({
-      store,
-      svg,
-      card_dim: config.card_dim,
-      card_display: [
-        i => `${i.data["first name"] || ""} ${i.data["last name"] || ""}`,
-        i => `${i.data.birthday || ""}`
-      ],
-      mini_tree: true,
-      link_break: false
-    });
-
-    store.setOnUpdate(props => f3.view(store.getTree(), svg, Card, props || {}));
-    store.updateTree({ initial: true });
-
-    // Handle touch events for mobile
-    if (isMobile) {
-      const familyChart = document.querySelector("#FamilyChart");
-      if (familyChart) {
-        familyChart.style.touchAction = 'pan-x pan-y';
-      }
+    if (!familyData || familyData.length === 0) {
+      return;
     }
-
-    // Cleanup function
-    return () => {
-      // Clear the chart content
-      const chartElement = document.querySelector("#FamilyChart");
-      if (chartElement) {
-        chartElement.innerHTML = '';
+    
+    function create(data) {
+      // Clear previous chart
+      const container = document.getElementById('FamilyChart')
+      if (container) {
+        container.innerHTML = ''
       }
-    };
-  }, [isMobile]); // Re-run when mobile state changes
 
-  return <div className="f3" id="FamilyChart" ref={cont}></div>;
+      // Responsive spacing based on device
+      const cardXSpacing = isMobile ? 180 : isTablet ? 220 : 250
+      const cardYSpacing = isMobile ? 120 : isTablet ? 140 : 150
+
+      const f3Chart = f3.createChart('#FamilyChart', data)
+        .setTransitionTime(500)
+        .setCardXSpacing(cardXSpacing)
+        .setCardYSpacing(cardYSpacing)
+
+      const f3Card = f3Chart.setCard(f3.CardHtml)
+        .setCardInnerHtmlCreator(d => {
+          const fontSize = isMobile ? '12px' : '14px'
+          const cardWidth = isMobile ? '140px' : '180px'
+          
+          return `<div class="card-inner italian-card" style="width: ${cardWidth}; font-size: ${fontSize}; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border: 2px solid #c8a882; border-radius: 8px; padding: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+            <div class="card-name" style="font-weight: bold; margin-bottom: 4px; font-size: ${isMobile ? '13px' : '15px'}; color: #2d5a27; text-align: center;">
+              ${d.data.data.firstName} ${d.data.data.lastName}
+            </div>
+            <div class="card-birthday" style="font-size: ${isMobile ? '10px' : '12px'}; color: #666; margin-bottom: 2px; text-align: center;">
+              ${d.data.data.birthday ? d.data.data.birthday : ''}${d.data.data.death ? ' - ' + d.data.data.death : ''}
+            </div>
+            <div class="card-occupation" style="font-size: ${isMobile ? '10px' : '11px'}; color: #888; font-style: italic; text-align: center;">
+              ${d.data.data.occupation ? d.data.data.occupation : ''}
+            </div>
+          </div>`;
+        })
+
+      f3Card.setOnCardClick((e, d) => {
+        if (onPersonClick) {
+          onPersonClick(d.data);
+        }
+        f3Card.onCardClickDefault(e, d);
+      });
+      
+      f3Chart.updateTree({ initial: true })
+      chartRef.current = f3Chart
+    }
+    
+    create(familyData);
+
+  }, [familyData, isMobile, isTablet]);
+
+  const chartHeight = isMobile ? '600px' : isTablet ? '750px' : '900px'
+
+  return (
+    <div 
+      id="FamilyChart" 
+      className="f3 italian-family-tree" 
+      style={{ 
+        width: '100%', 
+        height: chartHeight, 
+        margin: 'auto', 
+        background: 'linear-gradient(135deg, #2d5a27 0%, #1e3a1a 100%)',
+        color: '#fff',
+        overflow: 'auto',
+        borderRadius: '12px',
+        position: 'relative',
+        border: '3px solid #c8a882',
+        boxShadow: '0 8px 32px rgba(45, 90, 39, 0.3)'
+      }}
+    />
+  );
 }
