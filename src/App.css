@@ -128,13 +128,6 @@ html, body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Better focus states for accessibility */
-button:focus,
-.chakra-button:focus {
-  outline: 2px solid #3182ce;
-  outline-offset: 2px;
-}
-
 /* Loading states and transitions */
 .family-tree-loading {
   display: flex;

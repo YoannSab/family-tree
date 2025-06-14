@@ -72,6 +72,7 @@ const LanguageSwitcher = ({ size = 'sm', variant = 'solid' }) => {
             mx={1}
             fontWeight={i18n.language === language.code ? 'bold' : 'normal'}
             color={i18n.language === language.code ? '#2d5a27' : 'inherit'}
+            _hover={{ bg: 'rgba(45,90,39,0.1)' }}
           >
             <HStack spacing={3} w="full">
               <Box fontSize="lg">{language.flag}</Box>

@@ -109,5 +109,9 @@
   "clickStartCamera": "Clicca \"Avvia Fotocamera\" per iniziare il riconoscimento facciale",
   "faceReferencesLoaded": "riferimenti facciali caricati",  "capturedImage": "Immagine Catturata",
   "years": "anni",
-  "clickToViewDetails": "Clicca per vedere dettagli"
+  "clickToViewDetails": "Clicca per vedere dettagli",
+  "selectCamera": "Seleziona Fotocamera",
+  "camera": "Fotocamera",
+  "switchToBack": "Fotocamera Posteriore",
+  "switchToFront": "Fotocamera Anteriore"
 }

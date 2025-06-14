@@ -109,5 +109,9 @@
   "clickStartCamera": "Click \"Start Camera\" to begin face recognition",
   "faceReferencesLoaded": "face references loaded",  "capturedImage": "Captured Image",
   "years": "years",
-  "clickToViewDetails": "Click to view details"
+  "clickToViewDetails": "Click to view details",
+  "selectCamera": "Select Camera",
+  "camera": "Camera",
+  "switchToBack": "Back Camera",
+  "switchToFront": "Front Camera"
 }
