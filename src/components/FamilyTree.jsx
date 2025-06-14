@@ -33,23 +33,33 @@ export default function FamilyTree({ onPersonClick, familyData }) {
       const f3Card = f3Chart.setCard(f3.CardHtml)        
       .setCardInnerHtmlCreator(d => {
           const fontSize = isMobile ? '12px' : '14px'
-          const cardWidth = isMobile ? '140px' : '180px'
+          const cardWidth = isMobile ? '160px' : '200px' // Made cards slightly wider to accommodate image
           const isReliable = d.data.data.reliable
           const reliabilityIndicator = isReliable === false ? 
-            `<div style="position: absolute; top: 4px; right: 4px; width: 12px; height: 12px; background: #f56565; border-radius: 50%; border: 1px solid white;" title="Unreliable information"></div>` : 
-            `<div style="position: absolute; top: 4px; right: 4px; width: 12px; height: 12px; background: #48bb78; border-radius: 50%; border: 1px solid white;" title="Reliable information"></div>`
+        `<div style="position: absolute; top: 4px; right: 4px; width: 12px; height: 12px; background: #f56565; border-radius: 50%; border: 1px solid white;" title="Unreliable information"></div>` : 
+        `<div style="position: absolute; top: 4px; right: 4px; width: 12px; height: 12px; background: #48bb78; border-radius: 50%; border: 1px solid white;" title="Reliable information"></div>`
+          
+          const avatarSize = '60px'
+            const avatarImg = `<img src="/images/${d.data.data.image}.JPG" onerror="this.onerror=null; this.src='/images/default.png';" style="width: ${avatarSize}; height: ${avatarSize}; object-fit: cover; border-radius: 50%; border: 1px solid #c8a882;">`
 
           return `<div class="card-inner italian-card" style="position: relative; width: ${cardWidth}; font-size: ${fontSize}; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border: 2px solid #c8a882; border-radius: 8px; padding: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-            ${reliabilityIndicator}
+        ${reliabilityIndicator}
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="avatar" style="flex-shrink: 0;">
+            ${avatarImg}
+          </div>
+          <div style="flex-grow: 1;">
             <div class="card-name" style="font-weight: bold; margin-bottom: 4px; font-size: ${isMobile ? '13px' : '15px'}; color: #2d5a27; text-align: center;">
-              ${d.data.data.firstName} ${d.data.data.lastName}
+          ${d.data.data.firstName} ${d.data.data.lastName}
             </div>
             <div class="card-birthday" style="font-size: ${isMobile ? '10px' : '12px'}; color: #666; margin-bottom: 2px; text-align: center;">
-              ${d.data.data.birthday ? d.data.data.birthday : ''}${d.data.data.death ? ' - ' + d.data.data.death : ''}
+          ${d.data.data.birthday ? d.data.data.birthday : ''}${d.data.data.death ? ' - ' + d.data.data.death : ''}
             </div>
             <div class="card-occupation" style="font-size: ${isMobile ? '10px' : '11px'}; color: #888; font-style: italic; text-align: center;">
-              ${d.data.data.occupation ? d.data.data.occupation : ''}
+          ${d.data.data.occupation ? d.data.data.occupation : ''}
             </div>
+          </div>
+        </div>
           </div>`;
         })
 

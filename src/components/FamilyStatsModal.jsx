@@ -23,8 +23,10 @@ import {
   Flex,
   useBreakpointValue,
 } from '@chakra-ui/react'
+import { useTranslation } from 'react-i18next'
 
 const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
+  const { t } = useTranslation()
   const cardBg = useColorModeValue('linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)', 'gray.700')
   const italianGold = '#c8a882'
   const italianGreen = '#2d5a27'
@@ -63,22 +65,22 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
       return sum + age
     }, 0)
     families[familyName].avgAge = Math.round(totalAge / familyMembers.length)
+  })  // Enhanced age distribution with more granular ranges
+  const ageRanges = {}
+  const ageRangeKeys = ['children', 'youngAdults', 'adults', 'seniors', 'elders']
+  
+  // Initialize age ranges with translated keys
+  ageRangeKeys.forEach(key => {
+    ageRanges[key] = 0
   })
-  // Enhanced age distribution with more granular ranges
-  const ageRanges = {
-    'Children (0-17)': 0,
-    'Young Adults (18-35)': 0,
-    'Adults (36-55)': 0,
-    'Seniors (56-75)': 0,
-    'Elders (76+)': 0
-  }
+  
   familyData.forEach(person => {
     const age = person.data.death ? person.data.death - person.data.birthday : new Date().getFullYear() - person.data.birthday
-    if (age <= 17) ageRanges['Children (0-17)']++
-    else if (age <= 35) ageRanges['Young Adults (18-35)']++
-    else if (age <= 55) ageRanges['Adults (36-55)']++
-    else if (age <= 75) ageRanges['Seniors (56-75)']++
-    else ageRanges['Elders (76+)']++
+    if (age <= 17) ageRanges['children']++
+    else if (age <= 35) ageRanges['youngAdults']++
+    else if (age <= 55) ageRanges['adults']++
+    else if (age <= 75) ageRanges['seniors']++
+    else ageRanges['elders']++
   })
   // Birth decades (handling NaN values)
   const birthDecades = {}
@@ -163,16 +165,15 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
         <ModalHeader pt={6} px={{ base: 4, md: 6 }}>
           <HStack spacing={3} mb={2}>
             <Box fontSize={{ base: 'xl', md: '2xl' }}>📊</Box>
-            <VStack align="start" spacing={0}>
-              <Heading 
+            <VStack align="start" spacing={0}>              <Heading 
                 size={headerSize}
                 color={italianGreen}
                 fontFamily="serif"
                 textShadow="1px 1px 2px rgba(0,0,0,0.1)"              >
-                Family Statistics
+                {t('familyStatistics')}
               </Heading>
               <Text fontSize={fontSize} color="gray.600" fontStyle="italic">
-                Explore the rich history and statistics of your family tree
+                {t('overview')}
               </Text>
             </VStack>
           </HStack>
@@ -209,21 +210,21 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
                   h={5}
                   bg={`linear-gradient(to bottom, ${italianGold}, #d4af37)`}
                   borderRadius="full"                />
-                Age Distribution
+                {t('demographics')}
               </Heading>
               <Card 
                 bg={cardBg}
                 border={`1px solid ${italianGold}`}
                 borderRadius="lg"
               >
-                <CardBody>
-                  <VStack spacing={4} align="stretch">
-                    {Object.entries(ageRanges).map(([range, count]) => {
+                <CardBody>                  <VStack spacing={4} align="stretch">
+                    {Object.entries(ageRanges).map(([rangeKey, count]) => {
                       const percentage = ((count / totalMembers) * 100).toFixed(1)
-                      const [ageGroup, ages] = range.split(' ')
+                      const ageGroup = t(`ageRanges.${rangeKey}`)
+                      const ages = t(`ageRangeLabels.${rangeKey}`)
                       
                       return (
-                        <Box key={range}>
+                        <Box key={rangeKey}>
                           <Flex justify="space-between" align="center" mb={2}>
                             <VStack align="start" spacing={0}>
                               <Text fontSize={fontSize} fontWeight="bold" color={italianGreen}>
@@ -237,7 +238,7 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
                                 border={`1px solid ${italianGold}`}
                                 fontSize="xs"
                               >
-                                {count} people
+                                {count} {count === 1 ? t('person') : t('people')}
                               </Badge>
                               <Text fontSize="sm" fontWeight="bold" color="gray.600">
                                 {percentage}%
@@ -280,7 +281,7 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
                   h={5}
                   bg={`linear-gradient(to bottom, ${italianGold}, #d4af37)`}
                   borderRadius="full"                />
-                Family Statistics
+                {t('familyStatistics')}
               </Heading>
               <SimpleGrid columns={cardGridColumns} spacing={6}>
                 <Card 
@@ -290,33 +291,30 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
                 >
                   <CardBody>
                     <VStack spacing={4} align="stretch">                      <Stat textAlign="center">
-                        <StatLabel fontSize={fontSize}>Average age at 1st child</StatLabel>
+                        <StatLabel fontSize={fontSize}>{t('averageAgeAtFirstChild')}</StatLabel>
                         <StatNumber fontSize={{ base: '2xl', md: '3xl' }} color={italianGreen}>
                           {avgAgeAtFirstChild > 0 ? `${avgAgeAtFirstChild} years` : 'N/A'}
-                        </StatNumber>
-                        <StatHelpText fontSize="xs">
-                          {validParents > 0 ? `Based on ${validParents} parents` : 'Insufficient data'}
+                        </StatNumber>                        <StatHelpText fontSize="xs">
+                          {validParents > 0 ? t('basedOnParents', { count: validParents }) : t('insufficientData')}
                         </StatHelpText>
                       </Stat>
-                        <Box>
-                        <Text fontSize="sm" fontWeight="bold" mb={2} color={italianGreen}>
-                          Family structure
+                        <Box>                        <Text fontSize="sm" fontWeight="bold" mb={2} color={italianGreen}>
+                          {t('familyStructure')}
                         </Text>
-                        <VStack spacing={2}>
-                          <HStack justify="space-between" w="full">
-                            <Text fontSize="sm">Total members</Text>
+                        <VStack spacing={2}>                          <HStack justify="space-between" w="full">
+                            <Text fontSize="sm">{t('totalMembersLabel')}</Text>
                             <Badge colorScheme="blue">{totalMembers}</Badge>
                           </HStack>
                           <HStack justify="space-between" w="full">
-                            <Text fontSize="sm">Living</Text>
+                            <Text fontSize="sm">{t('livingLabel')}</Text>
                             <Badge colorScheme="green">{livingMembers}</Badge>
                           </HStack>
                           <HStack justify="space-between" w="full">
-                            <Text fontSize="sm">Married</Text>
+                            <Text fontSize="sm">{t('marriedLabel')}</Text>
                             <Badge colorScheme="purple">{marriedMembers}</Badge>
                           </HStack>
                           <HStack justify="space-between" w="full">
-                            <Text fontSize="sm">Parents</Text>
+                            <Text fontSize="sm">{t('parentsLabel')}</Text>
                             <Badge colorScheme="orange">{parentsCount}</Badge>
                           </HStack>
                         </VStack>
@@ -332,25 +330,22 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
                 >
                   <CardBody>
                     <VStack spacing={4} align="stretch">                      <Stat textAlign="center">
-                        <StatLabel fontSize={fontSize}>Average life expectancy</StatLabel>
+                        <StatLabel fontSize={fontSize}>{t('averageLifeExpectancy')}</StatLabel>
                         <StatNumber fontSize={{ base: '2xl', md: '3xl' }} color={italianGreen}>
                           {avgLifespan > 0 ? `${avgLifespan} years` : 'N/A'}
-                        </StatNumber>
-                        <StatHelpText fontSize="xs">
-                          Record: {maxLifespan > 0 ? `${maxLifespan} years` : 'N/A'}
+                        </StatNumber>                        <StatHelpText fontSize="xs">
+                          {t('recordLabel')}: {maxLifespan > 0 ? `${maxLifespan} ${t('yearsOld')}` : 'N/A'}
                         </StatHelpText>
                       </Stat>
-                        <Box>
-                        <Text fontSize="sm" fontWeight="bold" mb={2} color={italianGreen}>
-                          Gender distribution
+                        <Box>                        <Text fontSize="sm" fontWeight="bold" mb={2} color={italianGreen}>
+                          {t('genderDistribution')}
                         </Text>
-                        <VStack spacing={2}>
-                          <HStack justify="space-between" w="full">
-                            <Text fontSize="sm">Men</Text>
+                        <VStack spacing={2}>                          <HStack justify="space-between" w="full">
+                            <Text fontSize="sm">{t('men')}</Text>
                             <Badge colorScheme="blue">{maleCount}</Badge>
                           </HStack>
                           <HStack justify="space-between" w="full">
-                            <Text fontSize="sm">Women</Text>
+                            <Text fontSize="sm">{t('women')}</Text>
                             <Badge colorScheme="pink">{femaleCount}</Badge>
                           </HStack>
                           <Progress
@@ -382,7 +377,7 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
                   h={5}
                   bg={`linear-gradient(to bottom, ${italianGold}, #d4af37)`}
                   borderRadius="full"                />
-                Birth timeline by decade
+                {t('birthTimelineByDecade')}
               </Heading>
               <Card 
                 bg={cardBg}
@@ -425,12 +420,11 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
                         })}
                     </SimpleGrid>
                   ) : (                    <Text fontSize="sm" color="gray.500" fontStyle="italic" textAlign="center">
-                      Insufficient birth data
+                      {t('insufficientBirthData')}
                     </Text>
                   )}
-                    <Box mt={6} pt={4} borderTop="1px solid" borderColor="gray.200">
-                    <Text fontSize="sm" fontWeight="bold" color={italianGreen} textAlign="center">
-                      Average children per parent: {avgChildrenPerParent}
+                    <Box mt={6} pt={4} borderTop="1px solid" borderColor="gray.200">                    <Text fontSize="sm" fontWeight="bold" color={italianGreen} textAlign="center">
+                      {t('averageChildrenPerParent')}: {avgChildrenPerParent}
                     </Text>
                   </Box>
                 </CardBody>

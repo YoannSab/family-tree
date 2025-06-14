@@ -27,3 +27,4 @@ dist-ssr
 src/assets/data.js
 test.html
 public/images/*
+public/data/*

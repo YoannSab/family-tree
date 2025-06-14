@@ -15,8 +15,10 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react'
 import { CalendarIcon, StarIcon } from '@chakra-ui/icons'
+import { useTranslation } from 'react-i18next'
 
 const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSelect }) => {
+  const { t } = useTranslation()
   const cardBg = useColorModeValue('linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)', 'gray.700')
   const italianGold = '#c8a882'
   const italianGreen = '#2d5a27'
@@ -96,8 +98,8 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
               <CardBody p={3} pt={4}>
                 <HStack spacing={3}>
                   <Avatar
-                    size="sm"
-                    src={relatedPerson.data.image}
+                    size="lg"
+                    src={`/images/${relatedPerson.data.image}.JPG`}
                     name={relatedPerson.data.firstName}
                     ring={2}
                     ringColor={italianGold}
@@ -112,17 +114,16 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
                         bg={relatedPerson.data.reliable === false ? '#f56565' : '#48bb78'}
                         borderRadius="50%"
                         border="0.5px solid white"
-                        title={relatedPerson.data.reliable === false ? 'Unreliable information' : 'Reliable information'}
+                        title={relatedPerson.data.reliable === false ? t('unreliableInformation') : t('reliableInformation')}
                         flexShrink={0}
                       />
                     </HStack>
                     {relatedPerson.data.death ? (
                       <Text fontSize="xs" color="gray.600">
                         {relatedPerson.data.birthday} - {relatedPerson.data.death}
-                      </Text>
-                    ) : (
+                      </Text>                    ) : (
                       <Text fontSize="xs" color="gray.600">
-                        Born {relatedPerson.data.birthday}
+                        {t('birthdate')} {relatedPerson.data.birthday}
                       </Text>
                     )}
                   </VStack>
@@ -131,9 +132,9 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
             </Card>
           ))}        
           </Grid>
-      ) : (
-        <Text fontSize="sm" color="gray.500" fontStyle="italic">
-          None recorded
+      ) : (        
+      <Text fontSize="sm" color="gray.500" fontStyle="italic">
+          {t('unknown')}
         </Text>
       )}
     </Box>
@@ -161,10 +162,11 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
 
       <VStack spacing={isMobile ? 4 : 6} align="stretch" position="relative" zIndex={2}>
         {/* Header with person details */}
-        <Box>            <Flex direction={{ base: 'column', sm: 'row' }} align={{ base: 'center', sm: 'center' }} gap={4}>
+        <Box>            
+          <Flex direction={{ base: 'column', sm: 'row' }} align={{ base: 'center', sm: 'center' }} gap={4}>
               <Avatar
-                size={isMobile ? "xl" : "lg"}
-                src={person.data.image}
+                size={"xl"}
+                src={`/images/${person.data.image}.JPG`}
                 name={person.data.firstName}
                 ring={3}
                 ringColor={italianGold}
@@ -191,15 +193,14 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
                     borderRadius="50%"
                     border="1px solid white"
                     boxShadow="0 1px 3px rgba(0,0,0,0.2)"
-                    title={person.data.reliable === false ? 'Unreliable information' : 'Reliable information'}
+                    title={person.data.reliable === false ? t('unreliableInformation') : t('reliableInformation')}
                     cursor="help"
                   />
                 </HStack>
                 
-                {person.data.reliable === false && (
-                  <Text fontSize="xs" color="orange.600" fontStyle="italic">
-                    ⚠️ Information to verify
-                  </Text>
+                {person.data.reliable === false && (                      <Text fontSize="xs" color="orange.600" fontStyle="italic">
+                        ⚠️ {t('informationToVerify')}
+                      </Text>
                 )}
               </VStack>
             </Flex>
@@ -207,8 +208,7 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
 
         <VStack spacing={isMobile ? 4 : 6} align="stretch">
           {/* Basic Information */}
-          <Box>
-            <Heading
+          <Box>            <Heading
               size={isMobile ? "sm" : "md"}
               mb={4}
               color={italianGreen}
@@ -223,7 +223,7 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
                 bg={`linear-gradient(to bottom, ${italianGold}, #d4af37)`}
                 borderRadius="full"
               />
-              Basic Information
+              {t('personalInfo')}
             </Heading>
 
             <Grid
@@ -238,9 +238,8 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
             >
               <GridItem>
                 <Flex align="center" gap={3}>
-                  <Icon as={CalendarIcon} color={italianGreen} boxSize={5} />
-                  <VStack align="start" spacing={0}>
-                    <Text fontSize="xs" color="gray.500">Birth Year</Text>
+                  <Icon as={CalendarIcon} color={italianGreen} boxSize={5} />                  <VStack align="start" spacing={0}>
+                    <Text fontSize="xs" color="gray.500">{t('birthdate')}</Text>
                     <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">{person.data.birthday}</Text>
                   </VStack>
                 </Flex>
@@ -249,9 +248,8 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
               {person.data.death && (
                 <GridItem>
                   <Flex align="center" gap={3}>
-                    <Text fontSize="xl">🕊️</Text>
-                    <VStack align="start" spacing={0}>
-                      <Text fontSize="xs" color="gray.500">Death Year</Text>
+                    <Text fontSize="xl">🕊️</Text>                    <VStack align="start" spacing={0}>
+                      <Text fontSize="xs" color="gray.500">{t('deathdate')}</Text>
                       <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">{person.data.death}</Text>
                     </VStack>
                   </Flex>
@@ -262,10 +260,9 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
                 <Flex align="center" gap={3}>
                   <Box p={1} borderRadius="full" bg={`rgba(${isLiving ? '45, 90, 39, 0.1' : '200, 168, 130, 0.1'})`}>
                     <Text fontSize="sm">{isLiving ? '👤' : '⌛'}</Text>
-                  </Box>
-                  <VStack align="start" spacing={0}>
-                    <Text fontSize="xs" color="gray.500">Age</Text>
-                    <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">{age} y.o.</Text>
+                  </Box>                  <VStack align="start" spacing={0}>
+                    <Text fontSize="xs" color="gray.500">{t('age')}</Text>
+                    <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">{age} {t('yearsOld')}</Text>
                   </VStack>
                 </Flex>
               </GridItem>
@@ -275,9 +272,8 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
                   <Flex align="center" gap={3}>
                     <Box p={1} borderRadius="full" bg="rgba(200, 168, 130, 0.1)">
                       <Text fontSize="sm">💼</Text>
-                    </Box>
-                    <VStack align="start" spacing={0}>
-                      <Text fontSize="xs" color="gray.500">Occupation</Text>
+                    </Box>                    <VStack align="start" spacing={0}>
+                      <Text fontSize="xs" color="gray.500">{t('occupation')}</Text>
                       <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">{person.data.occupation}</Text>
                     </VStack>
                   </Flex>
@@ -292,8 +288,7 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
           />
 
           {/* Family Relationships */}
-          <VStack spacing={isMobile ? 4 : 6} align="stretch">
-            <Heading
+          <VStack spacing={isMobile ? 4 : 6} align="stretch">            <Heading
               size={isMobile ? "sm" : "md"}
               color={italianGreen}
               fontFamily="serif"
@@ -307,12 +302,10 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
                 bg={`linear-gradient(to bottom, ${italianGold}, #d4af37)`}
                 borderRadius="full"
               />
-              Family Relationships
-            </Heading>
-
-            {parents.length > 0 && (
+              {t('familyConnections')}
+            </Heading>            {parents.length > 0 && (
               <RelatedPersonsList
-                title="Parents"
+                title={t('parents')}
                 people={parents}
                 colorScheme="purple"
               />
@@ -320,7 +313,7 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
 
             {spouses.length > 0 && (
               <RelatedPersonsList
-                title="Spouse(s)"
+                title={t('spouse')}
                 people={spouses}
                 colorScheme="pink"
               />
@@ -328,7 +321,7 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
 
             {children.length > 0 && (
               <RelatedPersonsList
-                title="Children"
+                title={t('children')}
                 people={children}
                 colorScheme="green"
               />
@@ -336,7 +329,7 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
 
             {siblings.length > 0 && (
               <RelatedPersonsList
-                title="Siblings"
+                title={t('siblings')}
                 people={siblings}
                 colorScheme="orange"
               />

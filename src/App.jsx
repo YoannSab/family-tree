@@ -2,6 +2,8 @@ import './App.css'
 import FamilyTree from './components/FamilyTree.jsx'
 import PersonInfo from './components/PersonInfo.jsx'
 import FamilyStatsModal from './components/FamilyStatsModal.jsx'
+import LanguageSwitcher from './components/LanguageSwitcher.jsx'
+import PasswordProtection from './components/PasswordProtection.jsx'
 import {
   Box,
   Flex,
@@ -30,7 +32,7 @@ import {
 } from '@chakra-ui/react'
 import { InfoIcon, ChevronLeftIcon, ViewIcon, SearchIcon } from '@chakra-ui/icons'
 import { useState, useEffect } from 'react'
-import { data } from './assets/data.js'
+import { useTranslation } from 'react-i18next'
 
 // Custom hook for responsive design that updates in real-time
 const useResponsive = () => {
@@ -64,6 +66,8 @@ const useResponsive = () => {
 }
 
 export default function App() {
+  const { t } = useTranslation()
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [selectedPerson, setSelectedPerson] = useState(null)
   const [familyData, setFamilyData] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
@@ -74,13 +78,13 @@ export default function App() {
 
   // Use custom responsive hook instead of Chakra's useBreakpointValue
   const { isMobile, isTablet, isDesktop } = useResponsive()
-
-  const headerBg = useColorModeValue('white', 'gray.800')
   const bgColor = useColorModeValue('gray.50', 'gray.900')
   const cardBg = useColorModeValue('white', 'gray.800')
 
   useEffect(() => {
-    setFamilyData(data())
+    fetch('/data/data_819811684156.json')
+      .then(response => response.json())
+      .then(data => setFamilyData(data))
   }, [])
 
   // Close drawer when screen becomes desktop
@@ -92,7 +96,6 @@ export default function App() {
 
   const handlePersonClick = (person) => {
     setSelectedPerson(person)
-    // Don't automatically open drawer on mobile anymore
   }
 
   // Search functionality
@@ -118,11 +121,20 @@ export default function App() {
     setSelectedPerson(person)
     if (isMobile) {
       onPersonDrawerOpen()
-    }
-    setSearchQuery('')
+    }    setSearchQuery('')
     setShowSearchResults(false)
     setSearchResults([])
   }
+  
+  const handleUnlock = () => {
+    setIsAuthenticated(true)
+  }
+
+  // Show password protection if not authenticated
+  if (!isAuthenticated) {
+    return <PasswordProtection onUnlock={handleUnlock} />
+  }
+  
   // Calculate quick stats
   const totalMembers = familyData.length
   const livingMembers = familyData.filter(p => !p.data.death || p.data.death === "").length
@@ -149,7 +161,7 @@ export default function App() {
               mb={3}
             >
               <HStack spacing={{ base: 3, md: 4 }}>
-                <Box fontSize={{ base: '2xl', md: '3xl' }}>🇮🇹</Box>
+                <Box fontSize={{ base: '2xl', md: '3xl' }}>🇮🇹</Box>                
                 <VStack align="start" spacing={0}>
                   <Heading
                     size={{ base: 'lg', md: 'xl' }}
@@ -158,7 +170,7 @@ export default function App() {
                     fontFamily="serif"
                     textShadow="2px 2px 4px rgba(0,0,0,0.3)"
                   >
-                    Famiglia Colanero
+                    {t('familyName')}
                   </Heading>
                   <Text
                     fontSize={{ base: 'sm', md: 'md' }}
@@ -166,12 +178,12 @@ export default function App() {
                     fontStyle="italic"
                     letterSpacing="0.5px"
                   >
-                    Dalle montagne degli Abruzzi
+                    {t('subtitle')}
                   </Text>
                 </VStack>
-              </HStack>
-
+              </HStack>              
               <HStack spacing={2}>
+                <LanguageSwitcher size="sm" />
                 <IconButton
                   icon={<InfoIcon />}
                   onClick={onStatsModalOpen}
@@ -195,7 +207,7 @@ export default function App() {
                   _hover={{ bg: "rgba(255,255,255,0.25)" }}
                   backdropFilter="blur(10px)"
                   border="1px solid rgba(255,255,255,0.2)"                >
-                  Statistics
+                  {t('statistics')}
                 </Button>
               </HStack>
             </Flex>
@@ -215,23 +227,22 @@ export default function App() {
                 direction="row"
                 justifyContent="center"
                 gap={{ base: 5, md: 10 }}
-              >
-                <HStack spacing={1} color="rgba(255,255,255,0.9)">
+              >                <HStack spacing={1} color="rgba(255,255,255,0.9)">
                   <Box fontSize="md">💚</Box>
                   <Text fontSize={{ base: 'xs', md: 'sm' }} fontWeight="bold">
-                    {livingMembers} Living
+                    {livingMembers} {t('living')}
                   </Text>
                 </HStack>
                 <HStack spacing={1} color="rgba(255,255,255,0.8)">
                   <Box fontSize="md">🕊️</Box>
                   <Text fontSize={{ base: 'xs', md: 'sm' }} fontWeight="bold">
-                    {deceasedMembers} Remembered
+                    {deceasedMembers} {t('remembered')}
                   </Text>
                 </HStack>
                 <HStack spacing={1} color="rgba(255,255,255,0.9)">
                   <Box fontSize="md">🏛️</Box>
                   <Text fontSize={{ base: 'xs', md: 'sm' }} fontWeight="bold">
-                    5 Generations
+                    5 {t('generations')}
                   </Text>
                 </HStack>
               </Flex>
@@ -266,13 +277,12 @@ export default function App() {
                     >
                       <Text fontSize="2xl">🌳</Text>
                     </Box>
-                    <VStack align="start" spacing={1}>
-                      <Heading
+                    <VStack align="start" spacing={1}>                      <Heading
                         size={{ base: 'md', md: 'lg' }}
                         color="gray.800"
                         fontFamily="serif"
                       >
-                        Interactive Family Tree
+                        {t('interactiveTree')}
                       </Heading>                      
                       <Text
                         fontSize={{ base: 'sm', md: 'md' }}
@@ -280,8 +290,8 @@ export default function App() {
                         fontStyle="italic"
                       >
                         {isMobile
-                          ? 'Touch a family member to discover their story'
-                          : 'Click on a family member to explore family connections'
+                          ? t('treeDescriptionMobile')
+                          : t('treeDescription')
                         }
                       </Text>
                     </VStack>
@@ -292,9 +302,8 @@ export default function App() {
                     <InputGroup size={isMobile ? "md" : "lg"}>
                       <InputLeftElement pointerEvents="none">
                         <SearchIcon color="gray.400" />
-                      </InputLeftElement>
-                      <Input
-                        placeholder="Search family members..."
+                      </InputLeftElement>                      <Input
+                        placeholder={t('searchPlaceholder')}
                         fontSize={isMobile ? "sm" : "md"}
                         value={searchQuery}
                         onChange={handleSearchChange}
@@ -355,11 +364,10 @@ export default function App() {
                               </HStack>
                               <Divider mt={2} />
                             </ListItem>
-                          ))}
-                          {searchResults.length === 0 && searchQuery && (
+                          ))}                          {searchResults.length === 0 && searchQuery && (
                             <ListItem p={3}>
                               <Text fontSize="sm" color="gray.500" fontStyle="italic">
-                                Aucun résultat trouvé pour "{searchQuery}"
+                                {t('noResults')} "{searchQuery}"
                               </Text>
                             </ListItem>
                           )}
@@ -404,9 +412,8 @@ export default function App() {
                         transition="all 0.2s"
                         fontWeight="bold"
                         border="1px solid rgba(255,255,255,0.1)"
-                      >
-                        <VStack spacing={0}>
-                          <Text fontSize="sm">See Details on {selectedPerson.data.firstName} {selectedPerson.data.lastName}</Text>
+                      >                        <VStack spacing={0}>
+                          <Text fontSize="sm">{t('seeDetailsOn')} {selectedPerson.data.firstName} {selectedPerson.data.lastName}</Text>
                         </VStack>
                       </Button>
                     </Box>
@@ -446,14 +453,13 @@ export default function App() {
                       alignItems="center"
                       justifyContent="center"
                       border="2px dashed #d0d0d0"
-                    >
-                      <VStack spacing={3} textAlign="center">
+                    >                      <VStack spacing={3} textAlign="center">
                         <Box fontSize="4xl" opacity={0.6}>👤</Box>
                         <Text fontSize="md" color="gray.600" fontWeight="medium">
-                          Select a member
+                          {t('selectMember')}
                         </Text>
                         <Text fontSize="sm" color="gray.500">
-                          to view family details
+                          {t('viewDetails')}
                         </Text>
                       </VStack>
                     </Box>
@@ -478,10 +484,11 @@ export default function App() {
                 aria-label="Close"
                 color="gray.600"
                 _hover={{ bg: "gray.200" }}
-              />              <HStack spacing={2}>
+              />              
+              <HStack spacing={2}>
                 <Box fontSize="lg">👤</Box>
                 <Text fontSize="lg" fontWeight="bold" color="gray.800">
-                  Member Details
+                  {t('memberDetails')}
                 </Text>
               </HStack>
               <Spacer />
