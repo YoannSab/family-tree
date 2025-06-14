@@ -28,3 +28,6 @@ src/assets/data.js
 test.html
 public/images/*
 public/data/*
+public/models/*
+
+.firebase/*

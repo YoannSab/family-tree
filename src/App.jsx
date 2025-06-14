@@ -2,6 +2,7 @@ import './App.css'
 import FamilyTree from './components/FamilyTree.jsx'
 import PersonInfo from './components/PersonInfo.jsx'
 import FamilyStatsModal from './components/FamilyStatsModal.jsx'
+import FaceRecognition from './components/FaceRecognition.jsx'
 import LanguageSwitcher from './components/LanguageSwitcher.jsx'
 import PasswordProtection from './components/PasswordProtection.jsx'
 import {
@@ -28,9 +29,12 @@ import {
   List,
   ListItem,
   Collapse,
-  Divider
+  Divider,
+  InputRightElement,
+  transform
 } from '@chakra-ui/react'
 import { InfoIcon, ChevronLeftIcon, ViewIcon, SearchIcon } from '@chakra-ui/icons'
+import { FiCamera } from 'react-icons/fi'
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -75,6 +79,7 @@ export default function App() {
   const [showSearchResults, setShowSearchResults] = useState(false)
   const { isOpen: isStatsModalOpen, onOpen: onStatsModalOpen, onClose: onStatsModalClose } = useDisclosure()
   const { isOpen: isPersonDrawerOpen, onOpen: onPersonDrawerOpen, onClose: onPersonDrawerClose } = useDisclosure()
+  const { isOpen: isFaceRecognitionOpen, onOpen: onFaceRecognitionOpen, onClose: onFaceRecognitionClose } = useDisclosure()
 
   // Use custom responsive hook instead of Chakra's useBreakpointValue
   const { isMobile, isTablet, isDesktop } = useResponsive()
@@ -93,22 +98,32 @@ export default function App() {
       onPersonDrawerClose()
     }
   }, [isDesktop, isPersonDrawerOpen, onPersonDrawerClose])
-
   const handlePersonClick = (person) => {
     setSelectedPerson(person)
+  }
+
+  const handleFaceRecognitionPersonSelect = (person) => {
+    // Fermer la modal de reconnaissance faciale
+    onFaceRecognitionClose()
+    // Sélectionner la personne
+    setSelectedPerson(person)
+    // Ouvrir le drawer sur mobile/tablet
+    if (isMobile || isTablet) {
+      onPersonDrawerOpen()
+    }
   }
 
   // Search functionality
   const handleSearchChange = (e) => {
     const query = e.target.value
     setSearchQuery(query)
-    
+
     if (query.length > 0) {
       const results = familyData.filter(person =>
         person.data.firstName.toLowerCase().includes(query.toLowerCase()) ||
         person.data.lastName.toLowerCase().includes(query.toLowerCase())
       ).slice(0, 5) // Limit to 5 results
-      
+
       setSearchResults(results)
       setShowSearchResults(true)
     } else {
@@ -121,11 +136,11 @@ export default function App() {
     setSelectedPerson(person)
     if (isMobile) {
       onPersonDrawerOpen()
-    }    setSearchQuery('')
+    } setSearchQuery('')
     setShowSearchResults(false)
     setSearchResults([])
   }
-  
+
   const handleUnlock = () => {
     setIsAuthenticated(true)
   }
@@ -134,16 +149,16 @@ export default function App() {
   if (!isAuthenticated) {
     return <PasswordProtection onUnlock={handleUnlock} />
   }
-  
+
   // Calculate quick stats
   const totalMembers = familyData.length
   const livingMembers = familyData.filter(p => !p.data.death || p.data.death === "").length
   const deceasedMembers = totalMembers - livingMembers
   return (
-    <Box minH="100vh" bg={bgColor}>      
-    {/* Header */}
+    <Box minH="100vh" bg={bgColor}>
+      {/* Header */}
       <Box
-        bg="linear-gradient(135deg, #2d5a27 0%, #1e3a1a 50%, #0f2e0d 100%)"
+        bg="linear-gradient(135deg, #2d5a27 0%, #1e3a1a 50%,rgb(16, 62, 12) 100%)"
         position="sticky"
         top={0}
         zIndex={10}
@@ -161,7 +176,7 @@ export default function App() {
               mb={3}
             >
               <HStack spacing={{ base: 3, md: 4 }}>
-                <Box fontSize={{ base: '2xl', md: '3xl' }}>🇮🇹</Box>                
+                <Box fontSize={{ base: '2xl', md: '3xl' }}>🇮🇹</Box>
                 <VStack align="start" spacing={0}>
                   <Heading
                     size={{ base: 'lg', md: 'xl' }}
@@ -181,7 +196,7 @@ export default function App() {
                     {t('subtitle')}
                   </Text>
                 </VStack>
-              </HStack>              
+              </HStack>
               <HStack spacing={2}>
                 <LanguageSwitcher size="sm" />
                 <IconButton
@@ -249,7 +264,7 @@ export default function App() {
             </Box>
           </VStack>
         </Container>
-      </Box>        
+      </Box>
       {/* Main Content */}
       <Container maxW="full" px={0}>
         <Flex direction={{ base: 'column', lg: 'row' }} minH={{ base: "calc(100vh - 150px)", lg: "calc(100vh - 200px)" }}>
@@ -277,13 +292,14 @@ export default function App() {
                     >
                       <Text fontSize="2xl">🌳</Text>
                     </Box>
-                    <VStack align="start" spacing={1}>                      <Heading
+                    <VStack align="start" spacing={1}>
+                      <Heading
                         size={{ base: 'md', md: 'lg' }}
                         color="gray.800"
                         fontFamily="serif"
                       >
                         {t('interactiveTree')}
-                      </Heading>                      
+                      </Heading>
                       <Text
                         fontSize={{ base: 'sm', md: 'md' }}
                         color="gray.600"
@@ -302,7 +318,8 @@ export default function App() {
                     <InputGroup size={isMobile ? "md" : "lg"}>
                       <InputLeftElement pointerEvents="none">
                         <SearchIcon color="gray.400" />
-                      </InputLeftElement>                      <Input
+                      </InputLeftElement>
+                      <Input
                         placeholder={t('searchPlaceholder')}
                         fontSize={isMobile ? "sm" : "md"}
                         value={searchQuery}
@@ -318,6 +335,21 @@ export default function App() {
                           borderColor: "#d4af37"
                         }}
                       />
+                    
+                      <InputRightElement>
+                        {(
+                          <IconButton
+                            icon={<FiCamera />}
+                            onClick={onFaceRecognitionOpen}
+                            variant="ghost"
+                            size={"lg"}
+                            aria-label="Clear search"
+                            color="gray.600"
+                            // remove _hover style
+                            _hover={{ bg: "transparent", transform: "scale(1.2)" }}
+                          />
+                        )}
+                      </InputRightElement>
                     </InputGroup>
 
                     {/* Search Results */}
@@ -364,7 +396,8 @@ export default function App() {
                               </HStack>
                               <Divider mt={2} />
                             </ListItem>
-                          ))}                          {searchResults.length === 0 && searchQuery && (
+                          ))}
+                          {searchResults.length === 0 && searchQuery && (
                             <ListItem p={3}>
                               <Text fontSize="sm" color="gray.500" fontStyle="italic">
                                 {t('noResults')} "{searchQuery}"
@@ -375,17 +408,17 @@ export default function App() {
                       </Box>
                     </Collapse>
                   </Box>
-                  </Flex>
+                </Flex>
 
-                  {/* Decorative separator */}
-                  <Box
-                    w="full"
-                    h="2px"
-                    bg="linear-gradient(90deg, transparent 0%, #c8a882 20%, #d4af37 50%, #c8a882 80%, transparent 100%)"
-                    borderRadius="full"
-                    mb={4}
-                  />
-                
+                {/* Decorative separator */}
+                <Box
+                  w="full"
+                  h="2px"
+                  bg="linear-gradient(90deg, transparent 0%, #c8a882 20%, #d4af37 50%, #c8a882 80%, transparent 100%)"
+                  borderRadius="full"
+                  mb={4}
+                />
+
               </Box>
 
               <Flex flexDirection={{ base: 'column', lg: 'row' }} gap={6} alignItems="stretch">
@@ -484,7 +517,7 @@ export default function App() {
                 aria-label="Close"
                 color="gray.600"
                 _hover={{ bg: "gray.200" }}
-              />              
+              />
               <HStack spacing={2}>
                 <Box fontSize="lg">👤</Box>
                 <Text fontSize="lg" fontWeight="bold" color="gray.800">
@@ -502,20 +535,21 @@ export default function App() {
                 familyData={familyData}
                 setPerson={setSelectedPerson}
                 compact={true}
-                onPersonSelect={() => {
-                  // Keep drawer open when selecting related person
-                }}
               />
             )}
           </DrawerBody>
         </DrawerContent>
-      </Drawer>
-
-      {/* Stats Modal */}
+      </Drawer>      {/* Stats Modal */}
       <FamilyStatsModal
         isOpen={isStatsModalOpen}
         onClose={onStatsModalClose}
         familyData={familyData}
+      />      {/* Face Recognition Modal */}
+      <FaceRecognition
+        isOpen={isFaceRecognitionOpen}
+        onClose={onFaceRecognitionClose}
+        familyData={familyData}
+        onPersonSelect={handleFaceRecognitionPersonSelect}
       />
     </Box>
   )

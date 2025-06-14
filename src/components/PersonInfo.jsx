@@ -17,7 +17,7 @@ import {
 import { CalendarIcon, StarIcon } from '@chakra-ui/icons'
 import { useTranslation } from 'react-i18next'
 
-const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSelect }) => {
+const PersonInfo = ({ person, familyData, setPerson, compact = false }) => {
   const { t } = useTranslation()
   const cardBg = useColorModeValue('linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)', 'gray.700')
   const italianGold = '#c8a882'
@@ -73,7 +73,6 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonSe
               borderRadius="lg"
               onClick={() => {
                 setPerson(relatedPerson)
-                if (onPersonSelect) onPersonSelect()
               }}
               style={{ cursor: 'pointer' }}
               _hover={{
