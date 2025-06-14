@@ -92,6 +92,7 @@
   "cancel": "Cancel",
   "processing": "Processing...",
   "noFaceDetected": "No face detected",
+  "noFacesFound": "No faces found",
   "recognitionResults": "Recognition Results",
   "unknownPerson": "Unknown Person",
   "confidence": "Confidence",

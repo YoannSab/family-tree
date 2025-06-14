@@ -20,6 +20,7 @@ import {
     IconButton,
     Collapse,
     Progress,
+    useToast,
     useBreakpointValue
 } from '@chakra-ui/react'
 import { RepeatIcon, CheckIcon } from '@chakra-ui/icons'
@@ -36,6 +37,7 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
     const [capturedImage, setCapturedImage] = useState(null)
     const [capturedImageCanvas, setCapturedImageCanvas] = useState(null)
     const [recognitionResults, setRecognitionResults] = useState([])
+    const [noFacesFound, setNoFacesFound] = useState(false)
     const [isProcessing, setIsProcessing] = useState(false)
     const [labeledDescriptors, setLabeledDescriptors] = useState([])
     const [loadingProgress, setLoadingProgress] = useState(0)
@@ -77,10 +79,11 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
             setLoadingProgress(100)
             setIsModelLoaded(true)
         } catch (error) {
-            console.error('Erreur lors du chargement des modèles:', error)        
+            console.error('Erreur lors du chargement des modèles:', error)
         } finally {
             setIsLoading(false)
-        }    }, [])
+        }
+    }, [])
 
     // Créer les descripteurs étiquetés à partir des données familiales
     const createLabeledDescriptors = useCallback(async () => {
@@ -148,9 +151,13 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
 
             // Pour la caméra arrière, ajouter des contraintes pour éviter l'ultra-wide
             if (currentFacingMode === 'environment') {
-                constraints.video.zoom = { exact : 1.0 } // Zoom à 1x pour éviter l'ultra-wide
-                // Certains navigateurs supportent ces propriétés pour éviter l'ultra-wide
-                // constraints.video.focusDistance = { ideal: 0.5 }
+                const availableDevices = await navigator.mediaDevices.enumerateDevices()
+                const backCameras = availableDevices.filter(device => device.kind === 'videoinput' && device.label.toLowerCase().includes('back'))
+                if (backCameras.length > 0) {
+                    constraints.video.deviceId = { exact: backCameras[backCameras.length - 1].deviceId }
+                } else {
+                    constraints.video.zoom = { exact: 1.0 } // Zoom à 1x pour éviter l'ultra-wide
+                }
             }
 
             const stream = await navigator.mediaDevices.getUserMedia(constraints)
@@ -161,11 +168,11 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
         } catch (error) {
             console.error('Erreur d\'accès à la caméra:', error)
             setIsCameraActive(false)
-            
+
             // Essayer avec des contraintes plus basiques si échec
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { 
+                    video: {
                         facingMode: currentFacingMode,
                         // Essayer de forcer une résolution qui favorise la caméra principale
                         width: { exact: 640 },
@@ -173,7 +180,7 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
                     }
                 })
                 streamRef.current = stream
-                setIsCameraActive(true)            
+                setIsCameraActive(true)
             } catch (fallbackError) {
                 console.error('Impossible d\'accéder à la caméra:', fallbackError)
             }
@@ -183,7 +190,7 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
         setIsSwitchingCamera(true)
         const newFacingMode = currentFacingMode === 'user' ? 'environment' : 'user'
         setCurrentFacingMode(newFacingMode)
-        
+
         if (isCameraActive) {
             stopCamera()
             // Petit délai pour s'assurer que l'ancienne caméra est bien fermée
@@ -199,8 +206,13 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
 
                     // Pour la caméra arrière, ajouter des contraintes pour éviter l'ultra-wide
                     if (newFacingMode === 'environment') {
-                        constraints.video.zoom = { ideal: 1.0 }
-                        constraints.video.focusDistance = { ideal: 0.5 }
+                        const availableDevices = await navigator.mediaDevices.enumerateDevices()
+                        const backCameras = availableDevices.filter(device => device.kind === 'videoinput' && device.label.toLowerCase().includes('back'))
+                        if (backCameras.length > 0) {
+                            constraints.video.deviceId = { exact: backCameras[backCameras.length - 1].deviceId }
+                        } else {
+                            constraints.video.zoom = { exact: 1.0 } // Zoom à 1x pour éviter l'ultra-wide
+                        }
                     }
 
                     const stream = await navigator.mediaDevices.getUserMedia(constraints)
@@ -260,9 +272,7 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
         if (!labeledDescriptors.length || !imageCanvas) return
 
         try {
-            setIsProcessing(true)
-
-            // Détecter tous les visages dans l'image
+            setIsProcessing(true)            // Détecter tous les visages dans l'image
             const detections = await faceapi
                 .detectAllFaces(imageCanvas)
                 .withFaceLandmarks()
@@ -270,9 +280,24 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
                 .withAgeAndGender()
 
             if (detections.length === 0) {
+                setNoFacesFound(true)
+                setRecognitionResults([])
+
+                // Dessiner quand même l'image sur le canvas
+                if (canvasRef.current) {
+                    const displayCanvas = canvasRef.current
+                    displayCanvas.width = imageCanvas.width
+                    displayCanvas.height = imageCanvas.height
+
+                    const ctx = displayCanvas.getContext('2d')
+                    ctx.drawImage(imageCanvas, 0, 0)
+                }
+
                 setIsProcessing(false)
                 return
-            }            // Créer le matcher avec les descripteurs
+            }
+
+            setNoFacesFound(false)// Créer le matcher avec les descripteurs
             const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.6)
 
             const results = detections.map((detection, index) => {
@@ -338,14 +363,12 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
             ctx.font = '14px Arial'
             ctx.fillText(label, box.x + 5, box.y - 8)
         })
-    }, [])
-
-    // Fonction pour redessiner le canvas avec les résultats existants
+    }, [])    // Fonction pour redessiner le canvas avec les résultats existants
     const redrawCanvas = useCallback(() => {
-        if (!canvasRef.current || !captureCanvasRef.current || recognitionResults.length === 0 || !capturedImageCanvas) return
+        if (!canvasRef.current || !captureCanvasRef.current || !capturedImageCanvas) return
 
         const displayCanvas = canvasRef.current
-        
+
         // Copier les dimensions du canvas de capture
         displayCanvas.width = capturedImageCanvas.width
         displayCanvas.height = capturedImageCanvas.height
@@ -354,8 +377,10 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
         // Redessiner l'image capturée
         ctx.drawImage(capturedImageCanvas, 0, 0)
 
-        // Utiliser la fonction commune pour dessiner les résultats
-        drawRecognitionResults(ctx, recognitionResults)
+        // Utiliser la fonction commune pour dessiner les résultats (seulement s'il y en a)
+        if (recognitionResults.length > 0) {
+            drawRecognitionResults(ctx, recognitionResults)
+        }
     }, [recognitionResults, capturedImageCanvas, drawRecognitionResults])
 
     // Sauvegarder les descripteurs
@@ -430,20 +455,19 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
     // Nettoyer les ressources
     const cleanup = () => {
         stopCamera()
-    }
-
-    // Recommencer le processus
+    }    // Recommencer le processus
     const restart = () => {
         setIsSwitchingCamera(true)
         stopCamera()
         setCapturedImage(null)
         setCapturedImageCanvas(null)
         setRecognitionResults([])
+        setNoFacesFound(false)
         if (capturedImage) {
             URL.revokeObjectURL(capturedImage)
         }
         startCamera()
-    }    // Initialisation
+    }// Initialisation
     useEffect(() => {
         if (isOpen && !isModelLoaded) {
             loadModels()
@@ -455,17 +479,22 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
             createLabeledDescriptors()
         }
 
-    }, [isModelLoaded, createLabeledDescriptors])
-
-    // Effect pour redessiner le canvas quand la modal s'ouvre avec des résultats existants
+    }, [isModelLoaded, createLabeledDescriptors])    // Effect pour redessiner le canvas quand la modal s'ouvre avec des résultats existants ou quand aucun visage n'est trouvé
     useEffect(() => {
-        if (isOpen && recognitionResults.length > 0) {
+        if (isOpen && (recognitionResults.length > 0 || noFacesFound)) {
             // Attendre un petit délai pour s'assurer que le DOM est rendu
             setTimeout(() => {
                 redrawCanvas()
             }, 100)
         }
-    }, [isOpen, redrawCanvas])
+    }, [isOpen, redrawCanvas, noFacesFound])
+
+    // Démarrer automatiquement la caméra quand les conditions sont remplies
+    useEffect(() => {
+        if (isModelLoaded && labeledDescriptors.length > 0 && !capturedImage && !isCameraActive && !isSwitchingCamera) {
+            startCamera()
+        }
+    }, [isModelLoaded, labeledDescriptors.length, capturedImage, isCameraActive, isSwitchingCamera])
 
     // Nettoyer à la fermeture
     useEffect(() => {
@@ -486,8 +515,8 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
                 backdropFilter="blur(10px)"
                 onClick={onClose}
             />
-            <ModalContent 
-                maxH={isMobile ? "95vh" : "90vh"} 
+            <ModalContent
+                maxH={isMobile ? "95vh" : "90vh"}
                 overflowY="auto"
                 m={isMobile ? 3 : 4}
                 borderRadius="md"
@@ -527,27 +556,13 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
                                     </VStack>
                                 </CardBody>
                             </Card>
-                        )}
-
-                        {/* Caméra et capture */}
+                        )}                        {/* Caméra et capture */}
                         {isModelLoaded && !capturedImage && labeledDescriptors.length !== 0 && (
                             <Card w="full">
-                                <CardBody>                                      
+                                <CardBody>
                                     <VStack spacing={cardSpacing}>
                                         {!isCameraActive ? (
-                                            isSwitchingCamera ? (
-                                                <Spinner size="lg" color="green.500" />
-                                            ) : (
-                                                <Button
-                                                    leftIcon={<FiCamera />}
-                                                    colorScheme="green"
-                                                    size={isMobile ? "md" : "lg"}
-                                                    onClick={startCamera}
-                                                    isDisabled={labeledDescriptors.length === 0}
-                                                >
-                                                    {t('startCamera')}
-                                                </Button>
-                                            )
+                                            <Spinner size="lg" color="green.500" />
                                         ) : (
                                             <>
                                                 <Box position="relative" borderRadius="md" overflow="hidden">
@@ -559,14 +574,15 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
                                                             width: '100%',
                                                             maxWidth: isMobile ? '300px' : '400px',
                                                             height: 'auto',
-                                                            borderRadius: '8px'
+                                                            borderRadius: '8px',
+                                                            transform: currentFacingMode === 'user' ? 'scaleX(-1)' : 'none',
                                                         }}
                                                     />
                                                 </Box>
                                                 <HStack spacing={isMobile ? 2 : 4}>
                                                     <Button
                                                         leftIcon={<FiCamera />}
-                                                        colorScheme="blue" 
+                                                        colorScheme="blue"
                                                         onClick={captureImage}
                                                         size={isMobile ? "sm" : "md"}
                                                     >
@@ -593,7 +609,7 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
                         {/* Image capturée et traitement */}
                         {capturedImage && (
                             <Card w="full">
-                                <CardBody>                                    
+                                <CardBody>
                                     <VStack spacing={cardSpacing}>
                                         <HStack w="full" justify="space-between" align="center">
                                             <Text fontWeight="bold" fontSize={fontSize}>{t('capturedImage')}</Text>
@@ -638,80 +654,98 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
                                     </VStack>
                                 </CardBody>
                             </Card>
-                        )}
-
-                        {/* Résultats de reconnaissance */}
-                        <Collapse in={recognitionResults.length > 0} style={{ width: '100%' }}>
+                        )}                        {/* Résultats de reconnaissance */}
+                        <Collapse in={recognitionResults.length > 0 || noFacesFound} style={{ width: '100%' }}>
                             <Card w="full">
                                 <CardBody>
                                     <VStack spacing={4} align="stretch">
-                                        {/* { !isSwitchingCamera && */}
                                         <Text fontWeight="bold" color={italianGreen}>
                                             {t('recognitionResults')}
                                         </Text>
-                                        {/* } */}
-                                        {recognitionResults.map((result, index) => (
+                                        {noFacesFound ? (
                                             <Card
-                                                key={result.id}
                                                 size="sm"
                                                 variant="outline"
-                                                cursor={result.person ? "pointer" : "default"}
-                                                onClick={() => result.person && onPersonSelect && onPersonSelect(result.person)}
-                                                _hover={result.person ? {
-                                                    shadow: "md",
-                                                    borderColor: italianGreen,
-                                                    transform: "translateY(-1px)",
-                                                    transition: "all 0.2s"
-                                                } : {}}
-                                                transition="all 0.2s"
-                                            >                                                
-                                            <CardBody p={isMobile ? 3 : 4}>
-                                                    <Flex align="center" gap={isMobile ? 2 : 4}>
-                                                        {result.person ? (
-                                                            <Avatar
-                                                                src={`/images/${result.person.data.image}.JPG`}
-                                                                name={`${result.person.data.firstName} ${result.person.data.lastName}`}
-                                                                size={avatarSize}
-                                                            />
-                                                        ) : (
-                                                            <Avatar size={avatarSize} />
-                                                        )}
-
-                                                        <VStack align="start" flex={1} spacing={isMobile ? 0.5 : 1}>
-                                                            <HStack wrap="wrap" spacing={2}>
-                                                                <Text fontWeight="bold" fontSize={fontSize}>
-                                                                    {result.match.label !== 'unknown'
-                                                                        ? result.match.label
-                                                                        : t('unknownPerson')
-                                                                    }
-                                                                </Text>
-                                                                <Badge
-                                                                    colorScheme={
-                                                                        result.confidence > 50 ? 'green' :
-                                                                            result.confidence > 40 ? 'orange' : 'red'
-                                                                    }
-                                                                    fontSize={isMobile ? "2xs" : "xs"}
-                                                                >
-                                                                    {result.confidence.toFixed(1)}%
-                                                                </Badge>
-                                                            </HStack>
-                                                            {result.person && (
-                                                                <Text fontSize="xs" color="gray.500">
-                                                                    {result.person.data.birthday}
-                                                                    {result.person.data.death && ` - ${result.person.data.death}`}
-                                                                    {result.person.data.occupation && ` • ${result.person.data.occupation}`}
-                                                                </Text>
-                                                            )}
-                                                        </VStack>
-                                                        {result.person && (
-                                                            <Box color={italianGreen} fontSize="lg">
-                                                                →
-                                                            </Box>
-                                                        )}
+                                                borderColor="orange.200"
+                                                bg="orange.50"
+                                            >
+                                                <CardBody p={isMobile ? 3 : 4}>
+                                                    <Flex align="center" justify="center">
+                                                        <Text
+                                                            color="orange.600"
+                                                            fontWeight="medium"
+                                                            textAlign="center"
+                                                        >
+                                                            {t('noFacesFound')}
+                                                        </Text>
                                                     </Flex>
                                                 </CardBody>
                                             </Card>
-                                        ))}
+                                        ) : (
+                                            recognitionResults.map((result, index) => (
+                                                <Card
+                                                    key={result.id}
+                                                    size="sm"
+                                                    variant="outline"
+                                                    cursor={result.person ? "pointer" : "default"}
+                                                    onClick={() => result.person && onPersonSelect && onPersonSelect(result.person)}
+                                                    _hover={result.person ? {
+                                                        shadow: "md",
+                                                        borderColor: italianGreen,
+                                                        transform: "translateY(-1px)",
+                                                        transition: "all 0.2s"
+                                                    } : {}}
+                                                    transition="all 0.2s"
+                                                >
+                                                    <CardBody p={isMobile ? 3 : 4}>
+                                                        <Flex align="center" gap={isMobile ? 2 : 4}>
+                                                            {result.person ? (
+                                                                <Avatar
+                                                                    src={`/images/${result.person.data.image}.JPG`}
+                                                                    name={`${result.person.data.firstName} ${result.person.data.lastName}`}
+                                                                    size={avatarSize}
+                                                                />
+                                                            ) : (
+                                                                <Avatar size={avatarSize} />
+                                                            )}
+
+                                                            <VStack align="start" flex={1} spacing={isMobile ? 0.5 : 1}>
+                                                                <HStack wrap="wrap" spacing={2}>
+                                                                    <Text fontWeight="bold" fontSize={fontSize}>
+                                                                        {result.match.label !== 'unknown'
+                                                                            ? result.match.label
+                                                                            : t('unknownPerson')
+                                                                        }
+                                                                    </Text>
+                                                                    <Badge
+                                                                        colorScheme={
+                                                                            result.confidence > 50 ? 'green' :
+                                                                                result.confidence > 40 ? 'orange' : 'red'
+                                                                        }
+                                                                        fontSize={isMobile ? "2xs" : "xs"}
+                                                                    >
+                                                                        {result.confidence.toFixed(1)}%
+                                                                    </Badge>
+                                                                </HStack>
+                                                                {result.person && (
+                                                                    <Text fontSize="xs" color="gray.500">
+                                                                        {result.person.data.birthday}
+                                                                        {result.person.data.death && ` - ${result.person.data.death}`}
+                                                                        {result.person.data.occupation && ` • ${result.person.data.occupation}`}
+                                                                    </Text>
+                                                                )}
+                                                            </VStack>
+                                                            {result.person && (
+                                                                <Box color={italianGreen} fontSize="lg">
+                                                                    →
+                                                                </Box>
+                                                            )}
+
+                                                        </Flex>
+                                                    </CardBody>
+                                                </Card>
+                                            ))
+                                        )}
                                     </VStack>
                                 </CardBody>
                             </Card>

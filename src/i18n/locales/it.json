@@ -92,6 +92,7 @@
   "cancel": "Annulla",
   "processing": "Elaborazione in corso...",
   "noFaceDetected": "Nessun volto rilevato",
+  "noFacesFound": "Nessun volto trovato",
   "recognitionResults": "Risultati Riconoscimento",
   "unknownPerson": "Persona Sconosciuta",
   "confidence": "Affidabilità",
