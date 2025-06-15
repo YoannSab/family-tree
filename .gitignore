@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 dist
+*.firebase
 dist-ssr
 *.local
 
@@ -26,8 +27,9 @@ dist-ssr
 # Sensitive data files
 src/assets/data.js
 test.html
+test.ipynb
 public/images/*
 public/data/*
 public/models/*
 
-.firebase/*
+

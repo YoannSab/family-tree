@@ -272,12 +272,12 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
         if (!labeledDescriptors.length || !imageCanvas) return
 
         try {
-            setIsProcessing(true)            // Détecter tous les visages dans l'image
+            setIsProcessing(true)            
+            // Détecter tous les visages dans l'image
             const detections = await faceapi
                 .detectAllFaces(imageCanvas)
                 .withFaceLandmarks()
                 .withFaceDescriptors()
-                .withAgeAndGender()
 
             if (detections.length === 0) {
                 setNoFacesFound(true)
@@ -355,7 +355,7 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
             // Dessiner le label
             const label = match.label !== 'unknown'
                 ? `${match.label} (${confidence.toFixed(1)}%)`
-                : `Inconnu (${confidence.toFixed(1)}%)`
+                : `Unknown (${confidence.toFixed(1)}%)`
 
             ctx.fillStyle = color
             ctx.fillRect(box.x, box.y - 25, ctx.measureText(label).width + 10, 25)
