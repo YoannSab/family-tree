@@ -219,15 +219,6 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonUp
                       <Text fontSize="sm" fontWeight="bold" color={italianGreen} fontFamily="serif">
                         {relatedPerson.data.firstName} {relatedPerson.data.lastName} {relatedPerson.data.death ? "✞" : ""}
                       </Text>
-                      <Box
-                        w={2}
-                        h={2}
-                        bg={relatedPerson.data.reliable === false ? '#f56565' : '#48bb78'}
-                        borderRadius="50%"
-                        border="0.5px solid white"
-                        title={relatedPerson.data.reliable === false ? t('unreliableInformation') : t('reliableInformation')}
-                        flexShrink={0}
-                      />
                     </HStack>
                     {relatedPerson.data.death ? (
                       <Text fontSize="xs" color="gray.600">
@@ -254,7 +245,7 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonUp
 
   return (
     <Box
-      bg="linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)"
+      bg="linear-gradient(135deg, #fafafa 0%,rgb(252, 252, 236) 100%)"
       borderRadius="xl"
       p={isMobile ? 4 : 6}
       border={`2px solid ${italianGold}`}
@@ -351,20 +342,6 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonUp
                     variant="outline"
                     onClick={handleEditStart}
                     aria-label="Modifier"
-                  />
-                )}
-
-                {/* Reliability indicator */}
-                {!isEditing && (
-                  <Box
-                    w={3}
-                    h={3}
-                    bg={person.data.reliable === false ? '#f56565' : '#48bb78'}
-                    borderRadius="50%"
-                    border="1px solid white"
-                    boxShadow="0 1px 3px rgba(0,0,0,0.2)"
-                    title={person.data.reliable === false ? t('unreliableInformation') : t('reliableInformation')}
-                    cursor="help"
                   />
                 )}
               </HStack>

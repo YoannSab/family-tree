@@ -34,16 +34,10 @@ export default function FamilyTree({ onPersonClick, familyData }) {
       .setCardInnerHtmlCreator(d => {
           const fontSize = isMobile ? '12px' : '14px'
           const cardWidth = isMobile ? '160px' : '200px' // Made cards slightly wider to accommodate image
-          const isReliable = d.data.data.reliable
-          const reliabilityIndicator = isReliable === false ? 
-        `<div style="position: absolute; top: 4px; right: 4px; width: 12px; height: 12px; background: #f56565; border-radius: 50%; border: 1px solid white;" title="Unreliable information"></div>` : 
-        `<div style="position: absolute; top: 4px; right: 4px; width: 12px; height: 12px; background: #48bb78; border-radius: 50%; border: 1px solid white;" title="Reliable information"></div>`
-          
           const avatarSize = '60px'
           const avatarImg = `<img src="/images/${d.data.data.image}.JPG" onerror="this.onerror=null; this.src='/images/default.png';" style="width: ${avatarSize}; height: ${avatarSize}; object-fit: cover; border-radius: 50%; border: 1px solid #c8a882;">`
 
           return `<div class="card-inner italian-card" style="position: relative; width: ${cardWidth}; font-size: ${fontSize}; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border: 2px solid #c8a882; border-radius: 8px; padding: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-        ${reliabilityIndicator}
         <div style="display: flex; align-items: center; gap: 8px;">
           <div class="avatar" style="flex-shrink: 0;">
             ${avatarImg}
