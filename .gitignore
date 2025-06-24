@@ -31,5 +31,5 @@ test.ipynb
 public/images/*
 public/data/*
 public/models/*
-
+src/config/firebase.js
 
