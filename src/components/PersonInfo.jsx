@@ -13,18 +13,117 @@ import {
   Flex,
   Icon,
   useColorModeValue,
+  useDisclosure,
+  Button,
+  Input,
+  FormControl,
+  FormLabel,
+  Select,
+  Textarea,
+  useToast,
+  IconButton
 } from '@chakra-ui/react'
-import { CalendarIcon, StarIcon } from '@chakra-ui/icons'
+import { CalendarIcon, StarIcon, EditIcon, CheckIcon, CloseIcon } from '@chakra-ui/icons'
 import { useTranslation } from 'react-i18next'
+import { useState } from 'react'
+import ImageModal from './ImageModal'
+import { updateFamilyMemberByInternalId } from '../services/familyService'
 
-const PersonInfo = ({ person, familyData, setPerson, compact = false }) => {
+const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonUpdate }) => {
   const { t } = useTranslation()
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [selectedImage, setSelectedImage] = useState({ src: '', name: '' })
+  const [isEditing, setIsEditing] = useState(false)
+  const [editForm, setEditForm] = useState({})
+  const [isLoading, setIsLoading] = useState(false)
+  const toast = useToast()
   const cardBg = useColorModeValue('linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)', 'gray.700')
   const italianGold = '#c8a882'
   const italianGreen = '#2d5a27'
   const isMobile = compact
 
   if (!person) return null
+
+  // Fonctions pour gérer l'édition
+  const handleEditStart = () => {
+    setEditForm({
+      firstName: person.data.firstName || '',
+      lastName: person.data.lastName || '',
+      birthday: person.data.birthday || '',
+      death: person.data.death || '',
+      occupation: person.data.occupation || '',
+      reliable: person.data.reliable !== false
+    })
+    setIsEditing(true)
+  }
+
+  const handleEditCancel = () => {
+    setIsEditing(false)
+    setEditForm({})
+  }
+
+  const handleEditSave = async () => {
+    setIsLoading(true)
+    try {
+      const updatedData = {
+        data: {
+          ...person.data,
+          firstName: editForm.firstName,
+          lastName: editForm.lastName,
+          birthday: editForm.birthday ? parseInt(editForm.birthday) : person.data.birthday,
+          death: editForm.death ? parseInt(editForm.death) : (editForm.death === '' ? null : person.data.death),
+          occupation: editForm.occupation,
+          reliable: editForm.reliable
+        }
+      }
+
+      // Utiliser l'ID interne de la personne pour la mise à jour
+      await updateFamilyMemberByInternalId(person.id, updatedData)
+
+      // Mettre à jour la personne localement
+      const updatedPerson = { ...person, ...updatedData }
+      setPerson(updatedPerson)
+
+      // Informer le parent de la mise à jour si la fonction est fournie
+      if (onPersonUpdate) {
+        onPersonUpdate(updatedPerson)
+      }
+
+      setIsEditing(false)
+      setEditForm({})
+
+      toast({
+        title: t('updateSuccess'),
+        description: t('personInformationUpdated'),
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      })
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour:', error)
+      toast({
+        title: t('updateError'),
+        description: t('errorUpdatingPerson'),
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleInputChange = (field, value) => {
+    setEditForm(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  const handleImageClick = (imageSrc, personName) => {
+    setSelectedImage({ src: imageSrc, name: personName })
+    onOpen()
+  }
 
   const isLiving = !person.data.death
   const age = person.data.death
@@ -102,7 +201,20 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false }) => {
                     name={relatedPerson.data.firstName}
                     ring={2}
                     ringColor={italianGold}
-                  />                  <VStack align="start" spacing={1} flex={1}>
+                    cursor="pointer"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleImageClick(
+                        `/images/${relatedPerson.data.image}.JPG`,
+                        `${relatedPerson.data.firstName} ${relatedPerson.data.lastName}`
+                      )
+                    }}
+                    _hover={{
+                      transform: 'scale(1.05)',
+                      transition: 'transform 0.2s ease'
+                    }}
+                  />
+                  <VStack align="start" spacing={1} flex={1}>
                     <HStack spacing={2} align="center">
                       <Text fontSize="sm" fontWeight="bold" color={italianGreen} fontFamily="serif">
                         {relatedPerson.data.firstName} {relatedPerson.data.lastName} {relatedPerson.data.death ? "✞" : ""}
@@ -120,7 +232,8 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false }) => {
                     {relatedPerson.data.death ? (
                       <Text fontSize="xs" color="gray.600">
                         {relatedPerson.data.birthday} - {relatedPerson.data.death}
-                      </Text>                    ) : (
+                      </Text>
+                    ) : (
                       <Text fontSize="xs" color="gray.600">
                         {t('birthdate')} {relatedPerson.data.birthday}
                       </Text>
@@ -129,10 +242,10 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false }) => {
                 </HStack>
               </CardBody>
             </Card>
-          ))}        
-          </Grid>
-      ) : (        
-      <Text fontSize="sm" color="gray.500" fontStyle="italic">
+          ))}
+        </Grid>
+      ) : (
+        <Text fontSize="sm" color="gray.500" fontStyle="italic">
           {t('unknown')}
         </Text>
       )}
@@ -161,19 +274,44 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false }) => {
 
       <VStack spacing={isMobile ? 4 : 6} align="stretch" position="relative" zIndex={2}>
         {/* Header with person details */}
-        <Box>            
+        <Box>
           <Flex direction={{ base: 'column', sm: 'row' }} align={{ base: 'center', sm: 'center' }} gap={4}>
-              <Avatar
-                size={"xl"}
-                src={`/images/${person.data.image}.JPG`}
-                name={person.data.firstName}
-                ring={3}
-                ringColor={italianGold}
-                bg="linear-gradient(135deg, #2d5a27, #1e3a1a)"
-              />
+            <Avatar
+              size={"xl"}
+              src={`/images/${person.data.image}.JPG`}
+              name={person.data.firstName}
+              ring={3}
+              ringColor={italianGold}
+              bg="linear-gradient(135deg, #2d5a27, #1e3a1a)"
+              cursor="pointer"
+              onClick={() => handleImageClick(
+                `/images/${person.data.image}.JPG`,
+                `${person.data.firstName} ${person.data.lastName}`
+              )}
+              _hover={{
+                transform: 'scale(1.05)',
+                transition: 'transform 0.2s ease'
+              }}
+            />
 
-              <VStack align={{ base: 'center', sm: 'start' }} spacing={2}>
-                <HStack spacing={3} align="center">
+            <VStack align={{ base: 'center', sm: 'start' }} spacing={2}>
+              <HStack spacing={3} align="center">
+                {isEditing ? (
+                  <Flex flexDirection={{ base: 'row', md: 'column' }} gap={1} align="start" flex="1">
+                    <Input
+                      value={editForm.firstName}
+                      onChange={(e) => handleInputChange('firstName', e.target.value)}
+                      size="md"
+                      mr={2}
+                      placeholder={t('firstName')} />
+                    <Input
+                      value={editForm.lastName}
+                      onChange={(e) => handleInputChange('lastName', e.target.value)}
+                      size="md"
+                      mr={2}
+                      placeholder={t('lastName')} />
+                  </Flex>
+                ) : (
                   <Heading
                     size={isMobile ? "md" : "lg"}
                     textAlign={{ base: 'center', sm: 'left' }}
@@ -183,8 +321,41 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false }) => {
                   >
                     {person.data.firstName} {person.data.lastName}
                   </Heading>
-                  
-                  {/* Reliability indicator */}
+                )}
+
+                {/* Boutons d'édition */}
+                {isEditing ? (
+                  <HStack spacing={1}>
+                    <IconButton
+                      icon={<CheckIcon />}
+                      size="sm"
+                      colorScheme="green"
+                      onClick={handleEditSave}
+                      isLoading={isLoading}
+                      aria-label="Sauvegarder"
+                    />
+                    <IconButton
+                      icon={<CloseIcon />}
+                      size="sm"
+                      colorScheme="red"
+                      variant="outline"
+                      onClick={handleEditCancel}
+                      aria-label="Annuler"
+                    />
+                  </HStack>
+                ) : (
+                  <IconButton
+                    icon={<EditIcon />}
+                    size="sm"
+                    colorScheme="green"
+                    variant="outline"
+                    onClick={handleEditStart}
+                    aria-label="Modifier"
+                  />
+                )}
+
+                {/* Reliability indicator */}
+                {!isEditing && (
                   <Box
                     w={3}
                     h={3}
@@ -195,19 +366,21 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false }) => {
                     title={person.data.reliable === false ? t('unreliableInformation') : t('reliableInformation')}
                     cursor="help"
                   />
-                </HStack>
-                
-                {person.data.reliable === false && (                      <Text fontSize="xs" color="orange.600" fontStyle="italic">
-                        ⚠️ {t('informationToVerify')}
-                      </Text>
                 )}
-              </VStack>
-            </Flex>
+              </HStack>
+
+              {person.data.reliable === false && (
+                <Text fontSize="xs" color="orange.600" fontStyle="italic">
+                  ⚠️ {t('informationToVerify')}
+                </Text>
+              )}
+            </VStack>
+          </Flex>
         </Box>
 
         <VStack spacing={isMobile ? 4 : 6} align="stretch">
-          {/* Basic Information */}
-          <Box>            <Heading
+          <Box>
+            <Heading
               size={isMobile ? "sm" : "md"}
               mb={4}
               color={italianGreen}
@@ -237,19 +410,44 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false }) => {
             >
               <GridItem>
                 <Flex align="center" gap={3}>
-                  <Icon as={CalendarIcon} color={italianGreen} boxSize={5} />                  <VStack align="start" spacing={0}>
+                  <Icon as={CalendarIcon} color={italianGreen} boxSize={5} />
+                  <VStack align="start" spacing={0} flex="1">
                     <Text fontSize="xs" color="gray.500">{t('birthdate')}</Text>
-                    <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">{person.data.birthday}</Text>
+                    {isEditing ? (
+                      <Input
+                        value={editForm.birthday}
+                        onChange={(e) => handleInputChange('birthday', e.target.value)}
+                        size="sm"
+                        type="number"
+                        placeholder="1990"
+                      />
+                    ) : (
+                      <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">{person.data.birthday}</Text>
+                    )}
                   </VStack>
                 </Flex>
               </GridItem>
 
-              {person.data.death && (
+              {(isEditing || person.data.death) && (
                 <GridItem>
                   <Flex align="center" gap={3}>
-                    <Text fontSize="xl">🕊️</Text>                    <VStack align="start" spacing={0}>
+                    <Text fontSize="xl">🕊️</Text>
+                    <VStack align="start" spacing={0} flex="1">
                       <Text fontSize="xs" color="gray.500">{t('deathdate')}</Text>
-                      <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">{person.data.death}</Text>
+                      {isEditing ? (
+                        <Input
+                          value={editForm.death}
+                          onChange={(e) => handleInputChange('death', e.target.value)}
+                          size="sm"
+                          type="number"
+                          placeholder="2025"
+                        />
+                      ) : (
+
+                        <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">
+                          {person.data.death || t('living')}
+                        </Text>
+                      )}
                     </VStack>
                   </Flex>
                 </GridItem>
@@ -259,21 +457,55 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false }) => {
                 <Flex align="center" gap={3}>
                   <Box p={1} borderRadius="full" bg={`rgba(${isLiving ? '45, 90, 39, 0.1' : '200, 168, 130, 0.1'})`}>
                     <Text fontSize="sm">{isLiving ? '👤' : '⌛'}</Text>
-                  </Box>                  <VStack align="start" spacing={0}>
+                  </Box>
+                  <VStack align="start" spacing={0}>
                     <Text fontSize="xs" color="gray.500">{t('age')}</Text>
                     <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">{age} {t('yearsOld')}</Text>
                   </VStack>
                 </Flex>
               </GridItem>
 
-              {person.data.occupation && (
+              {(isEditing || person.data.occupation) && (
                 <GridItem>
                   <Flex align="center" gap={3}>
                     <Box p={1} borderRadius="full" bg="rgba(200, 168, 130, 0.1)">
                       <Text fontSize="sm">💼</Text>
-                    </Box>                    <VStack align="start" spacing={0}>
+                    </Box>
+                    <VStack align="start" spacing={0} flex="1">
                       <Text fontSize="xs" color="gray.500">{t('occupation')}</Text>
-                      <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">{person.data.occupation}</Text>
+                      {isEditing ? (
+                        <Input
+                          value={editForm.occupation}
+                          onChange={(e) => handleInputChange('occupation', e.target.value)}
+                          size="sm"
+                          placeholder={t('occupation')}
+                        />
+                      ) : (
+                        <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">
+                          {person.data.occupation || t('notSpecified')}
+                        </Text>
+                      )}
+                    </VStack>
+                  </Flex>
+                </GridItem>
+              )}
+
+              {isEditing && (
+                <GridItem>
+                  <Flex align="center" gap={3}>
+                    <Box p={1} borderRadius="full" bg="rgba(200, 168, 130, 0.1)">
+                      <Text fontSize="sm">✓</Text>
+                    </Box>
+                    <VStack align="start" spacing={0} flex="1">
+                      <Text fontSize="xs" color="gray.500">{t('reliable')}</Text>
+                      <Select
+                        value={editForm.reliable}
+                        onChange={(e) => handleInputChange('reliable', e.target.value === 'true')}
+                        size="sm"
+                      >
+                        <option value="true">{t('reliableInformation')}</option>
+                        <option value="false">{t('unreliableInformation')}</option>
+                      </Select>
                     </VStack>
                   </Flex>
                 </GridItem>
@@ -287,7 +519,8 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false }) => {
           />
 
           {/* Family Relationships */}
-          <VStack spacing={isMobile ? 4 : 6} align="stretch">            <Heading
+          <VStack spacing={isMobile ? 4 : 6} align="stretch">
+            <Heading
               size={isMobile ? "sm" : "md"}
               color={italianGreen}
               fontFamily="serif"
@@ -302,7 +535,8 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false }) => {
                 borderRadius="full"
               />
               {t('familyConnections')}
-            </Heading>            {parents.length > 0 && (
+            </Heading>
+            {parents.length > 0 && (
               <RelatedPersonsList
                 title={t('parents')}
                 people={parents}
@@ -343,6 +577,14 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false }) => {
           />
         </VStack>
       </VStack>
+
+      {/* Image Modal */}
+      <ImageModal
+        isOpen={isOpen}
+        onClose={onClose}
+        imageSrc={selectedImage.src}
+        personName={selectedImage.name}
+      />
     </Box>
   )
 }

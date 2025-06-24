@@ -108,11 +108,20 @@
   "loadingModels": "Loading recognition models...",
   "loadingDescriptors" : "Analysing faces (only once)",
   "clickStartCamera": "Click \"Start Camera\" to begin face recognition",
-  "faceReferencesLoaded": "face references loaded",  "capturedImage": "Captured Image",
+  "faceReferencesLoaded": "face references loaded",
+  "capturedImage": "Captured Image",
   "years": "years",
   "clickToViewDetails": "Click to view details",
   "selectCamera": "Select Camera",
   "camera": "Camera",
   "switchToBack": "Back Camera",
-  "switchToFront": "Front Camera"
+  "switchToFront": "Front Camera",
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "notSpecified": "Not specified",
+  "reliable": "Reliability",
+  "updateSuccess": "Update successful",
+  "personInformationUpdated": "Person information has been updated",
+  "updateError": "Update error",
+  "errorUpdatingPerson": "Error updating person information"
 }

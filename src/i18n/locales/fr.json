@@ -107,11 +107,20 @@
   "loadingModels": "Chargement des modèles de reconnaissance...",
   "loadingDescriptors" : "Analyse des visages (une fois seulement)",
   "clickStartCamera": "Cliquez sur \"Démarrer la caméra\" pour commencer la reconnaissance faciale",
-  "faceReferencesLoaded": "visages de référence chargés",  "capturedImage": "Image capturée",
+  "faceReferencesLoaded": "visages de référence chargés",
+  "capturedImage": "Image capturée",
   "years": "ans",
   "clickToViewDetails": "Cliquer pour voir détails",
   "selectCamera": "Sélectionner la caméra",
   "camera": "Caméra",
   "switchToBack": "Caméra arrière",
-  "switchToFront": "Caméra avant"
+  "switchToFront": "Caméra avant",
+  "firstName": "Prénom",
+  "lastName": "Nom de famille",
+  "notSpecified": "Non spécifié",
+  "reliable": "Fiabilité",
+  "updateSuccess": "Mise à jour réussie",
+  "personInformationUpdated": "Les informations de la personne ont été mises à jour",
+  "updateError": "Erreur de mise à jour",
+  "errorUpdatingPerson": "Erreur lors de la mise à jour des informations de la personne"
 }

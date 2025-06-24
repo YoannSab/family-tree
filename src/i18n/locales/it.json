@@ -108,11 +108,20 @@
   "loadingModels": "Caricamento modelli di riconoscimento...",
   "loadingDescriptors": "Analisi dei volti (una volta sola)",
   "clickStartCamera": "Clicca \"Avvia Fotocamera\" per iniziare il riconoscimento facciale",
-  "faceReferencesLoaded": "riferimenti facciali caricati",  "capturedImage": "Immagine Catturata",
+  "faceReferencesLoaded": "riferimenti facciali caricati",
+  "capturedImage": "Immagine Catturata",
   "years": "anni",
   "clickToViewDetails": "Clicca per vedere dettagli",
   "selectCamera": "Seleziona Fotocamera",
   "camera": "Fotocamera",
   "switchToBack": "Fotocamera Posteriore",
-  "switchToFront": "Fotocamera Anteriore"
+  "switchToFront": "Fotocamera Anteriore",
+  "firstName": "Nome",
+  "lastName": "Cognome",
+  "notSpecified": "Non specificato",
+  "reliable": "Affidabilità",
+  "updateSuccess": "Aggiornamento riuscito",
+  "personInformationUpdated": "Le informazioni della persona sono state aggiornate",
+  "updateError": "Errore di aggiornamento",
+  "errorUpdatingPerson": "Errore nell'aggiornamento delle informazioni della persona"
 }

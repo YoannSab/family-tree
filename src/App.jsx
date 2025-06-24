@@ -35,8 +35,9 @@ import {
 } from '@chakra-ui/react'
 import { InfoIcon, ChevronLeftIcon, ViewIcon, SearchIcon } from '@chakra-ui/icons'
 import { FiCamera } from 'react-icons/fi'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { fetchFamilyMembers } from './services/familyService.js'
 
 // Custom hook for responsive design that updates in real-time
 const useResponsive = () => {
@@ -81,16 +82,39 @@ export default function App() {
   const { isOpen: isPersonDrawerOpen, onOpen: onPersonDrawerOpen, onClose: onPersonDrawerClose } = useDisclosure()
   const { isOpen: isFaceRecognitionOpen, onOpen: onFaceRecognitionOpen, onClose: onFaceRecognitionClose } = useDisclosure()
 
+  // Refs for swipe detection
+  const drawerRef = useRef(null)
+  const drawerHeaderRef = useRef(null)
+  const touchStartY = useRef(0)
+  const touchEndY = useRef(0)
+  const isDragging = useRef(false)
+  const canSwipe = useRef(false)
+
   // Use custom responsive hook instead of Chakra's useBreakpointValue
   const { isMobile, isTablet, isDesktop } = useResponsive()
   const bgColor = useColorModeValue('gray.50', 'gray.900')
   const cardBg = useColorModeValue('white', 'gray.800')
 
   useEffect(() => {
-    fetch('/data/data_819811684156.json')
-      .then(response => response.json())
-      .then(data => setFamilyData(data))
+    const fetchData = async () => {
+      const data = await fetchFamilyMembers()
+      setFamilyData(data)
+    }
+    fetchData()
   }, [])
+
+  // Fonction pour mettre à jour une personne dans la liste familyData
+  const handlePersonUpdate = (updatedPerson) => {
+    setFamilyData(prevData => 
+      prevData.map(person => 
+        person.id === updatedPerson.id ? updatedPerson : person
+      )
+    )
+    // Mettre à jour la personne sélectionnée si c'est la même
+    if (selectedPerson && selectedPerson.id === updatedPerson.id) {
+      setSelectedPerson(updatedPerson)
+    }
+  }
 
   // Close drawer when screen becomes desktop
   useEffect(() => {
@@ -98,6 +122,55 @@ export default function App() {
       onPersonDrawerClose()
     }
   }, [isDesktop, isPersonDrawerOpen, onPersonDrawerClose])
+
+  // Swipe detection functions
+  const handleTouchStart = (e) => {
+    if (!isMobile) return
+    
+    // Check if touch started in the header area (first 100px of the drawer)
+    const rect = drawerRef.current?.getBoundingClientRect()
+    if (rect) {
+      const touchY = e.touches[0].clientY
+      const headerHeight = 100 // Height of header + some tolerance
+      canSwipe.current = touchY - rect.top <= headerHeight
+    }
+    
+    if (canSwipe.current) {
+      touchStartY.current = e.touches[0].clientY
+      isDragging.current = false
+    }
+  }
+
+  const handleTouchMove = (e) => {
+    if (!isMobile || !canSwipe.current) return
+    
+    touchEndY.current = e.touches[0].clientY
+    const diff = touchEndY.current - touchStartY.current
+    
+    // If swiping down more than 10px, consider it a drag
+    if (diff > 10) {
+      isDragging.current = true
+    }
+  }
+
+  const handleTouchEnd = () => {
+    if (!isMobile || !isDragging.current || !canSwipe.current) return
+    
+    const swipeDistance = touchEndY.current - touchStartY.current
+    const minSwipeDistance = 80 // Reduced minimum distance since we're more selective
+    
+    // If swiped down more than minimum distance, close drawer
+    if (swipeDistance > minSwipeDistance) {
+      onPersonDrawerClose()
+    }
+    
+    // Reset values
+    touchStartY.current = 0
+    touchEndY.current = 0
+    isDragging.current = false
+    canSwipe.current = false
+  }
+
   const handlePersonClick = (person) => {
     setSelectedPerson(person)
   }
@@ -445,7 +518,8 @@ export default function App() {
                         transition="all 0.2s"
                         fontWeight="bold"
                         border="1px solid rgba(255,255,255,0.1)"
-                      >                        <VStack spacing={0}>
+                      >                        
+                      <VStack spacing={0}>
                           <Text fontSize="sm">{t('seeDetailsOn')} {selectedPerson.data.firstName} {selectedPerson.data.lastName}</Text>
                         </VStack>
                       </Button>
@@ -472,6 +546,7 @@ export default function App() {
                         familyData={familyData}
                         setPerson={setSelectedPerson}
                         compact={isTablet}
+                        onPersonUpdate={handlePersonUpdate}
                       />
                     </Box>
                   ) : (
@@ -486,7 +561,8 @@ export default function App() {
                       alignItems="center"
                       justifyContent="center"
                       border="2px dashed #d0d0d0"
-                    >                      <VStack spacing={3} textAlign="center">
+                    >                      
+                    <VStack spacing={3} textAlign="center">
                         <Box fontSize="4xl" opacity={0.6}>👤</Box>
                         <Text fontSize="md" color="gray.600" fontWeight="medium">
                           {t('selectMember')}
@@ -506,8 +582,42 @@ export default function App() {
       {/* Mobile Person Details Drawer */}
       <Drawer isOpen={isPersonDrawerOpen} placement="bottom" onClose={onPersonDrawerClose} size="full">
         <DrawerOverlay />
-        <DrawerContent borderTopRadius="xl" maxH="90vh" bg="linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)">
-          <DrawerHeader pb={2} borderBottom="1px solid #e0e0e0">
+        <DrawerContent 
+          borderTopRadius="xl" 
+          maxH="90vh" 
+          bg="linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)"
+          ref={drawerRef}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <DrawerHeader 
+            pb={2} 
+            borderBottom="1px solid #e0e0e0"
+            ref={drawerHeaderRef}
+            position="relative"
+          >
+            {/* Swipe indicator */}
+            <Box
+              w="60px"
+              h="4px"
+              bg="gray.300"
+              borderRadius="full"
+              mx="auto"
+              mb={3}
+              cursor="pointer"
+              _hover={{ bg: "gray.400" }}
+              transition="background-color 0.2s"
+            />
+            {/* Swipe zone indicator */}
+            <Text
+              fontSize="xs"
+              color="gray.400"
+              textAlign="center"
+              mb={2}
+              fontStyle="italic"
+            >
+            </Text>
             <Flex alignItems="center" gap={3}>
               <IconButton
                 icon={<ChevronLeftIcon />}
@@ -535,16 +645,19 @@ export default function App() {
                 familyData={familyData}
                 setPerson={setSelectedPerson}
                 compact={true}
+                onPersonUpdate={handlePersonUpdate}
               />
             )}
           </DrawerBody>
         </DrawerContent>
-      </Drawer>      {/* Stats Modal */}
+      </Drawer>      
+      {/* Stats Modal */}
       <FamilyStatsModal
         isOpen={isStatsModalOpen}
         onClose={onStatsModalClose}
         familyData={familyData}
-      />      {/* Face Recognition Modal */}
+      />      
+      {/* Face Recognition Modal */}
       <FaceRecognition
         isOpen={isFaceRecognitionOpen}
         onClose={onFaceRecognitionClose}
