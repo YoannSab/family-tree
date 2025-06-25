@@ -1,4 +1,4 @@
-import { db, DATA_SOURCE } from '../config/config.js';
+import { db, DATA_SOURCE, COLLECTION_NAME } from '../config/config.js';
 
 let firestoreDeps;
 
@@ -23,7 +23,7 @@ const getFirebaseDeps = async () => {
 
 const getFamilyCollection = async () => {
   const { collection } = await getFirebaseDeps();
-  return collection(db, 'familyMembers');
+  return collection(db, COLLECTION_NAME);
 };
 
 export const fetchFamilyMembers = async () => {
