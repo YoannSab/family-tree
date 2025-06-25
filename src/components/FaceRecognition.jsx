@@ -354,8 +354,8 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
 
             // Dessiner le label
             const label = match.label !== 'unknown'
-                ? `${match.label} (${confidence.toFixed(1)}%)`
-                : `Unknown (${confidence.toFixed(1)}%)`
+                ? `${match.label}`
+                : `Unknown`
 
             ctx.fillStyle = color
             ctx.fillRect(box.x, box.y - 25, ctx.measureText(label).width + 10, 25)
@@ -717,15 +717,6 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
                                                                             : t('unknownPerson')
                                                                         }
                                                                     </Text>
-                                                                    <Badge
-                                                                        colorScheme={
-                                                                            result.confidence > 50 ? 'green' :
-                                                                                result.confidence > 40 ? 'orange' : 'red'
-                                                                        }
-                                                                        fontSize={isMobile ? "2xs" : "xs"}
-                                                                    >
-                                                                        {result.confidence.toFixed(1)}%
-                                                                    </Badge>
                                                                 </HStack>
                                                                 {result.person && (
                                                                     <Text fontSize="xs" color="gray.500">

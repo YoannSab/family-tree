@@ -3,7 +3,6 @@ import {
   HStack,
   Text,
   Avatar,
-  Badge,
   Box,
   Heading,
   Grid,
@@ -14,26 +13,22 @@ import {
   Icon,
   useColorModeValue,
   useDisclosure,
-  Button,
   Input,
-  FormControl,
-  FormLabel,
   Select,
-  Textarea,
   useToast,
   IconButton
 } from '@chakra-ui/react'
-import { CalendarIcon, StarIcon, EditIcon, CheckIcon, CloseIcon } from '@chakra-ui/icons'
+import { CalendarIcon, EditIcon, CheckIcon, CloseIcon } from '@chakra-ui/icons'
 import { useTranslation } from 'react-i18next'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ImageModal from './ImageModal'
 import { updateFamilyMemberByInternalId } from '../services/familyService'
+import { DATA_SOURCE } from '../config/config'
 
-const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonUpdate }) => {
+const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonUpdate, isEditing, setIsEditing, handlePersonClick }) => {
   const { t } = useTranslation()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [selectedImage, setSelectedImage] = useState({ src: '', name: '' })
-  const [isEditing, setIsEditing] = useState(false)
   const [editForm, setEditForm] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const toast = useToast()
@@ -171,7 +166,7 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonUp
               border={`1px solid ${italianGold}`}
               borderRadius="lg"
               onClick={() => {
-                setPerson(relatedPerson)
+                handlePersonClick(relatedPerson)
               }}
               style={{ cursor: 'pointer' }}
               _hover={{
@@ -335,14 +330,17 @@ const PersonInfo = ({ person, familyData, setPerson, compact = false, onPersonUp
                     />
                   </HStack>
                 ) : (
-                  <IconButton
-                    icon={<EditIcon />}
-                    size="sm"
-                    colorScheme="green"
-                    variant="outline"
-                    onClick={handleEditStart}
-                    aria-label="Modifier"
-                  />
+                  DATA_SOURCE === 'firebase' &&
+                  (
+                    <IconButton
+                      icon={<EditIcon />}
+                      size="sm"
+                      colorScheme="green"
+                      variant="outline"
+                      onClick={handleEditStart}
+                      aria-label="Modifier"
+                    />
+                  )
                 )}
               </HStack>
 

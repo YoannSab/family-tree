@@ -18,6 +18,7 @@ import {
 import { ViewIcon, ViewOffIcon, LockIcon } from '@chakra-ui/icons';
 import { useTranslation } from 'react-i18next';
 import CryptoJS from 'crypto-js';
+import { FAMILY_CONFIG } from '../config/config.js';
 
 const PasswordProtection = ({ onUnlock }) => {
     const { t } = useTranslation();
@@ -82,7 +83,7 @@ const PasswordProtection = ({ onUnlock }) => {
                 <VStack spacing={8} align="stretch">
                     {/* Header */}
                     <VStack spacing={4} textAlign="center">
-                        <Box fontSize="6xl">🇮🇹</Box>
+                        <Box fontSize="6xl">{FAMILY_CONFIG.countryIcon}</Box>
                         <VStack spacing={2}>
                             <Heading
                                 size="xl"
@@ -90,7 +91,7 @@ const PasswordProtection = ({ onUnlock }) => {
                                 fontFamily="serif"
                                 textShadow="2px 2px 4px rgba(0,0,0,0.3)"
                             >
-                                Famiglia Colanero
+                                {FAMILY_CONFIG.familyName}
                             </Heading>
                             <Text
                                 fontSize="lg"
@@ -98,7 +99,7 @@ const PasswordProtection = ({ onUnlock }) => {
                                 fontStyle="italic"
                                 letterSpacing="0.5px"
                             >
-                                {t('subtitle')}
+                                {FAMILY_CONFIG.subtitle}
                             </Text>
                         </VStack>
 

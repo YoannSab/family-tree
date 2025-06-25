@@ -290,11 +290,13 @@ const FamilyStatsModal = ({ isOpen, onClose, familyData }) => {
                   borderRadius="lg"
                 >
                   <CardBody>
-                    <VStack spacing={4} align="stretch">                      <Stat textAlign="center">
+                    <VStack spacing={4} align="stretch">                      
+                      <Stat textAlign="center">
                         <StatLabel fontSize={fontSize}>{t('averageAgeAtFirstChild')}</StatLabel>
                         <StatNumber fontSize={{ base: '2xl', md: '3xl' }} color={italianGreen}>
                           {avgAgeAtFirstChild > 0 ? `${avgAgeAtFirstChild} years` : 'N/A'}
-                        </StatNumber>                        <StatHelpText fontSize="xs">
+                        </StatNumber>
+                        <StatHelpText fontSize="xs">
                           {validParents > 0 ? t('basedOnParents', { count: validParents }) : t('insufficientData')}
                         </StatHelpText>
                       </Stat>

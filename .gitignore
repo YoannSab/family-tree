@@ -28,8 +28,6 @@ dist-ssr
 src/assets/data.js
 test.html
 test.ipynb
-public/images/*
-public/data/*
+public/images/*.JPG
 public/models/*
-src/config/firebase.js
-
+data.json

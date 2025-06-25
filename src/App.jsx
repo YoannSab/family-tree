@@ -31,13 +31,13 @@ import {
   Collapse,
   Divider,
   InputRightElement,
-  transform
 } from '@chakra-ui/react'
 import { InfoIcon, ChevronLeftIcon, ViewIcon, SearchIcon } from '@chakra-ui/icons'
 import { FiCamera } from 'react-icons/fi'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { fetchFamilyMembers } from './services/familyService.js'
+import { FAMILY_CONFIG } from './config/config.js'
 
 // Custom hook for responsive design that updates in real-time
 const useResponsive = () => {
@@ -78,6 +78,7 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [showSearchResults, setShowSearchResults] = useState(false)
+  const [isPersonEditingMode, setIsPersonEditingMode] = useState(false)
   const { isOpen: isStatsModalOpen, onOpen: onStatsModalOpen, onClose: onStatsModalClose } = useDisclosure()
   const { isOpen: isPersonDrawerOpen, onOpen: onPersonDrawerOpen, onClose: onPersonDrawerClose } = useDisclosure()
   const { isOpen: isFaceRecognitionOpen, onOpen: onFaceRecognitionOpen, onClose: onFaceRecognitionClose } = useDisclosure()
@@ -89,6 +90,7 @@ export default function App() {
   const touchEndY = useRef(0)
   const isDragging = useRef(false)
   const canSwipe = useRef(false)
+  const isPersonEditingModeRef = useRef(isPersonEditingMode)
 
   // Use custom responsive hook instead of Chakra's useBreakpointValue
   const { isMobile, isTablet, isDesktop } = useResponsive()
@@ -103,10 +105,15 @@ export default function App() {
     fetchData()
   }, [])
 
+  useEffect(() => {
+    // Update the editing mode ref whenever it changes
+    isPersonEditingModeRef.current = isPersonEditingMode
+  }, [isPersonEditingMode])
+
   // Fonction pour mettre à jour une personne dans la liste familyData
   const handlePersonUpdate = (updatedPerson) => {
-    setFamilyData(prevData => 
-      prevData.map(person => 
+    setFamilyData(prevData =>
+      prevData.map(person =>
         person.id === updatedPerson.id ? updatedPerson : person
       )
     )
@@ -126,7 +133,7 @@ export default function App() {
   // Swipe detection functions
   const handleTouchStart = (e) => {
     if (!isMobile) return
-    
+
     // Check if touch started in the header area (first 100px of the drawer)
     const rect = drawerRef.current?.getBoundingClientRect()
     if (rect) {
@@ -134,7 +141,7 @@ export default function App() {
       const headerHeight = 100 // Height of header + some tolerance
       canSwipe.current = touchY - rect.top <= headerHeight
     }
-    
+
     if (canSwipe.current) {
       touchStartY.current = e.touches[0].clientY
       isDragging.current = false
@@ -143,10 +150,10 @@ export default function App() {
 
   const handleTouchMove = (e) => {
     if (!isMobile || !canSwipe.current) return
-    
+
     touchEndY.current = e.touches[0].clientY
     const diff = touchEndY.current - touchStartY.current
-    
+
     // If swiping down more than 10px, consider it a drag
     if (diff > 10) {
       isDragging.current = true
@@ -155,15 +162,15 @@ export default function App() {
 
   const handleTouchEnd = () => {
     if (!isMobile || !isDragging.current || !canSwipe.current) return
-    
+
     const swipeDistance = touchEndY.current - touchStartY.current
     const minSwipeDistance = 80 // Reduced minimum distance since we're more selective
-    
+
     // If swiped down more than minimum distance, close drawer
     if (swipeDistance > minSwipeDistance) {
       onPersonDrawerClose()
     }
-    
+
     // Reset values
     touchStartY.current = 0
     touchEndY.current = 0
@@ -172,10 +179,20 @@ export default function App() {
   }
 
   const handlePersonClick = (person) => {
+    // Si on est en mode modification et qu'on change de personne, annuler les modifications
+    if (isPersonEditingModeRef.current) {
+      // Annuler le mode d'édition avant de changer de personne
+      setIsPersonEditingMode(false)
+    }
     setSelectedPerson(person)
   }
 
   const handleFaceRecognitionPersonSelect = (person) => {
+    // Si on est en mode modification et qu'on change de personne, annuler les modifications
+    if (isPersonEditingMode) {
+      // Annuler le mode d'édition avant de changer de personne
+      setIsPersonEditingMode(false)
+    }
     // Fermer la modal de reconnaissance faciale
     onFaceRecognitionClose()
     // Sélectionner la personne
@@ -206,10 +223,16 @@ export default function App() {
   }
 
   const handleSearchSelect = (person) => {
+    // Si on est en mode modification et qu'on change de personne, annuler les modifications
+    if (isPersonEditingMode && selectedPerson && person.id !== selectedPerson.id) {
+      // Annuler le mode d'édition avant de changer de personne
+      setIsPersonEditingMode(false)
+    }
     setSelectedPerson(person)
     if (isMobile) {
       onPersonDrawerOpen()
-    } setSearchQuery('')
+    } 
+    setSearchQuery('')
     setShowSearchResults(false)
     setSearchResults([])
   }
@@ -247,9 +270,10 @@ export default function App() {
               alignItems="center"
               justifyContent="space-between"
               mb={3}
+              px={{ base: 2, md: 4 }}
             >
               <HStack spacing={{ base: 3, md: 4 }}>
-                <Box fontSize={{ base: '2xl', md: '3xl' }}>🇮🇹</Box>
+                <Box fontSize={{ base: '2xl', md: '3xl' }}>{FAMILY_CONFIG.countryIcon}</Box>
                 <VStack align="start" spacing={0}>
                   <Heading
                     size={{ base: 'lg', md: 'xl' }}
@@ -258,7 +282,7 @@ export default function App() {
                     fontFamily="serif"
                     textShadow="2px 2px 4px rgba(0,0,0,0.3)"
                   >
-                    {t('familyName')}
+                    {FAMILY_CONFIG.familyName}
                   </Heading>
                   <Text
                     fontSize={{ base: 'sm', md: 'md' }}
@@ -266,7 +290,7 @@ export default function App() {
                     fontStyle="italic"
                     letterSpacing="0.5px"
                   >
-                    {t('subtitle')}
+                    {FAMILY_CONFIG.subtitle}
                   </Text>
                 </VStack>
               </HStack>
@@ -315,7 +339,8 @@ export default function App() {
                 direction="row"
                 justifyContent="center"
                 gap={{ base: 5, md: 10 }}
-              >                <HStack spacing={1} color="rgba(255,255,255,0.9)">
+              >                
+              <HStack spacing={1} color="rgba(255,255,255,0.9)">
                   <Box fontSize="md">💚</Box>
                   <Text fontSize={{ base: 'xs', md: 'sm' }} fontWeight="bold">
                     {livingMembers} {t('living')}
@@ -408,7 +433,7 @@ export default function App() {
                           borderColor: "#d4af37"
                         }}
                       />
-                    
+
                       <InputRightElement>
                         {(
                           <IconButton
@@ -518,8 +543,8 @@ export default function App() {
                         transition="all 0.2s"
                         fontWeight="bold"
                         border="1px solid rgba(255,255,255,0.1)"
-                      >                        
-                      <VStack spacing={0}>
+                      >
+                        <VStack spacing={0}>
                           <Text fontSize="sm">{t('seeDetailsOn')} {selectedPerson.data.firstName} {selectedPerson.data.lastName}</Text>
                         </VStack>
                       </Button>
@@ -547,6 +572,9 @@ export default function App() {
                         setPerson={setSelectedPerson}
                         compact={isTablet}
                         onPersonUpdate={handlePersonUpdate}
+                        isEditing={isPersonEditingMode}
+                        setIsEditing={setIsPersonEditingMode}
+                        handlePersonClick={handlePersonClick}
                       />
                     </Box>
                   ) : (
@@ -561,8 +589,8 @@ export default function App() {
                       alignItems="center"
                       justifyContent="center"
                       border="2px dashed #d0d0d0"
-                    >                      
-                    <VStack spacing={3} textAlign="center">
+                    >
+                      <VStack spacing={3} textAlign="center">
                         <Box fontSize="4xl" opacity={0.6}>👤</Box>
                         <Text fontSize="md" color="gray.600" fontWeight="medium">
                           {t('selectMember')}
@@ -582,17 +610,17 @@ export default function App() {
       {/* Mobile Person Details Drawer */}
       <Drawer isOpen={isPersonDrawerOpen} placement="bottom" onClose={onPersonDrawerClose} size="full">
         <DrawerOverlay />
-        <DrawerContent 
-          borderTopRadius="xl" 
-          maxH="90vh" 
+        <DrawerContent
+          borderTopRadius="xl"
+          maxH="90vh"
           bg="linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)"
           ref={drawerRef}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          <DrawerHeader 
-            pb={2} 
+          <DrawerHeader
+            pb={2}
             borderBottom="1px solid #e0e0e0"
             ref={drawerHeaderRef}
             position="relative"
@@ -635,7 +663,9 @@ export default function App() {
                 </Text>
               </HStack>
               <Spacer />
-              <Box fontSize="sm">🇮🇹</Box>
+              <Box fontSize="sm">
+                {FAMILY_CONFIG.countryIcon}
+              </Box>
             </Flex>
           </DrawerHeader>
           <DrawerBody pb={6} overflowY="auto">
@@ -643,20 +673,23 @@ export default function App() {
               <PersonInfo
                 person={selectedPerson}
                 familyData={familyData}
-                setPerson={setSelectedPerson}
                 compact={true}
+                setPerson={setSelectedPerson}
                 onPersonUpdate={handlePersonUpdate}
+                isEditing={isPersonEditingMode}
+                setIsEditing={setIsPersonEditingMode}
+                handlePersonClick={handlePersonClick}
               />
             )}
           </DrawerBody>
         </DrawerContent>
-      </Drawer>      
+      </Drawer>
       {/* Stats Modal */}
       <FamilyStatsModal
         isOpen={isStatsModalOpen}
         onClose={onStatsModalClose}
         familyData={familyData}
-      />      
+      />
       {/* Face Recognition Modal */}
       <FaceRecognition
         isOpen={isFaceRecognitionOpen}
