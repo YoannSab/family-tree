@@ -8,7 +8,7 @@ const COLLECTION_NAME = "familyMembers";
 // Family Configuration - Edit these values to customize your family tree
 const FAMILY_CONFIG = {
   familyName: "Famiglia Colanero",
-  subtitle: "From the mountains of Abruzzo",
+  subtitle: "Dalle montagne Abruzzesi",
   countryIcon: "🇮🇹",
 };
 

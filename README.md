@@ -5,7 +5,7 @@ Une application web moderne pour visualiser et explorer votre arbre généalogiq
 ## 🛠️ Technologies
 
 - **React 19** + **Vite** - Interface moderne et performante
-- **D3.js** + **Family Chart** - Visualisation interactive de l'arbre
+- **D3.js** + [**Family Chart**](https://donatso.github.io/family-chart-doc/) - Visualisation interactive de l'arbre
 - **Chakra UI** - Design responsive et élégant
 - **Face-api.js** - Reconnaissance faciale IA
 - **i18next** - Support multilingue (FR/EN/IT)
