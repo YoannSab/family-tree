@@ -25,6 +25,7 @@ dist-ssr
 *.sw?
 
 # Sensitive data files
+.env
 src/assets/data.js
 test.html
 test.ipynb
