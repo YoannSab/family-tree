@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Box,
   Flex,
@@ -9,7 +8,6 @@ import {
   HStack,
   Container,
   IconButton,
-  Spacer,
 } from '@chakra-ui/react';
 import { InfoIcon } from '@chakra-ui/icons';
 import LanguageSwitcher from './LanguageSwitcher';

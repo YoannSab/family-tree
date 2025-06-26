@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import { useBreakpointValue } from '@chakra-ui/react';
 import f3 from 'family-chart';
 
@@ -7,11 +7,8 @@ export const useFamilyTree = (familyData, onPersonClick) => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const isTablet = useBreakpointValue({ base: false, md: true, lg: false });
 
-  const memoizedFamilyData = JSON.stringify(familyData);
-
   useEffect(() => {
-    const parsedFamilyData = JSON.parse(memoizedFamilyData);
-    if (!parsedFamilyData || parsedFamilyData.length === 0) {
+    if (!familyData || familyData.length === 0) {
       return;
     }
 
@@ -67,9 +64,9 @@ export const useFamilyTree = (familyData, onPersonClick) => {
       chartRef.current = f3Chart;
     }
 
-    create(parsedFamilyData);
+    create(familyData);
 
-  }, [memoizedFamilyData, isMobile, isTablet, onPersonClick]);
+  }, [familyData, isMobile, isTablet, onPersonClick]);
 
   return chartRef;
 };

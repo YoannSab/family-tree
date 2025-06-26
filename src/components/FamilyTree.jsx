@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import './FamilyTree.css';
+import './css/FamilyTree.css';
 import { useFamilyTree } from '../hooks/useFamilyTree';
 
 export default function FamilyTree({ onPersonClick, familyData }) {

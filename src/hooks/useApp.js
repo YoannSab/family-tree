@@ -149,7 +149,7 @@ export const useApp = () => {
     const query = e.target.value;
     setSearchQuery(query);
 
-    if (query.length > 0) {
+    if (query.length > 2) {
       const results = familyData.filter(person =>
         person.data.firstName.toLowerCase().includes(query.toLowerCase()) ||
         person.data.lastName.toLowerCase().includes(query.toLowerCase())

@@ -1,4 +1,4 @@
-import './App.css';
+import './css/App.css';
 import FamilyTree from './components/FamilyTree.jsx';
 import PersonInfo from './components/PersonInfo.jsx';
 import FamilyStatsModal from './components/FamilyStatsModal.jsx';
