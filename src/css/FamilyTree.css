@@ -98,7 +98,7 @@
 }
 .f3.f3-cont {
   width:100%;
-  height:900px;
+  height:800px;
   max-height:70vh;
   background-color: var(--background-color);
   color:#fff;
@@ -647,7 +647,7 @@
   
   .italian-family-tree {
     /* min-height: 300px !important; */
-    height: 30vh!important;
+    height: 45vh!important;
   }
   
   .italian-card {

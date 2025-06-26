@@ -128,5 +128,17 @@
   "updateSuccess": "Mise à jour réussie",
   "personInformationUpdated": "Les informations de la personne ont été mises à jour",
   "updateError": "Erreur de mise à jour",
-  "errorUpdatingPerson": "Erreur lors de la mise à jour des informations de la personne"
+  "errorUpdatingPerson": "Erreur lors de la mise à jour des informations de la personne",
+  "registeredPersons": "personnes enregistrées",
+  "ofTotal": "du total",
+  "avgChildren": "Enfants Moyens",
+  "perParent": "par parent",
+  "avgAgeFirstChild": "Âge Moyen 1er Enfant",
+  "avgLifespan": "Durée de Vie Moyenne",
+  "forDeceased": "pour les décédés",
+  "longestLife": "Vie la Plus Longue",
+  "recordHolder": "détenteur du record",
+  "married": "Mariés",
+  "births": "Naissances",
+  "birth": "Naissance"
 }

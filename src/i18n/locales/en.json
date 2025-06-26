@@ -127,5 +127,17 @@
   "updateSuccess": "Update successful",
   "personInformationUpdated": "Person information has been updated",
   "updateError": "Update error",
-  "errorUpdatingPerson": "Error updating person information"
+  "errorUpdatingPerson": "Error updating person information",
+  "registeredPersons": "registered persons",
+  "ofTotal": "of total",
+  "avgChildren": "Avg Children",
+  "perParent": "per parent",
+  "avgAgeFirstChild": "Avg Age 1st Child",
+  "avgLifespan": "Avg Lifespan",
+  "forDeceased": "for deceased",
+  "longestLife": "Longest Life",
+  "recordHolder": "record holder",
+  "married": "Married",
+  "births": "Births",
+  "birth": "Birth"
 }

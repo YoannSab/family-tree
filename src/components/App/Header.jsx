@@ -10,15 +10,15 @@ import {
   IconButton,
 } from '@chakra-ui/react';
 import { InfoIcon } from '@chakra-ui/icons';
-import LanguageSwitcher from './LanguageSwitcher';
+import LanguageSwitcher from '../LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 
 const Header = ({
   onStatsModalOpen,
-  totalMembers,
   livingMembers,
   deceasedMembers,
   FAMILY_CONFIG,
+  isMobile
 }) => {
   const { t } = useTranslation();
 
@@ -62,6 +62,32 @@ const Header = ({
                 </Text>
               </VStack>
             </HStack>
+            {!isMobile && (
+              <Flex
+                direction="row"
+                justifyContent="center"
+                gap={{ base: 5, md: 10 }}
+              >
+                <HStack spacing={1} color="rgba(255,255,255,0.9)">
+                  <Box fontSize="md">💚</Box>
+                  <Text fontSize={{ base: 'xs', md: 'sm' }} fontWeight="bold">
+                    {livingMembers} {t('living')}
+                  </Text>
+                </HStack>
+                <HStack spacing={1} color="rgba(255,255,255,0.8)">
+                  <Box fontSize="md">🕊️</Box>
+                  <Text fontSize={{ base: 'xs', md: 'sm' }} fontWeight="bold">
+                    {deceasedMembers} {t('remembered')}
+                  </Text>
+                </HStack>
+                <HStack spacing={1} color="rgba(255,255,255,0.9)">
+                  <Box fontSize="md">🏛️</Box>
+                  <Text fontSize={{ base: 'xs', md: 'sm' }} fontWeight="bold">
+                    5 {t('generations')}
+                  </Text>
+                </HStack>
+              </Flex>
+            )}
             <HStack spacing={2}>
               <LanguageSwitcher size="sm" />
               <IconButton
@@ -92,39 +118,6 @@ const Header = ({
               </Button>
             </HStack>
           </Flex>
-
-          <Box w="full" position="relative">
-            <Box
-              h="2px"
-              bg="linear-gradient(90deg, transparent 0%, #c8a882 20%, #d4af37 50%, #c8a882 80%, transparent 100%)"
-              mb={4}
-              borderRadius="full"
-            />
-            <Flex
-              direction="row"
-              justifyContent="center"
-              gap={{ base: 5, md: 10 }}
-            >
-              <HStack spacing={1} color="rgba(255,255,255,0.9)">
-                <Box fontSize="md">💚</Box>
-                <Text fontSize={{ base: 'xs', md: 'sm' }} fontWeight="bold">
-                  {livingMembers} {t('living')}
-                </Text>
-              </HStack>
-              <HStack spacing={1} color="rgba(255,255,255,0.8)">
-                <Box fontSize="md">🕊️</Box>
-                <Text fontSize={{ base: 'xs', md: 'sm' }} fontWeight="bold">
-                  {deceasedMembers} {t('remembered')}
-                </Text>
-              </HStack>
-              <HStack spacing={1} color="rgba(255,255,255,0.9)">
-                <Box fontSize="md">🏛️</Box>
-                <Text fontSize={{ base: 'xs', md: 'sm' }} fontWeight="bold">
-                  5 {t('generations')}
-                </Text>
-              </HStack>
-            </Flex>
-          </Box>
         </VStack>
       </Container>
     </Box>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {
   Box,
   Heading,
@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 
-const RelatedPersonsList = ({ title, people, handlePersonClick, handleImageClick, isMobile }) => {
+const RelatedPersonsList = memo(({ title, people, handlePersonClick, handleImageClick, isMobile }) => {
   const { t } = useTranslation();
   const cardBg = useColorModeValue('linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)', 'gray.700');
   const italianGold = '#c8a882';
@@ -140,6 +140,8 @@ const RelatedPersonsList = ({ title, people, handlePersonClick, handleImageClick
       </Grid>
     </Box>
   );
-};
+});
+
+RelatedPersonsList.displayName = 'RelatedPersonsList';
 
 export default RelatedPersonsList;
