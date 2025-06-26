@@ -9,7 +9,7 @@ export const useFamilyStatsModal = (familyData) => {
   const italianGreen = '#2d5a27';
 
   const modalSize = useBreakpointValue({ base: 'full', md: '6xl' });
-  const cardGridColumns = useBreakpointValue({ base: 1, md: 2 });
+  const cardGridColumns = useBreakpointValue({ base: 2, md: 5 });
   const fontSize = useBreakpointValue({ base: 'sm', md: 'md' });
   const headerSize = useBreakpointValue({ base: 'md', md: 'lg' });
 

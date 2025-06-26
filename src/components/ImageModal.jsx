@@ -28,7 +28,6 @@ const ImageModal = ({ isOpen, onClose, imageSrc, personName }) => {
                     borderRadius="full"
                     _hover={{ bg: 'rgba(0, 0, 0, 0.8)' }}
                 />
-
                 <ModalBody p={0}>
                     <VStack spacing={4} p={6}>
                         {personName && (
@@ -60,6 +59,7 @@ const ImageModal = ({ isOpen, onClose, imageSrc, personName }) => {
                                 borderRadius="lg"
                                 boxShadow="0 20px 25px -5px rgba(0, 0, 0, 0.1)"
                                 fallbackSrc="/images/default.png"
+                                border="4px solid hsla(59, 100.00%, 68.00%, 0.80)"
                             />
                         </Box>
                     </VStack>
