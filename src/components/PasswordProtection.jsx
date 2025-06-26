@@ -89,6 +89,7 @@ const PasswordProtection = ({ onUnlock }) => {
                         border={`3px solid ${italianGold}`}
                         position="relative"
                         overflow="hidden"
+                        mx={4}
                     >
                         {/* Italian flag accent */}
                         <Box

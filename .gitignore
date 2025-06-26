@@ -31,4 +31,4 @@ test.html
 test.ipynb
 public/images/*.JPG
 public/models/*
-data.json
+data_family.json
