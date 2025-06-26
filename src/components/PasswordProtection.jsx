@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
     Box,
     VStack,
@@ -13,58 +13,26 @@ import {
     InputGroup,
     InputRightElement,
     IconButton,
-    useColorModeValue,
 } from '@chakra-ui/react';
 import { ViewIcon, ViewOffIcon, LockIcon } from '@chakra-ui/icons';
-import { useTranslation } from 'react-i18next';
-import CryptoJS from 'crypto-js';
 import { FAMILY_CONFIG } from '../config/config.js';
+import { usePasswordProtection } from '../hooks/usePasswordProtection.js';
 
 const PasswordProtection = ({ onUnlock }) => {
-    const { t } = useTranslation();
-    const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-
-    const targetHash = '10bad1fc4630e07864527ea519a0e323d8a1e176a2c8564eaa6211c02e6cfc80';
-
-    const bgColor = useColorModeValue('gray.50', 'gray.900');
-    const cardBg = useColorModeValue('white', 'gray.800');
-    const italianGold = '#c8a882';
-    const italianGreen = '#2d5a27';
-
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setIsLoading(true);
-        setError('');
-
-        // Hash the password using SHA-256
-        const hashedPassword = CryptoJS.SHA256(password).toString();
-
-        if (hashedPassword === targetHash) {
-            // Simply store auth: true in localStorage
-            localStorage.setItem('familyTreePassword', password);
-            onUnlock();
-        } else {
-            setError(t('passwordError'));
-            setPassword('');
-        }
-
-        setIsLoading(false);
-    };
-
-    useEffect(() => {
-        const storedPassword = localStorage.getItem('familyTreePassword');
-        if (storedPassword) {
-            const hashedStoredPassword = CryptoJS.SHA256(storedPassword).toString();
-            if (hashedStoredPassword === targetHash) {
-                onUnlock();
-            }
-        }
-    }, [onUnlock]);
-
+    const {
+        t,
+        password,
+        setPassword,
+        showPassword,
+        toggleShowPassword,
+        error,
+        isLoading,
+        handleSubmit,
+        bgColor,
+        cardBg,
+        italianGold,
+        italianGreen,
+    } = usePasswordProtection(onUnlock);
 
     return (
         <Box minH="100vh" bg={bgColor} display="flex" alignItems="center" justifyContent="center">
@@ -176,7 +144,7 @@ const PasswordProtection = ({ onUnlock }) => {
                                             <IconButton
                                                 h="1.75rem"
                                                 size="sm"
-                                                onClick={() => setShowPassword(!showPassword)}
+                                                onClick={toggleShowPassword}
                                                 icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
                                                 variant="ghost"
                                                 color="gray.500"
