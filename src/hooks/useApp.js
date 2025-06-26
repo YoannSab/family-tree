@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useDisclosure, useColorModeValue } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { fetchFamilyMembers } from '../services/familyService';
