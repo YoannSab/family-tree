@@ -18,7 +18,7 @@ import {
   Divider,
 } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
-import { FiCamera } from 'react-icons/fi';
+import { FiCamera, FiRefreshCw } from 'react-icons/fi';
 
 const TreeSectionHeader = memo(({
   t,
@@ -28,7 +28,8 @@ const TreeSectionHeader = memo(({
   searchResults,
   handleSearchChange,
   handleSearchSelect,
-  onFaceRecognitionOpen
+  onFaceRecognitionOpen,
+  onResetView
 }) => {
   return (
     <Box>
@@ -66,6 +67,29 @@ const TreeSectionHeader = memo(({
             </Text>
           </VStack>
         </HStack>
+
+        {/* Control Buttons */}
+        <HStack spacing={2}>
+          <IconButton
+            icon={<FiRefreshCw />}
+            onClick={onResetView}
+            variant="outline"
+            size={isMobile ? "md" : "lg"}
+            aria-label={t('resetView')}
+            bg="white"
+            border="2px solid #c8a882"
+            borderRadius="xl"
+            color="#2d5a27"
+            _hover={{
+              bg: "rgba(200, 168, 130, 0.1)",
+              borderColor: "#d4af37",
+              transform: "scale(1.05)"
+            }}
+            _active={{
+              transform: "scale(0.95)"
+            }}
+            title={t('resetView')}
+          />
 
         {/* Search Bar */}
         <Box position="relative" maxW="400px" w="full">
@@ -159,7 +183,9 @@ const TreeSectionHeader = memo(({
             </Box>
           </Collapse>
         </Box>
+        </HStack>
       </Flex>
+      
 
       {/* Decorative separator */}
       <Box

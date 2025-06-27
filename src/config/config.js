@@ -5,6 +5,9 @@ const DATA_SOURCE = "firebase";
 // Collection name in Firestore
 const COLLECTION_NAME = "familyMembers";
 
+// Password Hash
+const TARGET_HASH = import.meta.env.VITE_TARGET_HASH || "";
+
 // Family Configuration - Edit these values to customize your family tree
 const FAMILY_CONFIG = {
   familyName: "Famiglia Colanero",
@@ -31,4 +34,4 @@ if (DATA_SOURCE === "firebase") {
   db = getFirestore(app);
 }
 
-export { db, DATA_SOURCE, FAMILY_CONFIG, COLLECTION_NAME };
+export { db, DATA_SOURCE, FAMILY_CONFIG, COLLECTION_NAME, TARGET_HASH };

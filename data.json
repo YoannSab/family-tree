@@ -1,0 +1,1829 @@
+[
+    {
+        "id": "0",
+        "data": {
+            "firstName": "Nonna",
+            "lastName": "Concetta",
+            "gender": "F",
+            "birthday": "1911",
+            "death": "2005",
+            "image": "nonna_concetta_7671334563",
+            "occupation": "Farmer",
+            "generation": 1,
+            "reliable": true
+        },
+        "rels": {
+            "spouses": [
+                "1"
+            ],
+            "children": [
+                "2",
+                "9",
+                "15",
+                "24",
+                "34",
+                "44",
+                "56",
+                "59",
+                "68"
+            ]
+        }
+    },
+    {
+        "id": "1",
+        "data": {
+            "firstName": "Nonno",
+            "lastName": "Donato",
+            "gender": "M",
+            "birthday": "1916",
+            "death": "1983",
+            "image": "nonno_donato_2601585975",
+            "occupation": "Farmer",
+            "generation": 1,
+            "reliable": true
+        },
+        "rels": {
+            "spouses": [
+                "0"
+            ],
+            "children": [
+                "2",
+                "9",
+                "15",
+                "24",
+                "34",
+                "44",
+                "56",
+                "59",
+                "68"
+            ]
+        }
+    },
+    {
+        "id": "2",
+        "data": {
+            "firstName": "Zia",
+            "lastName": "Lucia",
+            "gender": "F",
+            "birthday": "1936",
+            "death": "2022",
+            "image": "zia_lucia_9837605538",
+            "occupation": "Farmer",
+            "generation": 2,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "0",
+            "father": "1",
+            "spouses": [
+                "3"
+            ],
+            "children": [
+                "4"
+            ]
+        }
+    },
+    {
+        "id": "3",
+        "data": {
+            "firstName": "Zio",
+            "lastName": "Nicola",
+            "gender": "M",
+            "birthday": "1926",
+            "death": "2022",
+            "image": "zio_nicola_9472630918",
+            "occupation": "Farmer",
+            "generation": 2,
+            "reliable": true
+        },
+        "rels": {
+            "spouses": [
+                "2"
+            ],
+            "children": [
+                "4"
+            ]
+        }
+    },
+    {
+        "id": "4",
+        "data": {
+            "firstName": "Domenico",
+            "lastName": "Rulli",
+            "gender": "M",
+            "birthday": "1965",
+            "death": "",
+            "image": "domenico_rulli_3051487239",
+            "occupation": "Solderer",
+            "generation": 3,
+            "reliable": false
+        },
+        "rels": {
+            "mother": "2",
+            "father": "3",
+            "spouses": [
+                "6"
+            ],
+            "children": [
+                "7",
+                "8"
+            ]
+        }
+    },
+    {
+        "id": "6",
+        "data": {
+            "firstName": "Marilena",
+            "lastName": "d'Amico",
+            "gender": "F",
+            "birthday": "1965",
+            "death": "",
+            "image": "marilena_rulli_1532569390",
+            "occupation": "",
+            "generation": 3,
+            "reliable": false
+        },
+        "rels": {
+            "spouses": [
+                "4"
+            ],
+            "children": [
+                "7",
+                "8"
+            ]
+        }
+    },
+    {
+        "id": "7",
+        "data": {
+            "firstName": "Nicola",
+            "lastName": "Rulli",
+            "gender": "M",
+            "birthday": "1998",
+            "death": "",
+            "image": "nicola_5672540894",
+            "occupation": "",
+            "generation": 4,
+            "reliable": false
+        },
+        "rels": {
+            "mother": "6",
+            "father": "4",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "8",
+        "data": {
+            "firstName": "Gabriele",
+            "lastName": "Rulli",
+            "gender": "M",
+            "birthday": "2002",
+            "death": "",
+            "image": "gabriele_9597630567",
+            "occupation": "",
+            "generation": 4,
+            "reliable": false
+        },
+        "rels": {
+            "mother": "6",
+            "father": "4",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "9",
+        "data": {
+            "firstName": "Zio",
+            "lastName": "Fileno",
+            "gender": "M",
+            "birthday": "1938",
+            "death": "2020",
+            "image": "zio_fileno_8612535937",
+            "occupation": "Electrician",
+            "generation": 2,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "0",
+            "father": "1",
+            "children": [
+                "10"
+            ],
+            "spouses": [
+                "80"
+            ]
+        }
+    },
+    {
+        "id": "80",
+        "data": {
+            "firstName": "Unknown",
+            "lastName": "Zia",
+            "gender": "F",
+            "birthday": "",
+            "death": "",
+            "image": "",
+            "occupation": "",
+            "generation": 2,
+            "reliable": false
+        },
+        "rels": {
+            "spouses": [
+                "9"
+            ],
+            "children": [
+                "10"
+            ]
+        }
+    },
+    {
+        "id": "10",
+        "data": {
+            "firstName": "Dino",
+            "lastName": "Colanero",
+            "gender": "M",
+            "birthday": "1970",
+            "death": "",
+            "image": "dino_9895890217",
+            "occupation": "Electrician",
+            "generation": 3,
+            "reliable": false
+        },
+        "rels": {
+            "father": "9",
+            "spouses": [
+                "11"
+            ],
+            "children": [
+                "12",
+                "13",
+                "14"
+            ],
+            "mother": "80"
+        }
+    },
+    {
+        "id": "11",
+        "data": {
+            "firstName": "Carla",
+            "lastName": "Pacifico",
+            "gender": "F",
+            "birthday": "1968",
+            "death": "",
+            "image": "carla_3271578200",
+            "occupation": "Facebook fitgirl",
+            "generation": 3,
+            "reliable": false
+        },
+        "rels": {
+            "spouses": [
+                "10"
+            ],
+            "children": [
+                "12",
+                "13",
+                "14"
+            ]
+        }
+    },
+    {
+        "id": "12",
+        "data": {
+            "firstName": "Demetrio",
+            "lastName": "Colanero",
+            "gender": "M",
+            "birthday": "2006",
+            "death": "",
+            "image": "demetrio_8224165684",
+            "occupation": "",
+            "generation": 4,
+            "reliable": false
+        },
+        "rels": {
+            "mother": "11",
+            "father": "10",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "13",
+        "data": {
+            "firstName": "Samuele",
+            "lastName": "Colanero",
+            "gender": "M",
+            "birthday": "2005",
+            "death": "",
+            "image": "samuele_7042475449",
+            "occupation": "",
+            "generation": 4,
+            "reliable": false
+        },
+        "rels": {
+            "mother": "11",
+            "father": "10",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "14",
+        "data": {
+            "firstName": "Fiona",
+            "lastName": "Colanero",
+            "gender": "F",
+            "birthday": "2008",
+            "death": "",
+            "image": "fiona_6815681540",
+            "occupation": "",
+            "generation": 4,
+            "reliable": false
+        },
+        "rels": {
+            "mother": "11",
+            "father": "10",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "15",
+        "data": {
+            "firstName": "Zia",
+            "lastName": "Menouch",
+            "gender": "F",
+            "birthday": "1939",
+            "death": "",
+            "image": "zia_menouch_2976092187",
+            "occupation": "",
+            "generation": 2,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "0",
+            "father": "1",
+            "spouses": [
+                "16"
+            ],
+            "children": [
+                "17"
+            ]
+        }
+    },
+    {
+        "id": "16",
+        "data": {
+            "firstName": "Zio",
+            "lastName": "Antonio",
+            "gender": "M",
+            "birthday": "1934",
+            "death": "2020",
+            "image": "zio_antonio_8803085104",
+            "occupation": "Bricklayer",
+            "generation": 2,
+            "reliable": true
+        },
+        "rels": {
+            "spouses": [
+                "15"
+            ],
+            "children": [
+                "17"
+            ]
+        }
+    },
+    {
+        "id": "17",
+        "data": {
+            "firstName": "Mario",
+            "lastName": "Di Renzo",
+            "gender": "M",
+            "birthday": "1962",
+            "death": "",
+            "image": "mario_direnzo_4099915040",
+            "occupation": "",
+            "generation": 3,
+            "reliable": false
+        },
+        "rels": {
+            "mother": "15",
+            "father": "16",
+            "spouses": [
+                "18"
+            ],
+            "children": [
+                "19",
+                "20",
+                "21"
+            ]
+        }
+    },
+    {
+        "id": "18",
+        "data": {
+            "firstName": "Marilena",
+            "lastName": "Persichitti",
+            "gender": "F",
+            "birthday": "1967",
+            "death": "",
+            "image": "marilena_4526153398",
+            "occupation": "Worker",
+            "generation": 3,
+            "reliable": false
+        },
+        "rels": {
+            "spouses": [
+                "17"
+            ],
+            "children": [
+                "19",
+                "20",
+                "21"
+            ]
+        }
+    },
+    {
+        "id": "19",
+        "data": {
+            "firstName": "Milena",
+            "lastName": "Di Renzo",
+            "gender": "F",
+            "birthday": "1991",
+            "death": "",
+            "image": "milena_2064415859",
+            "occupation": "",
+            "generation": 4,
+            "reliable": false
+        },
+        "rels": {
+            "mother": "18",
+            "father": "17",
+            "spouses": [
+                "22"
+            ],
+            "children": [
+                "23"
+            ]
+        }
+    },
+    {
+        "id": "22",
+        "data": {
+            "firstName": "Graziano",
+            "lastName": "Lallo",
+            "gender": "M",
+            "birthday": "1988",
+            "death": "",
+            "image": "graziano_3288299514",
+            "occupation": "",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "spouses": [
+                "19"
+            ],
+            "children": [
+                "23"
+            ]
+        }
+    },
+    {
+        "id": "23",
+        "data": {
+            "firstName": "Samuele",
+            "lastName": "Lallo",
+            "gender": "M",
+            "birthday": "2025",
+            "death": "",
+            "image": "samuele_6926142274",
+            "occupation": "",
+            "generation": 5,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "22",
+            "father": "23",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "20",
+        "data": {
+            "firstName": "Roberta",
+            "lastName": "Di Renzo",
+            "gender": "F",
+            "birthday": "1995",
+            "death": "",
+            "image": "roberta_2648214103",
+            "occupation": "",
+            "generation": 4,
+            "reliable": false
+        },
+        "rels": {
+            "mother": "18",
+            "father": "17",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "21",
+        "data": {
+            "firstName": "Antonio",
+            "lastName": "Di Renzo",
+            "gender": "M",
+            "birthday": "2002",
+            "death": "",
+            "image": "antonio_direnzo_8635883075",
+            "occupation": "",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "18",
+            "father": "17",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "24",
+        "data": {
+            "firstName": "Zia",
+            "lastName": "Alessia",
+            "gender": "F",
+            "birthday": "1945",
+            "death": "",
+            "image": "zia_alessia_3691040334",
+            "occupation": "",
+            "generation": 2,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "0",
+            "father": "1",
+            "spouses": [
+                "25"
+            ],
+            "children": [
+                "26",
+                "27"
+            ]
+        }
+    },
+    {
+        "id": "25",
+        "data": {
+            "firstName": "Zio",
+            "lastName": "Domenico",
+            "gender": "M",
+            "birthday": "1935",
+            "death": "2018",
+            "image": "zio_domenico_4158735888",
+            "occupation": "",
+            "generation": 2,
+            "reliable": true
+        },
+        "rels": {
+            "spouses": [
+                "24"
+            ],
+            "children": [
+                "26",
+                "27"
+            ]
+        }
+    },
+    {
+        "id": "26",
+        "data": {
+            "firstName": "Carmelina",
+            "lastName": "Foresi",
+            "gender": "F",
+            "birthday": "1966",
+            "death": "",
+            "image": "carmelina_5932243697",
+            "occupation": "Secretary",
+            "generation": 3,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "24",
+            "father": "25",
+            "spouses": [
+                "28"
+            ],
+            "children": [
+                "29",
+                "30"
+            ]
+        }
+    },
+    {
+        "id": "28",
+        "data": {
+            "firstName": "Donato",
+            "lastName": "Gentile",
+            "gender": "M",
+            "birthday": "1955",
+            "death": "",
+            "image": "donato_gentile_8907784759",
+            "occupation": "",
+            "generation": 3,
+            "reliable": true
+        },
+        "rels": {
+            "spouses": [
+                "26"
+            ],
+            "children": [
+                "29",
+                "30"
+            ]
+        }
+    },
+    {
+        "id": "29",
+        "data": {
+            "firstName": "Andrea",
+            "lastName": "Gentile",
+            "gender": "M",
+            "birthday": "1995",
+            "death": "",
+            "image": "andrea_gentile_8530481187",
+            "occupation": "",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "28",
+            "father": "26",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "30",
+        "data": {
+            "firstName": "Marialisa",
+            "lastName": "Gentile",
+            "gender": "F",
+            "birthday": "1997",
+            "death": "",
+            "image": "marialisa_4627284447",
+            "occupation": "",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "28",
+            "father": "26",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "27",
+        "data": {
+            "firstName": "Carmine",
+            "lastName": "Foresi",
+            "gender": "M",
+            "birthday": "1968",
+            "death": "",
+            "image": "carmine_1864109857",
+            "occupation": "Chemical Engineer",
+            "generation": 3,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "24",
+            "father": "25",
+            "spouses": [
+                "31"
+            ],
+            "children": [
+                "32",
+                "33"
+            ]
+        }
+    },
+    {
+        "id": "31",
+        "data": {
+            "firstName": "Teresa",
+            "lastName": "Catalano",
+            "gender": "F",
+            "birthday": "1970",
+            "death": "",
+            "image": "teresa_4612147507",
+            "occupation": "",
+            "generation": 3,
+            "reliable": false
+        },
+        "rels": {
+            "spouses": [
+                "27"
+            ],
+            "children": [
+                "32",
+                "33"
+            ]
+        }
+    },
+    {
+        "id": "32",
+        "data": {
+            "firstName": "Domenico",
+            "lastName": "Foresi",
+            "gender": "M",
+            "birthday": "2003",
+            "death": "",
+            "image": "domenico_2935465090",
+            "occupation": "",
+            "generation": 4,
+            "reliable": false
+        },
+        "rels": {
+            "mother": "31",
+            "father": "27",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "33",
+        "data": {
+            "firstName": "Erika",
+            "lastName": "Foresi",
+            "gender": "F",
+            "birthday": "2005",
+            "death": "",
+            "image": "erika_3451134478",
+            "occupation": "",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "31",
+            "father": "27",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "34",
+        "data": {
+            "firstName": "Zia",
+            "lastName": "Isoletta",
+            "gender": "F",
+            "birthday": "1942",
+            "death": "",
+            "image": "zia_isoletta_4514128423",
+            "occupation": "",
+            "generation": 2,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "0",
+            "father": "1",
+            "spouses": [
+                "35"
+            ],
+            "children": [
+                "36",
+                "37"
+            ]
+        }
+    },
+    {
+        "id": "35",
+        "data": {
+            "firstName": "Zio",
+            "lastName": "Felice",
+            "gender": "M",
+            "birthday": "1935",
+            "death": "",
+            "image": "zio_felice_9617672214",
+            "occupation": "",
+            "generation": 2,
+            "reliable": true
+        },
+        "rels": {
+            "spouses": [
+                "34"
+            ],
+            "children": [
+                "36",
+                "37"
+            ]
+        }
+    },
+    {
+        "id": "36",
+        "data": {
+            "firstName": "Leo",
+            "lastName": "Falcone",
+            "gender": "M",
+            "birthday": "1968",
+            "death": "",
+            "image": "leo_falcone_1402757486",
+            "occupation": "Teacher",
+            "generation": 3,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "34",
+            "father": "35",
+            "spouses": [
+                "38"
+            ],
+            "children": [
+                "39",
+                "40"
+            ]
+        }
+    },
+    {
+        "id": "38",
+        "data": {
+            "firstName": "Bev",
+            "lastName": "",
+            "gender": "F",
+            "birthday": "1970",
+            "death": "",
+            "image": "bev_6575959268",
+            "occupation": "Secretary",
+            "generation": 3,
+            "reliable": false
+        },
+        "rels": {
+            "spouses": [
+                "36"
+            ],
+            "children": [
+                "39",
+                "40"
+            ]
+        }
+    },
+    {
+        "id": "39",
+        "data": {
+            "firstName": "Vinny",
+            "lastName": "Falcone",
+            "gender": "M",
+            "birthday": "2004",
+            "death": "",
+            "image": "vinny_2861130464",
+            "occupation": "Mechanic",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "38",
+            "father": "36",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "40",
+        "data": {
+            "firstName": "Elia",
+            "lastName": "Falcone",
+            "gender": "F",
+            "birthday": "2002",
+            "death": "",
+            "image": "elia_6656924484",
+            "occupation": "Volley Pro player",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "38",
+            "father": "36",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "37",
+        "data": {
+            "firstName": "Dan",
+            "lastName": "Falcone",
+            "gender": "M",
+            "birthday": "1968",
+            "death": "",
+            "image": "dan_8865767333",
+            "occupation": "Teacher",
+            "generation": 3,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "34",
+            "father": "35",
+            "spouses": [
+                "41"
+            ],
+            "children": [
+                "42",
+                "43"
+            ]
+        }
+    },
+    {
+        "id": "41",
+        "data": {
+            "firstName": "Heather",
+            "lastName": "",
+            "gender": "F",
+            "birthday": "1972",
+            "death": "",
+            "image": "heather_7339900508",
+            "occupation": "Medical Tech",
+            "generation": 3,
+            "reliable": false
+        },
+        "rels": {
+            "spouses": [
+                "37"
+            ],
+            "children": [
+                "42",
+                "43"
+            ]
+        }
+    },
+    {
+        "id": "42",
+        "data": {
+            "firstName": "Ayden",
+            "lastName": "Falcone",
+            "gender": "M",
+            "birthday": "2005",
+            "death": "",
+            "image": "ayden_9412974122",
+            "occupation": "",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "41",
+            "father": "37",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "43",
+        "data": {
+            "firstName": "Noah",
+            "lastName": "Falcone",
+            "gender": "M",
+            "birthday": "2003",
+            "death": "",
+            "image": "noah_4578112086",
+            "occupation": "",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "41",
+            "father": "37",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "44",
+        "data": {
+            "firstName": "Zia",
+            "lastName": "Emma",
+            "gender": "F",
+            "birthday": "1946",
+            "death": "",
+            "image": "mamie_1396507885",
+            "occupation": "",
+            "generation": 2,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "0",
+            "father": "1",
+            "spouses": [
+                "45"
+            ],
+            "children": [
+                "46",
+                "47",
+                "48"
+            ]
+        }
+    },
+    {
+        "id": "45",
+        "data": {
+            "firstName": "Zio",
+            "lastName": "Giuseppe",
+            "gender": "M",
+            "birthday": "1937",
+            "death": "2025",
+            "image": "papi_7860519575",
+            "occupation": "Bricklayer",
+            "generation": 2,
+            "reliable": true
+        },
+        "rels": {
+            "spouses": [
+                "44"
+            ],
+            "children": [
+                "46",
+                "47",
+                "48"
+            ]
+        }
+    },
+    {
+        "id": "46",
+        "data": {
+            "firstName": "Mario",
+            "lastName": "Montanaro",
+            "gender": "M",
+            "birthday": "1967",
+            "death": "",
+            "image": "mario_montanaro_7344771065",
+            "occupation": "Old car expert",
+            "generation": 3,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "44",
+            "father": "45",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "47",
+        "data": {
+            "firstName": "Daniele",
+            "lastName": "Montanaro",
+            "gender": "F",
+            "birthday": "1968",
+            "death": "",
+            "image": "daniele_montanaro_5674051191",
+            "occupation": "Accountant",
+            "generation": 3,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "44",
+            "father": "45",
+            "spouses": [
+                "49"
+            ],
+            "children": [
+                "50",
+                "51",
+                "52"
+            ]
+        }
+    },
+    {
+        "id": "49",
+        "data": {
+            "firstName": "Denis",
+            "lastName": "Sabatier",
+            "gender": "M",
+            "birthday": "1968",
+            "death": "",
+            "image": "denis_sabatier_4658943168",
+            "occupation": "Bus Driver",
+            "generation": 3,
+            "reliable": true
+        },
+        "rels": {
+            "spouses": [
+                "47"
+            ],
+            "children": [
+                "50",
+                "51",
+                "52"
+            ]
+        }
+    },
+    {
+        "id": "50",
+        "data": {
+            "firstName": "Ludovic",
+            "lastName": "Sabatier Montanaro",
+            "gender": "M",
+            "birthday": "1999",
+            "death": "",
+            "image": "ludo_3422282339",
+            "occupation": "Pilot",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "47",
+            "father": "49",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "51",
+        "data": {
+            "firstName": "Yoann",
+            "lastName": "Sabatier Montanaro",
+            "gender": "M",
+            "birthday": "2001",
+            "death": "",
+            "image": "yoann_9374637141",
+            "occupation": "Computer Scientist",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "spouses": [
+                "81"
+            ],
+            "children": [],
+            "mother": "47",
+            "father": "49"
+        }
+    },
+    {
+        "id": "81",
+        "data": {
+            "firstName": "Charline",
+            "lastName": "Courbon",
+            "gender": "F",
+            "birthday": "2001",
+            "death": "",
+            "image": "charline_6841597206",
+            "occupation": "Biomedical Engineer",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "spouses": [
+                "51"
+            ],
+            "children": []
+        }
+    },
+    {
+        "id": "52",
+        "data": {
+            "firstName": "Emmanuel",
+            "lastName": "Sabatier Montanaro",
+            "gender": "M",
+            "birthday": "2007",
+            "death": "",
+            "image": "manu_3242652099",
+            "occupation": "Branlos",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "47",
+            "father": "49",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "48",
+        "data": {
+            "firstName": "Isabelle",
+            "lastName": "Gautron",
+            "gender": "F",
+            "birthday": "1972",
+            "death": "",
+            "image": "isabelle_8209557873",
+            "occupation": "Customer care",
+            "generation": 3,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "44",
+            "father": "45",
+            "spouses": [
+                "53"
+            ],
+            "children": [
+                "54",
+                "55"
+            ]
+        }
+    },
+    {
+        "id": "53",
+        "data": {
+            "firstName": "Nicolas",
+            "lastName": "Gautron",
+            "gender": "M",
+            "birthday": "1975",
+            "death": "",
+            "image": "nicolas_9503800972",
+            "occupation": "CEO",
+            "generation": 3,
+            "reliable": true
+        },
+        "rels": {
+            "spouses": [
+                "48"
+            ],
+            "children": [
+                "54",
+                "55"
+            ]
+        }
+    },
+    {
+        "id": "54",
+        "data": {
+            "firstName": "Matteo",
+            "lastName": "Gautron",
+            "gender": "M",
+            "birthday": "2001",
+            "death": "",
+            "image": "matteo_2178369129",
+            "occupation": "Network tech",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "48",
+            "father": "53",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "55",
+        "data": {
+            "firstName": "Giuliano",
+            "lastName": "Gautron",
+            "gender": "M",
+            "birthday": "2003",
+            "death": "",
+            "image": "giuliano_6435107928",
+            "occupation": "Hotel manager",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "48",
+            "father": "53",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "56",
+        "data": {
+            "firstName": "Zia",
+            "lastName": "Antonietta",
+            "gender": "F",
+            "birthday": "1948",
+            "death": "",
+            "image": "zia_antonietta_6140201973",
+            "occupation": "",
+            "generation": 2,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "0",
+            "father": "1",
+            "spouses": [
+                "57"
+            ],
+            "children": [
+                "58"
+            ]
+        }
+    },
+    {
+        "id": "57",
+        "data": {
+            "firstName": "Zio",
+            "lastName": "Antonio",
+            "gender": "M",
+            "birthday": "1940",
+            "death": "2021",
+            "image": "zio_antonio2_5846338522",
+            "occupation": "Collier",
+            "generation": 2,
+            "reliable": true
+        },
+        "rels": {
+            "spouses": [
+                "56"
+            ],
+            "children": [
+                "58"
+            ]
+        }
+    },
+    {
+        "id": "58",
+        "data": {
+            "firstName": "Carlo",
+            "lastName": "Foresi",
+            "gender": "M",
+            "birthday": "1976",
+            "death": "",
+            "image": "carlo_1603230333",
+            "occupation": "Tech support",
+            "generation": 3,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "56",
+            "father": "57",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "59",
+        "data": {
+            "firstName": "Zia",
+            "lastName": "Giuseppina",
+            "gender": "F",
+            "birthday": "1952",
+            "death": "",
+            "image": "zia_pina_7296515830",
+            "occupation": "",
+            "generation": 2,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "0",
+            "father": "1",
+            "spouses": [
+                "76"
+            ],
+            "children": [
+                "60",
+                "61"
+            ]
+        }
+    },
+    {
+        "id": "76",
+        "data": {
+            "firstName": "Zio",
+            "lastName": "Carmine",
+            "gender": "M",
+            "birthday": "1945",
+            "death": "1995",
+            "image": "zio_carmine_6465704839",
+            "occupation": "Train support",
+            "generation": 2,
+            "reliable": false
+        },
+        "rels": {
+            "spouses": [
+                "59"
+            ],
+            "children": [
+                "60",
+                "61"
+            ]
+        }
+    },
+    {
+        "id": "60",
+        "data": {
+            "firstName": "Dino",
+            "lastName": "d'Ulisse",
+            "gender": "M",
+            "birthday": "1973",
+            "death": "",
+            "image": "dino_dulisse_4258968248",
+            "occupation": "Train support",
+            "generation": 3,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "59",
+            "spouses": [
+                "62"
+            ],
+            "children": [
+                "63",
+                "64"
+            ],
+            "father": "76"
+        }
+    },
+    {
+        "id": "62",
+        "data": {
+            "firstName": "Eliza",
+            "lastName": "Arentewicz",
+            "gender": "F",
+            "birthday": "1975",
+            "death": "",
+            "image": "eliza_9762036397",
+            "occupation": "Yoga Instructor",
+            "generation": 3,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "59",
+            "spouses": [
+                "60"
+            ],
+            "children": [
+                "63",
+                "64"
+            ]
+        }
+    },
+    {
+        "id": "63",
+        "data": {
+            "firstName": "Dario",
+            "lastName": "d'Ulisse",
+            "gender": "M",
+            "birthday": "2008",
+            "death": "",
+            "image": "dario_1331210477",
+            "occupation": "Musician",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "62",
+            "father": "60",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "64",
+        "data": {
+            "firstName": "Niko",
+            "lastName": "d'Ulisse",
+            "gender": "M",
+            "birthday": "2010",
+            "death": "",
+            "image": "niko_5868926478",
+            "occupation": "Fortnite Pro Player",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "62",
+            "father": "60",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "61",
+        "data": {
+            "firstName": "Rita",
+            "lastName": "d'Ulisse",
+            "gender": "F",
+            "birthday": "1976",
+            "death": "",
+            "image": "rita_6169843254",
+            "occupation": "Airline Trainer",
+            "generation": 3,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "59",
+            "spouses": [
+                "65"
+            ],
+            "children": [
+                "66",
+                "67"
+            ],
+            "father": "76"
+        }
+    },
+    {
+        "id": "65",
+        "data": {
+            "firstName": "Mike",
+            "lastName": "Hicke",
+            "gender": "M",
+            "birthday": "1976",
+            "death": "",
+            "image": "mike_7647697704",
+            "occupation": "Gas Engineer",
+            "generation": 3,
+            "reliable": true
+        },
+        "rels": {
+            "spouses": [
+                "61"
+            ],
+            "children": [
+                "66",
+                "67"
+            ]
+        }
+    },
+    {
+        "id": "66",
+        "data": {
+            "firstName": "Aria",
+            "lastName": "Hicke",
+            "gender": "F",
+            "birthday": "2009",
+            "death": "",
+            "image": "aria_7854987567",
+            "occupation": "Gifted Cheerleader",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "61",
+            "father": "65",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "67",
+        "data": {
+            "firstName": "Ryder",
+            "lastName": "Hicke",
+            "gender": "M",
+            "birthday": "2011",
+            "death": "",
+            "image": "ryder_4267868135",
+            "occupation": "VR Enthusiast",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "61",
+            "father": "65",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "68",
+        "data": {
+            "firstName": "Zia",
+            "lastName": "Wilma",
+            "gender": "F",
+            "birthday": "1956",
+            "death": "",
+            "image": "zia_wilma_8830391540",
+            "occupation": "",
+            "generation": 2,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "0",
+            "father": "1",
+            "spouses": [
+                "69"
+            ],
+            "children": [
+                "70",
+                "71",
+                "72"
+            ]
+        }
+    },
+    {
+        "id": "69",
+        "data": {
+            "firstName": "Zio",
+            "lastName": "Giuseppe",
+            "gender": "M",
+            "birthday": "1948",
+            "death": "",
+            "image": "zio_giuseppe_4094899120",
+            "occupation": "Bricklayer",
+            "generation": 2,
+            "reliable": false
+        },
+        "rels": {
+            "spouses": [
+                "68"
+            ],
+            "children": [
+                "70",
+                "71",
+                "72"
+            ]
+        }
+    },
+    {
+        "id": "70",
+        "data": {
+            "firstName": "Marco",
+            "lastName": "Taddeo",
+            "gender": "M",
+            "birthday": "1982",
+            "death": "",
+            "image": "marco_taddeo_6269180101",
+            "occupation": "Bricklayer",
+            "generation": 3,
+            "reliable": false
+        },
+        "rels": {
+            "mother": "68",
+            "father": "69",
+            "spouses": [
+                "77"
+            ],
+            "children": [
+                "78",
+                "79"
+            ]
+        }
+    },
+    {
+        "id": "77",
+        "data": {
+            "firstName": "Manuela",
+            "lastName": "Cinalli",
+            "gender": "F",
+            "birthday": "1985",
+            "death": "",
+            "image": "manuela_8267291678",
+            "occupation": "",
+            "generation": 3,
+            "reliable": false
+        },
+        "rels": {
+            "spouses": [
+                "70"
+            ],
+            "children": [
+                "78",
+                "79"
+            ]
+        }
+    },
+    {
+        "id": "78",
+        "data": {
+            "firstName": "Simone",
+            "lastName": "Taddeo",
+            "gender": "M",
+            "birthday": "2016",
+            "death": "",
+            "image": "simone_3830067716",
+            "occupation": "",
+            "generation": 4,
+            "reliable": false
+        },
+        "rels": {
+            "mother": "77",
+            "father": "70",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "79",
+        "data": {
+            "firstName": "Lorenzo",
+            "lastName": "Taddeo",
+            "gender": "M",
+            "birthday": "2015",
+            "death": "",
+            "image": "lorenzo_4432645095",
+            "occupation": "",
+            "generation": 4,
+            "reliable": false
+        },
+        "rels": {
+            "mother": "77",
+            "father": "70",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "71",
+        "data": {
+            "firstName": "Francesco",
+            "lastName": "Taddeo",
+            "gender": "M",
+            "birthday": "1987",
+            "death": "",
+            "image": "francesco_taddeo_4264594735",
+            "occupation": "Surveyor",
+            "generation": 3,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "68",
+            "father": "69",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "72",
+        "data": {
+            "firstName": "Katrin",
+            "lastName": "Taddeo",
+            "gender": "F",
+            "birthday": "1974",
+            "death": "",
+            "image": "katrin_7477609921",
+            "occupation": "Krav Maga Trainer",
+            "generation": 3,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "68",
+            "father": "69",
+            "spouses": [
+                "73"
+            ],
+            "children": [
+                "74",
+                "75"
+            ]
+        }
+    },
+    {
+        "id": "73",
+        "data": {
+            "firstName": "Matteo",
+            "lastName": "Moreo",
+            "gender": "M",
+            "birthday": "1970",
+            "death": "",
+            "image": "matteo_moreo_1847724833",
+            "occupation": "Krav Maga Trainer",
+            "generation": 3,
+            "reliable": false
+        },
+        "rels": {
+            "spouses": [
+                "72"
+            ],
+            "children": [
+                "74",
+                "75"
+            ]
+        }
+    },
+    {
+        "id": "74",
+        "data": {
+            "firstName": "Jada",
+            "lastName": "Moreo",
+            "gender": "F",
+            "birthday": "2005",
+            "death": "",
+            "image": "jada_1240130886",
+            "occupation": "Tattoo artist",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "72",
+            "father": "73",
+            "spouses": [],
+            "children": []
+        }
+    },
+    {
+        "id": "75",
+        "data": {
+            "firstName": "Maya",
+            "lastName": "Moreo",
+            "gender": "F",
+            "birthday": "2008",
+            "death": "",
+            "image": "maya_8057814433",
+            "occupation": "",
+            "generation": 4,
+            "reliable": true
+        },
+        "rels": {
+            "mother": "72",
+            "father": "73",
+            "spouses": [],
+            "children": []
+        }
+    }
+]
