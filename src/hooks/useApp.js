@@ -50,6 +50,8 @@ export const useApp = () => {
   const isDragging = useRef(false);
   const canSwipe = useRef(false);
   const isPersonEditingModeRef = useRef(isPersonEditingMode);
+  const resetTreeViewRef = useRef(null);
+  const centerOnPersonRef = useRef(null);
 
   const { isMobile, isTablet, isDesktop } = useResponsive();
   const bgColor = useColorModeValue('gray.50', 'gray.900');
@@ -132,6 +134,11 @@ export const useApp = () => {
       setIsPersonEditingMode(false);
     }
     setSelectedPerson(person);
+    
+    // Center the tree on the selected person
+    if (centerOnPersonRef.current) {
+      centerOnPersonRef.current(person);
+    }
   }, []);
 
   const handleFaceRecognitionPersonSelect = useCallback((person) => {
@@ -142,6 +149,11 @@ export const useApp = () => {
     setSelectedPerson(person);
     if (isMobile || isTablet) {
       onPersonDrawerOpen();
+    }
+    
+    // Center the tree on the selected person
+    if (centerOnPersonRef.current) {
+      centerOnPersonRef.current(person);
     }
   }, [isPersonEditingMode, onFaceRecognitionClose, isMobile, isTablet, onPersonDrawerOpen]);
 
@@ -173,10 +185,29 @@ export const useApp = () => {
     setSearchQuery('');
     setShowSearchResults(false);
     setSearchResults([]);
+    
+    // Center the tree on the selected person
+    if (centerOnPersonRef.current) {
+      centerOnPersonRef.current(person);
+    }
   }, [isPersonEditingMode, selectedPerson, isMobile, onPersonDrawerOpen]);
 
   const handleUnlock = useCallback(() => {
     setIsAuthenticated(true);
+  }, []);
+
+  const handleResetView = useCallback((resetFunction) => {
+    resetTreeViewRef.current = resetFunction;
+  }, []);
+
+  const handleCenterPerson = useCallback((centerFunction) => {
+    centerOnPersonRef.current = centerFunction;
+  }, []);
+
+  const resetTreeView = useCallback(() => {
+    if (resetTreeViewRef.current) {
+      resetTreeViewRef.current();
+    }
   }, []);
 
   const totalMembers = familyData.length;
@@ -217,6 +248,9 @@ export const useApp = () => {
     handleSearchChange,
     handleSearchSelect,
     handleUnlock,
+    handleResetView,
+    handleCenterPerson,
+    resetTreeView,
     totalMembers,
     livingMembers,
     deceasedMembers,

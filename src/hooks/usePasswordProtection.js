@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useColorModeValue } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import CryptoJS from 'crypto-js';
+import { TARGET_HASH } from '../config/config';
 
-const TARGET_HASH = '10bad1fc4630e07864527ea519a0e323d8a1e176a2c8564eaa6211c02e6cfc80';
 
 export const usePasswordProtection = (onUnlock) => {
   const { t } = useTranslation();

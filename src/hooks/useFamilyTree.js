@@ -1,11 +1,34 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useBreakpointValue } from '@chakra-ui/react';
 import f3 from 'family-chart';
 
-export const useFamilyTree = (familyData, onPersonClick) => {
+export const useFamilyTree = (familyData, onPersonClick, onResetView) => {
   const chartRef = useRef(null);
   const isMobile = useBreakpointValue({ base: true, md: false });
   const isTablet = useBreakpointValue({ base: false, md: true, lg: false });
+
+  const centerOnPerson = useCallback((person) => {
+    if (chartRef.current && person) {
+      const tree = chartRef.current.store.getTree();
+      // Find the datum for the specific person
+      const datum = tree.data.find(d => d.data.id === person.id);
+      if (datum) {
+        f3.handlers.cardToMiddle({ 
+          datum, 
+          svg: chartRef.current.svg, 
+          svg_dim: chartRef.current.svg.getBoundingClientRect(), 
+          transition_time: 1000 
+        });
+      }
+    }
+  }, []);
+
+  const resetTreeView = useCallback(() => {
+    if (chartRef.current) {
+      // Re-render the tree to reset view
+      chartRef.current.updateTree({ initial: false });
+    }
+  }, []);
 
   useEffect(() => {
     if (!familyData || familyData.length === 0) {
@@ -33,7 +56,8 @@ export const useFamilyTree = (familyData, onPersonClick) => {
           const avatarSize = '60px';
           const avatarImg = `<img src="/images/${d.data.data.image}.JPG" onerror="this.onerror=null; this.src='/images/default.png';" style="width: ${avatarSize}; height: ${avatarSize}; object-fit: cover; border-radius: 50%; border: 1px solid #c8a882;">`;
 
-          return `<div class="card-inner italian-card" style="position: relative; width: ${cardWidth}; font-size: ${fontSize}; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border: 2px solid #c8a882; border-radius: 8px; padding: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+          return `
+          <div class="card-inner italian-card" style="position: relative; width: ${cardWidth}; font-size: ${fontSize}; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border: 2px solid #c8a882; border-radius: 8px; padding: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
             <div style="display: flex; align-items: center; gap: 8px;">
               <div class="avatar" style="flex-shrink: 0;">
                 ${avatarImg}
@@ -57,10 +81,13 @@ export const useFamilyTree = (familyData, onPersonClick) => {
         if (onPersonClick) {
           onPersonClick(d.data);
         }
-        f3Card.onCardClickDefault(e, d);
+        // Center the tree on the clicked person
+        centerOnPerson(d.data);
+        // f3Card.onCardClickDefault(e, d);
       });
 
       f3Chart.updateTree({ initial: true });
+      
       chartRef.current = f3Chart;
     }
 
@@ -68,5 +95,12 @@ export const useFamilyTree = (familyData, onPersonClick) => {
 
   }, [familyData, isMobile, isTablet, onPersonClick]);
 
-  return chartRef;
+  // Expose the reset function to the parent component
+  useEffect(() => {
+    if (onResetView) {
+      onResetView(resetTreeView);
+    }
+  }, [onResetView, resetTreeView]);
+
+  return { chartRef, centerOnPerson };
 };

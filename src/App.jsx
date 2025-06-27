@@ -51,6 +51,9 @@ const App = memo(() => {
     handleSearchChange,
     handleSearchSelect,
     handleUnlock,
+    handleResetView,
+    handleCenterPerson,
+    resetTreeView,
     totalMembers,
     livingMembers,
     deceasedMembers,
@@ -97,11 +100,17 @@ const App = memo(() => {
               handleSearchChange={handleSearchChange}
               handleSearchSelect={handleSearchSelect}
               onFaceRecognitionOpen={onFaceRecognitionOpen}
+              onResetView={resetTreeView}
             />
 
             <Flex flexDirection='row' gap={6} alignItems="stretch">
               <VStack spacing={4} alignItems="stretch" flex={1}>
-                <FamilyTree onPersonClick={handlePersonClick} familyData={memoizedFamilyData} />
+                <FamilyTree 
+                  onPersonClick={handlePersonClick} 
+                  familyData={memoizedFamilyData} 
+                  onResetView={handleResetView}
+                  onCenterPerson={handleCenterPerson}
+                />
                 {/* Mobile "See more" button */}
                 {isMobile && (
                   <MobilePersonButton
