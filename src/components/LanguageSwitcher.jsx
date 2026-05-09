@@ -8,15 +8,15 @@ import {
   HStack, 
   Text, 
   Box,
-  useColorModeValue
 } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { useTranslation } from 'react-i18next';
+import { THEME } from '../config/config';
 
 const LanguageSwitcher = ({ size = 'sm', variant = 'solid' }) => {
   const { i18n } = useTranslation();
-  const menuBg = useColorModeValue('white', 'gray.700');
-  const menuBorder = useColorModeValue('gray.200', 'gray.600');
+  const menuBg = THEME.bgSurface;
+  const menuBorder = 'gray.200';
 
   const languages = [
     { code: 'fr', name: 'Français', flag: '🇫🇷' },
@@ -71,15 +71,15 @@ const LanguageSwitcher = ({ size = 'sm', variant = 'solid' }) => {
             borderRadius="lg"
             mx={1}
             fontWeight={i18n.language === language.code ? 'bold' : 'normal'}
-            color={i18n.language === language.code ? '#2d5a27' : 'inherit'}
-            _hover={{ bg: 'rgba(45,90,39,0.1)' }}
+            color={i18n.language === language.code ? THEME.primary : 'inherit'}
+            _hover={{ bg: `rgba(${THEME.primaryRgb},0.1)` }}
           >
             <HStack spacing={3} w="full">
               <Box fontSize="lg">{language.flag}</Box>
               <Text fontSize="sm">{language.name}</Text>
               {i18n.language === language.code && (
                 <Box ml="auto">
-                  <Box w={2} h={2} bg="#2d5a27" borderRadius="full" />
+                  <Box w={2} h={2} bg={THEME.primary} borderRadius="full" />
                 </Box>
               )}
             </HStack>

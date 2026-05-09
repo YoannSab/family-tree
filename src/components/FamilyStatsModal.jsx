@@ -16,6 +16,7 @@ import DemographicsSection from './FamilyStatsModal/DemographicsSection';
 import QuickStatsGrid from './FamilyStatsModal/QuickStatsGrid';
 import BirthDecadesSection from './FamilyStatsModal/BirthDecadesSection';
 import { useFamilyStatsModal } from '../hooks/useFamilyStatsModal';
+import { THEME } from '../config/config';
 
 const FamilyStatsModal = memo(({ isOpen, onClose, familyData }) => {
   const {
@@ -49,8 +50,8 @@ const FamilyStatsModal = memo(({ isOpen, onClose, familyData }) => {
   } = stats;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={modalSize} scrollBehavior="inside">
-      <ModalOverlay bg="rgba(45, 90, 39, 0.4)" backdropFilter="blur(10px)" />
+    <Modal isOpen={isOpen} onClose={onClose} size={modalSize} scrollBehavior="inside" motionPreset="none">
+      <ModalOverlay bg={`rgba(${THEME.primaryRgb}, 0.4)`} />
       <ModalContent
         maxW={modalSize === 'full' ? 'full' : '1200px'}
         bg="linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)"
@@ -68,7 +69,7 @@ const FamilyStatsModal = memo(({ isOpen, onClose, familyData }) => {
           left={0}
           right={0}
           h="4px"
-          bg="linear-gradient(90deg, #009246 33%, #fff 33% 66%, #ce2b37 66%)"
+          bg={`linear-gradient(90deg, ${THEME.flagLeft} 33%, #fff 33% 66%, ${THEME.flagRight} 66%)`}
           zIndex={2}
         />
 
@@ -90,7 +91,7 @@ const FamilyStatsModal = memo(({ isOpen, onClose, familyData }) => {
           {/* Decorative line */}
           <Box
             h="2px"
-            bg={`linear-gradient(90deg, transparent 0%, ${italianGold} 20%, #d4af37 50%, ${italianGold} 80%, transparent 100%)`}
+            bg={`linear-gradient(90deg, transparent 0%, ${italianGold} 20%, ${THEME.accentDark} 50%, ${italianGold} 80%, transparent 100%)`}
             borderRadius="full"
             mt={3}
           />

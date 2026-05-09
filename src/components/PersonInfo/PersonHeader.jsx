@@ -9,6 +9,7 @@ import {
   IconButton,
 } from '@chakra-ui/react';
 import { EditIcon, CheckIcon, CloseIcon } from '@chakra-ui/icons';
+import { THEME } from '../../config/config';
 
 const PersonHeader = memo(({
   person,
@@ -34,7 +35,7 @@ const PersonHeader = memo(({
         name={person.data.firstName}
         ring={3}
         ringColor={italianGold}
-        bg="linear-gradient(135deg, #2d5a27, #1e3a1a)"
+        bg={`linear-gradient(135deg, ${THEME.primary}, ${THEME.primaryDark})`}
         cursor="pointer"
         onClick={() => handleImageClick(
           `/images/${person.data.image}.JPG`,

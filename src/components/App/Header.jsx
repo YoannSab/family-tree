@@ -12,6 +12,7 @@ import {
 import { InfoIcon } from '@chakra-ui/icons';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
+import { THEME } from '../../config/config';
 
 const Header = ({
   onStatsModalOpen,
@@ -24,11 +25,11 @@ const Header = ({
 
   return (
     <Box
-      bg="linear-gradient(135deg, #2d5a27 0%, #1e3a1a 50%,rgb(16, 62, 12) 100%)"
+      bg={`linear-gradient(135deg, ${THEME.primary} 0%, ${THEME.primaryDark} 50%, ${THEME.primaryDarker} 100%)`}
       position="sticky"
       top={0}
       zIndex={10}
-      borderBottom="3px solid #c8a882"
+      borderBottom={`3px solid ${THEME.accent}`}
       boxShadow="0 4px 20px rgba(0,0,0,0.15)"
     >
       <Container maxW="full" px={{ base: 4, md: 6 }}>

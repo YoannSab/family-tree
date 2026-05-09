@@ -11,6 +11,7 @@ import {
   Text,
   HStack,
 } from '@chakra-ui/react';
+import { THEME } from '../../config/config';
 
 const BirthDecadesSection = memo(({
   birthDecades,
@@ -35,7 +36,7 @@ const BirthDecadesSection = memo(({
         <Box
           w={1}
           h={5}
-          bg={`linear-gradient(to bottom, ${italianGold}, #d4af37)`}
+          bg={`linear-gradient(to bottom, ${italianGold}, ${THEME.accentDark})`}
           borderRadius="full"
         />
         {t('birthDecades')}

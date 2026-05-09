@@ -8,15 +8,14 @@ import {
     Box,
     Text,
     VStack,
-    useColorModeValue,
 } from '@chakra-ui/react'
 
 const ImageModal = ({ isOpen, onClose, imageSrc, personName }) => {
-    const overlayBg = useColorModeValue('rgba(0, 0, 0, 0.8)', 'rgba(0, 0, 0, 0.9)')
+    const overlayBg = 'rgba(0, 0, 0, 0.8)'
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} isCentered>
-            <ModalOverlay bg={overlayBg} backdropFilter="blur(10px)" />
+        <Modal isOpen={isOpen} onClose={onClose} isCentered motionPreset="none">
+            <ModalOverlay bg={overlayBg} />
             <ModalContent
                 borderRadius="xl"
                 bg={'rgba(255, 255, 255, 0)'}

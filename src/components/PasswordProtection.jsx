@@ -15,7 +15,7 @@ import {
     IconButton,
 } from '@chakra-ui/react';
 import { ViewIcon, ViewOffIcon, LockIcon } from '@chakra-ui/icons';
-import { FAMILY_CONFIG } from '../config/config.js';
+import { FAMILY_CONFIG, THEME } from '../config/config.js';
 import { usePasswordProtection } from '../hooks/usePasswordProtection.js';
 
 const PasswordProtection = ({ onUnlock }) => {
@@ -43,7 +43,7 @@ const PasswordProtection = ({ onUnlock }) => {
                 left={0}
                 right={0}
                 bottom={0}
-                bg="linear-gradient(135deg, #2d5a27 0%, #1e3a1a 50%, #0f2e0d 100%)"
+                bg={`linear-gradient(135deg, ${THEME.primary} 0%, ${THEME.primaryDark} 50%, ${THEME.primaryDarker} 100%)`}
                 opacity={0.95}
             />
 
@@ -75,7 +75,7 @@ const PasswordProtection = ({ onUnlock }) => {
                         <Box
                             w="200px"
                             h="2px"
-                            bg={`linear-gradient(90deg, transparent 0%, ${italianGold} 20%, #d4af37 50%, ${italianGold} 80%, transparent 100%)`}
+                            bg={`linear-gradient(90deg, transparent 0%, ${italianGold} 20%, ${THEME.accentDark} 50%, ${italianGold} 80%, transparent 100%)`}
                             borderRadius="full"
                         />
                     </VStack>
@@ -98,14 +98,14 @@ const PasswordProtection = ({ onUnlock }) => {
                             left={0}
                             right={0}
                             h="4px"
-                            bg="linear-gradient(90deg, #009246 33%, #fff 33% 66%, #ce2b37 66%)"
+                            bg={`linear-gradient(90deg, ${THEME.flagLeft} 33%, #fff 33% 66%, ${THEME.flagRight} 66%)`}
                         />
 
                         <VStack spacing={6} pt={2}>
                             <VStack spacing={2} textAlign="center">
                                 <Box
                                     p={4}
-                                    bg={`linear-gradient(135deg, ${italianGreen}, #1e3a1a)`}
+                                    bg={`linear-gradient(135deg, ${italianGreen}, ${THEME.primaryDark})`}
                                     borderRadius="full"
                                     color="white"
                                     fontSize="2xl"
@@ -133,11 +133,11 @@ const PasswordProtection = ({ onUnlock }) => {
                                             borderColor={error ? 'red.300' : italianGold}
                                             borderRadius="lg"
                                             _focus={{
-                                                borderColor: error ? 'red.400' : '#d4af37',
-                                                boxShadow: `0 0 0 1px ${error ? '#f56565' : '#d4af37'}`
+                                                borderColor: error ? 'red.400' : THEME.accentDark,
+                                                boxShadow: `0 0 0 1px ${error ? '#f56565' : THEME.accentDark}`
                                             }}
                                             _hover={{
-                                                borderColor: error ? 'red.400' : '#d4af37'
+                                                borderColor: error ? 'red.400' : THEME.accentDark
                                             }}
                                             required
                                         />
@@ -165,15 +165,15 @@ const PasswordProtection = ({ onUnlock }) => {
                                         type="submit"
                                         size="lg"
                                         w="full"
-                                        bg={`linear-gradient(135deg, ${italianGreen} 0%, #1e3a1a 100%)`}
+                                        bg={`linear-gradient(135deg, ${italianGreen} 0%, ${THEME.primaryDark} 100%)`}
                                         color="white"
                                         _hover={{
-                                            bg: "linear-gradient(135deg, #1e3a1a 0%, #0f2e0d 100%)",
+                                            bg: `linear-gradient(135deg, ${THEME.primaryDark} 0%, ${THEME.primaryDarker} 100%)`,
                                             transform: "translateY(-1px)",
-                                            boxShadow: "0 6px 20px rgba(45, 90, 39, 0.4)"
+                                            boxShadow: `0 6px 20px rgba(${THEME.primaryRgb}, 0.4)`
                                         }}
                                         _active={{ transform: "translateY(0)" }}
-                                        boxShadow="0 4px 12px rgba(45, 90, 39, 0.3)"
+                                        boxShadow={`0 4px 12px rgba(${THEME.primaryRgb}, 0.3)`}
                                         borderRadius="lg"
                                         fontWeight="bold"
                                         isLoading={isLoading}

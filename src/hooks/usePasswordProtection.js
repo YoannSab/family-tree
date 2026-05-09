@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useColorModeValue } from '@chakra-ui/react';
+
 import { useTranslation } from 'react-i18next';
 import CryptoJS from 'crypto-js';
-import { TARGET_HASH } from '../config/config';
-
+import { TARGET_HASH, THEME } from '../config/config';
 
 export const usePasswordProtection = (onUnlock) => {
   const { t } = useTranslation();
@@ -12,10 +11,10 @@ export const usePasswordProtection = (onUnlock) => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const bgColor = useColorModeValue('gray.50', 'gray.900');
-  const cardBg = useColorModeValue('white', 'gray.800');
-  const italianGold = '#c8a882';
-  const italianGreen = '#2d5a27';
+  const bgColor = THEME.bgPage;
+  const cardBg = THEME.bgSurface;
+  const italianGold = THEME.accent;
+  const italianGreen = THEME.primary;
 
   const handleSubmit = useCallback((e) => {
     e.preventDefault();

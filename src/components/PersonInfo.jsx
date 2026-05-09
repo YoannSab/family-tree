@@ -9,6 +9,7 @@ import PersonHeader from './PersonInfo/PersonHeader';
 import PersonDetails from './PersonInfo/PersonDetails';
 import FamilyConnections from './PersonInfo/FamilyConnections';
 import { usePersonInfo } from '../hooks/usePersonInfo';
+import { THEME } from '../config/config';
 
 const PersonInfo = memo(({ person, familyData, setPerson, compact = false, onPersonUpdate, isEditing, setIsEditing, handlePersonClick }) => {
   const isMobile = compact;
@@ -38,7 +39,7 @@ const PersonInfo = memo(({ person, familyData, setPerson, compact = false, onPer
 
   return (
     <Box
-      bg="linear-gradient(135deg, #fafafa 0%,rgb(252, 252, 236) 100%)"
+      bg={`linear-gradient(135deg, ${THEME.bgPage} 0%, rgb(252, 252, 236) 100%)`}
       borderRadius="xl"
       p={isMobile ? 4 : 6}
       border={`2px solid ${italianGold}`}
@@ -52,7 +53,7 @@ const PersonInfo = memo(({ person, familyData, setPerson, compact = false, onPer
         left={0}
         right={0}
         h="4px"
-        bg="linear-gradient(90deg, #009246 33%, #fff 33% 66%, #ce2b37 66%)"
+          bg={`linear-gradient(90deg, ${THEME.flagLeft} 33%, #fff 33% 66%, ${THEME.flagRight} 66%)`}
         zIndex={1}
       />
 
@@ -99,7 +100,7 @@ const PersonInfo = memo(({ person, familyData, setPerson, compact = false, onPer
 
           <Box
             h="1px"
-            bg={`linear-gradient(90deg, transparent 0%, ${italianGold} 20%, #d4af37 50%, ${italianGold} 80%, transparent 100%)`}
+            bg={`linear-gradient(90deg, transparent 0%, ${italianGold} 20%, ${THEME.accentDark} 50%, ${italianGold} 80%, transparent 100%)`}
             borderRadius="full"
           />
 
@@ -117,7 +118,7 @@ const PersonInfo = memo(({ person, familyData, setPerson, compact = false, onPer
           {/* Decorative separator */}
           <Box
             h="1px"
-            bg={`linear-gradient(90deg, transparent 0%, ${italianGold} 20%, #d4af37 50%, ${italianGold} 80%, transparent 100%)`}
+            bg={`linear-gradient(90deg, transparent 0%, ${italianGold} 20%, ${THEME.accentDark} 50%, ${italianGold} 80%, transparent 100%)`}
             borderRadius="full"
           />
         </VStack>

@@ -8,6 +8,9 @@ import TreeSectionHeader from './components/App/TreeSectionHeader.jsx';
 import MobilePersonButton from './components/App/MobilePersonButton.jsx';
 import DesktopPersonInfo from './components/App/DesktopPersonInfo.jsx';
 import MobilePersonDrawer from './components/App/MobilePersonDrawer.jsx';
+import TreeContextMenu from './components/FamilyTree/TreeContextMenu.jsx';
+import AddMemberModal from './components/FamilyTree/AddMemberModal.jsx';
+import DeleteConfirmModal from './components/FamilyTree/DeleteConfirmModal.jsx';
 import {
   Box,
   Flex,
@@ -60,6 +63,26 @@ const App = memo(() => {
     setIsPersonEditingMode,
     setSelectedPerson,
     FAMILY_CONFIG,
+    // Context menu
+    isContextMenuOpen,
+    contextMenuPerson,
+    contextMenuPosition,
+    closeContextMenu,
+    handleContextMenu,
+    handleOpenAddMember,
+    // Add member modal
+    isAddMemberOpen,
+    onAddMemberClose,
+    addRelationType,
+    addMemberSpouses,
+    memberActionLoading,
+    handleAddMemberSubmit,
+    // Delete confirm modal
+    isDeleteConfirmOpen,
+    onDeleteConfirmClose,
+    personToDelete,
+    handleOpenDeleteConfirm,
+    handleDeleteMember,
   } = useApp();
 
   const memoizedFamilyData = useMemo(() => familyData, [familyData]);
@@ -110,6 +133,7 @@ const App = memo(() => {
                   familyData={memoizedFamilyData} 
                   onResetView={handleResetView}
                   onCenterPerson={handleCenterPerson}
+                  onContextMenu={handleContextMenu}
                 />
                 {/* Mobile "See more" button */}
                 {isMobile && (
@@ -172,6 +196,38 @@ const App = memo(() => {
         onClose={onFaceRecognitionClose}
         familyData={memoizedFamilyData}
         onPersonSelect={handleFaceRecognitionPersonSelect}
+      />
+
+      {/* ── Dynamic member management ────────────────────────────────────── */}
+      {isContextMenuOpen && contextMenuPerson && (
+        <TreeContextMenu
+          person={contextMenuPerson}
+          position={contextMenuPosition}
+          onClose={closeContextMenu}
+          onAddFather={() => handleOpenAddMember('father')}
+          onAddMother={() => handleOpenAddMember('mother')}
+          onAddSpouse={() => handleOpenAddMember('spouse')}
+          onAddChild={() => handleOpenAddMember('child')}
+          onDelete={handleOpenDeleteConfirm}
+        />
+      )}
+
+      <AddMemberModal
+        isOpen={isAddMemberOpen}
+        onClose={onAddMemberClose}
+        relationType={addRelationType}
+        relatedPerson={contextMenuPerson}
+        spouses={addMemberSpouses}
+        onSubmit={handleAddMemberSubmit}
+        isLoading={memberActionLoading}
+      />
+
+      <DeleteConfirmModal
+        isOpen={isDeleteConfirmOpen}
+        onClose={onDeleteConfirmClose}
+        person={personToDelete}
+        onConfirm={handleDeleteMember}
+        isLoading={memberActionLoading}
       />
     </Box>
   );
