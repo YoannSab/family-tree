@@ -8,16 +8,17 @@
   /* Enhanced mobile-first color scheme */
   color-scheme: light;
   color: rgba(55, 53, 47, 0.95);
-  background-color: #fafafa;
+  background-color: var(--theme-bg-page);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   
-  /* CSS custom properties for consistent theming */
-  --primary-color: #3182ce;
-  --secondary-color: #805ad5;
+  /* CSS custom properties — injected from THEME (config.js) in main.jsx at runtime */
+  /* The --theme-* vars are the canonical source; aliases below for legacy/utility use */
+  --primary-color:   var(--theme-primary);  /* THEME.primary */
+  --secondary-color: var(--theme-accent);   /* THEME.accent */
   --success-color: #38a169;
   --warning-color: #d69e2e;
   --error-color: #e53e3e;
@@ -44,7 +45,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   min-height: 100dvh; /* Dynamic viewport height for mobile */
-  background-color: #fafafa;
+  background-color: var(--theme-bg-page);
   color: var(--text-primary);
   
   /* Mobile-optimized scrolling */
@@ -160,19 +161,4 @@ button:disabled {
   }
 }
 
-/* Dark mode ready */
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #1a1a1a;
-    --text-primary: rgba(255, 255, 255, 0.87);
-    --text-secondary: rgba(255, 255, 255, 0.6);
-    --border-color: rgba(255, 255, 255, 0.16);
-  }
-  
-  body {
-    background-color: #1a1a1a;
-    color: var(--text-primary);
-  }
-}
+

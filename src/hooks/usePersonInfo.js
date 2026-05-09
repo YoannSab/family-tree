@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useDisclosure, useToast, useColorModeValue } from '@chakra-ui/react';
+import { useDisclosure, useToast } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { updateFamilyMemberByInternalId } from '../services/familyService';
-import { DATA_SOURCE } from '../config/config';
+import { DATA_SOURCE, THEME } from '../config/config';
 
 export const usePersonInfo = (person, familyData, setPerson, onPersonUpdate, isEditing, setIsEditing) => {
   const { t } = useTranslation();
@@ -12,9 +12,9 @@ export const usePersonInfo = (person, familyData, setPerson, onPersonUpdate, isE
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
 
-  const cardBg = useColorModeValue('linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)', 'gray.700');
-  const italianGold = '#c8a882';
-  const italianGreen = '#2d5a27';
+  const cardBg = THEME.bgCard;
+  const italianGold = THEME.accent;
+  const italianGreen = THEME.primary;
 
   useEffect(() => {
     if (person) {

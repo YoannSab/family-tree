@@ -11,6 +11,7 @@ import {
   Text,
   HStack,
 } from '@chakra-ui/react';
+import { THEME } from '../../config/config';
 
 const DemographicsSection = memo(({
   ageRanges,
@@ -35,7 +36,7 @@ const DemographicsSection = memo(({
         <Box
           w={1}
           h={5}
-          bg={`linear-gradient(to bottom, ${italianGold}, #d4af37)`}
+          bg={`linear-gradient(to bottom, ${italianGold}, ${THEME.accentDark})`}
           borderRadius="full"
         />
         {t('demographics')}
@@ -83,7 +84,7 @@ const DemographicsSection = memo(({
                     bg="gray.100"
                     sx={{
                       '& > div': {
-                        background: `linear-gradient(90deg, ${italianGold}, #d4af37)`
+                        background: `linear-gradient(90deg, ${italianGold}, ${THEME.accentDark})`
                       }
                     }}
                   />

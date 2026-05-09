@@ -1,46 +1,7 @@
-.f3 .f3-svg-circle-hover circle {
-    transition: fill 0.2s ease-in-out;
-  }
 
-  .f3 .f3-svg-circle-hover:hover circle {
-    fill: rgba(0, 0, 0, 0.2) !important;
-  }
-  .f3 {
-  --female-color: rgb(196, 138, 146);
-  --male-color: rgb(120, 159, 172);
-  --background-color: rgb(33, 33, 33);
-
-  font-family: 'Roboto', sans-serif;
-}
-
-.f3 * {
-  box-sizing: border-box;
-}
-
-.f3 .cursor-pointer {
-  cursor: pointer;
-}
 .f3 svg.main_svg {
   width: 100%;
   height: 100%;
-}
-.f3 svg.main_svg text {
-  fill: currentColor;
-}
-.f3 rect.card-female, .f3 .card-female .card-body-rect, .f3 .card-female .text-overflow-mask {
-  fill: var(--female-color);
-}
-.f3 rect.card-male, .f3 .card-male .card-body-rect, .f3 .card-male .text-overflow-mask {
-  fill: var(--male-color);
-}
-.f3 .card-genderless .card-body-rect, .f3 .card-genderless .text-overflow-mask {
-  fill: lightgray;
-}
-.f3 .card_add .card-body-rect {
-  fill: #3b5560;
-  stroke-width: 4px;
-  stroke: #fff;
-  cursor: pointer;
 }
 .f3 g.card_add text {
   fill: #fff;
@@ -60,186 +21,12 @@
   color: #fff;
   transition: 0.3s;
 }
-.f3 .card_add_relative circle {
-  fill: rgba(0, 0, 0, 0);
-}
-.f3 .card_add_relative:hover {
-  color: black;
-}
-.f3 .card_edit.pencil_icon {
-  color: #fff;
-  transition: 0.3s;
-}
-.f3 .card_edit.pencil_icon:hover {
-  color: black;
-}
-.f3 .card_break_link, .f3 .link_upper, .f3 .link_lower, .f3 .link_particles {
-  transform-origin: 50% 50%;
-  transition: 1s;
-}
-.f3 .card_break_link {
-  color: #fff;
-}
-.f3 .card_break_link.closed .link_upper {
-  transform: translate(-140.5px, 655.6px);
-}
-.f3 .card_break_link.closed .link_upper g {
-  transform: rotate(-58deg);
-}
-.f3 .card_break_link.closed .link_particles {
-  transform: scale(0);
-}
-.f3 .input-field input {
-  height: 2.5rem !important;
-}
-.f3 .input-field > label:not(.label-icon).active {
-  -webkit-transform: translateY(-8px) scale(0.8);
-  transform: translateY(-8px) scale(0.8);
-}
-.f3.f3-cont {
-  width:100%;
-  height:800px;
-  max-height:70vh;
-  background-color: var(--background-color);
-  color:#fff;
-}
+
 .f3 {
   position: relative;
   display: flex;
 }
 
-
-
-
-/* form-info */
-.f3-form input[type="text"],
-.f3-form textarea,
-.f3-form select {
-  width: 100%;
-  padding: 8px 12px;
-  margin: 8px 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-sizing: border-box;
-  font-size: 14px;
-  background: var(--background-color);
-  color: currentColor;
-}
-
-.f3-form input[type="text"]:focus,
-.f3-form textarea:focus,
-.f3-form select:focus {
-  box-shadow: 0 0 5px rgba(76, 175, 80, 0.2);
-}
-
-.f3-form button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  margin: 10px 0;
-  transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, color 0.3s ease-in-out;
-}
-
-.f3-form button[type="submit"] {
-  background-color: #4CAF50;
-  color: white;
-}
-
-.f3-cancel-btn {
-  background-color: #ccc;
-}
-
-.f3-form .f3-delete-btn {
-  background-color: transparent;
-  border: 1px solid #f44336;
-  color: #f44336;
-  width: 100%;
-  padding: 5px 10px;
-}
-
-.f3-delete-btn:hover {
-  background-color: #da190b;
-  border-color: #da190b;
-  color: #fff;
-}
-
-.f3-delete-btn:disabled {
-  opacity: 0.5;
-  background-color: transparent;
-  color: #f44336;
-  cursor: not-allowed;
-}
-
-.f3-radio-group {
-  margin: 15px 0;
-}
-
-.f3-radio-group label {
-  margin-right: 15px;
-  cursor: pointer;
-}
-
-.f3-radio-group input[type="radio"] {
-  margin-right: 5px;
-}
-
-.f3-info-field-label, .f3-form-field label {
-  font-weight: bold;
-  font-size: 12px;
-  display: block;
-  opacity: 0.8;
-}
-
-.f3-info-field-value {
-  font-weight: normal;
-  display: block;
-  border: none;
-  outline: none;
-  border-bottom: 1px solid rgba(255,255,255,0.2);
-  padding-bottom: 1px;
-  margin-bottom: 10px;
-  min-height: 18px;
-}
-
-.f3-form-buttons {
-  text-align: right;
-}
-
-.f3-form-title {
-  text-align: center;
-}
-
-.f3-form.non-editable .f3-form-buttons, .f3-form.non-editable .f3-delete-btn {
-  display: none;
-}
-
-.f3-close-btn {
-  cursor: pointer;
-  position: absolute;
-  left: 10px;
-  top: 8px;
-  font-size: 30px;
-  color: #fff;
-}
-
-.f3-edit-btn {
-  position: relative;
-  top: -1px;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  display: inline-block;
-}
-
-.f3-add-relative-btn {
-  cursor: pointer;
-  width: 27px;
-  height: 27px;
-  margin-right: 5px;
-  display: inline-block;
-}
 
 /* card-html */
 
@@ -539,12 +326,6 @@
     overflow-wrap: break-word !important;
   }
   
-  .f3 .card-birthday,
-  .f3 .card-occupation {
-    line-height: 1.1 !important;
-    word-wrap: break-word !important;
-    overflow-wrap: break-word !important;
-  }
 }
 
 /* Tablet optimizations */
@@ -559,17 +340,15 @@
   }
 }
 
-/* Professional styling enhancements */
-
-/* Italian Family Tree Theme */
-.italian-family-tree {
-  background: linear-gradient(135deg, #2d5a27 0%, #1e3a1a 100%) !important;
-  border: 3px solid #c8a882 !important;
+/* Tree Theme */
+.tree-container {
+  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%) !important;
+  border: 3px solid var(--theme-accent) !important;
   position: relative;
   overflow: hidden;
 }
 
-.italian-family-tree::before {
+.tree-container::before {
   content: '';
   position: absolute;
   top: 0;
@@ -577,20 +356,20 @@
   right: 0;
   bottom: 0;
   background: 
-    radial-gradient(circle at 20% 50%, rgba(200, 168, 130, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 50%, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+    radial-gradient(circle at 20% 50%, rgba(var(--theme-accent-rgb), 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(var(--theme-accent-rgb), 0.1) 0%, transparent 50%);
   pointer-events: none;
   z-index: 0;
 }
 
-.italian-family-tree .f3 svg.main_svg {
+.tree-container .f3 svg.main_svg {
   position: relative;
   z-index: 1;
 }
 
-.italian-card {
-  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%) !important;
-  border: 2px solid #c8a882 !important;
+.tree-card {
+  background: var(--theme-bg-card) !important;
+  border: 2px solid var(--theme-accent) !important;
   border-radius: 8px !important;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
   transition: all 0.3s ease !important;
@@ -598,25 +377,20 @@
   overflow: hidden;
 }
 
-.italian-card::before {
+.tree-card::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #009246 33%, #fff 33% 66%, #ce2b37 66%);
+  /* Colors from THEME.flagLeft / THEME.flagRight injected in main.jsx */
+  background: linear-gradient(90deg, var(--theme-flag-left) 33%, #fff 33% 66%, var(--theme-flag-right) 66%);
   z-index: 1;
 }
 
-.italian-card:hover {
-  transform: translateY(-2px) scale(1.02) !important;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.2) !important;
-  border-color: #d4af37 !important;
-}
-
-.f3 .italian-card .card-name {
-  color: #2d5a27 !important;
+.f3 .tree-card .card-name {
+  color: var(--theme-primary) !important;
   font-weight: bold !important;
   font-family: 'Georgia', serif !important;
   text-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
@@ -624,49 +398,19 @@
   z-index: 2;
 }
 
-.f3 .italian-card .card-birthday {
-  color: #666 !important;
+.f3 .tree-card .card-birthday {
+  color: var(--theme-text-muted) !important;
   font-size: 11px !important;
   position: relative;
   z-index: 2;
 }
 
-.f3 .italian-card .card-occupation {
-  color: #888 !important;
-  font-style: italic !important;
-  position: relative;
-  z-index: 2;
-}
 
-/* Enhanced mobile touch interactions for Italian theme */
+/* Enhanced mobile touch interactions */
 @media (max-width: 768px) {
-  .italian-family-tree .f3 .card_family_tree {
-    min-height: 90px !important;
-    min-width: 150px !important;
-  }
-  
-  .italian-family-tree {
+  .tree-container {
     /* min-height: 300px !important; */
-    height: 40vh!important;
-  }
-  
-  .italian-card {
-    padding: 6px !important;
-  }
-  
-  .italian-card:active {
-    transform: scale(0.95) !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+    height: 50vh!important;
   }
 }
 
-/* Beautiful connection lines for Italian theme */
-.italian-family-tree .f3 path {
-  stroke: #c8a882 !important;
-  stroke-width: 2px !important;
-  filter: drop-shadow(0 0 2px rgba(200, 168, 130, 0.3));
-}
-
-.italian-family-tree .f3 .card_break_link {
-  color: #c8a882 !important;
-}

@@ -6,6 +6,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { ViewIcon } from '@chakra-ui/icons';
+import { THEME } from '../../config/config';
 
 const MobilePersonButton = memo(({
   selectedPerson,
@@ -20,15 +21,15 @@ const MobilePersonButton = memo(({
         onClick={onPersonDrawerOpen}
         size="lg"
         w="full"
-        bg="linear-gradient(135deg, #2d5a27 0%, #1e3a1a 100%)"
+        bg={`linear-gradient(135deg, ${THEME.primary} 0%, ${THEME.primaryDark} 100%)`}
         color="white"
         _hover={{
-          bg: "linear-gradient(135deg, #1e3a1a 0%, #0f2e0d 100%)",
+          bg: `linear-gradient(135deg, ${THEME.primaryDark} 0%, ${THEME.primaryDarker} 100%)`,
           transform: "translateY(-1px)",
-          boxShadow: "0 6px 20px rgba(45, 90, 39, 0.4)"
+          boxShadow: `0 6px 20px rgba(${THEME.primaryRgb}, 0.4)`
         }}
         _active={{ transform: "translateY(0)" }}
-        boxShadow="0 4px 12px rgba(45, 90, 39, 0.3)"
+        boxShadow={`0 4px 12px rgba(${THEME.primaryRgb}, 0.3)`}
         borderRadius="xl"
         leftIcon={<ViewIcon />}
         transition="all 0.2s"

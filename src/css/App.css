@@ -141,14 +141,15 @@ html, body {
   font-weight: 500;
 }
 
-/* Italian Heritage Theme Styles */
-.italian-header {
-  background: linear-gradient(135deg, #2d5a27 0%, #1e3a1a 50%, #0f2e0d 100%);
+/* App Header Theme Styles */
+/* Colors via CSS vars injected from THEME (config.js) in main.jsx */
+.app-header {
+  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 50%, var(--theme-primary-darker) 100%);
   position: relative;
   overflow: hidden;
 }
 
-.italian-header::before {
+.app-header::before {
   content: '';
   position: absolute;
   top: 0;
@@ -174,20 +175,20 @@ html, body {
   background: rgba(255, 255, 255, 0.12);
 }
 
-/* Italian-inspired decorative elements */
+/* Decorative elements */
 .decorative-line {
   background: linear-gradient(90deg, 
     transparent 0%, 
-    #c8a882 20%, 
-    #d4af37 40%, 
+    var(--theme-accent) 20%, 
+    var(--theme-accent-dark) 40%, 
     #fff 50%, 
-    #d4af37 60%, 
-    #c8a882 80%, 
+    var(--theme-accent-dark) 60%, 
+    var(--theme-accent) 80%, 
     transparent 100%
   );
   height: 2px;
   border-radius: 2px;
-  box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 0 8px rgba(var(--theme-accent-rgb), 0.3);
 }
 
 /* Professional family tree container */
@@ -209,12 +210,12 @@ html, body {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(45, 90, 39, 0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(var(--theme-primary-rgb), 0.2), transparent);
 }
 
-/* Enhanced mobile responsiveness for Italian theme */
+/* Enhanced mobile responsiveness */
 @media (max-width: 768px) {
-  .italian-header {
+  .app-header {
     padding: 1rem 0;
   }
   

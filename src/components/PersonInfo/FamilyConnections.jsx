@@ -5,6 +5,7 @@ import {
   Heading,
 } from '@chakra-ui/react';
 import RelatedPersonsList from '../RelatedPersonsList';
+import { THEME } from '../../config/config';
 
 const FamilyConnections = memo(({
   relatedPeople,
@@ -28,7 +29,7 @@ const FamilyConnections = memo(({
         <Box
           w={1}
           h={5}
-          bg={`linear-gradient(to bottom, ${italianGold}, #d4af37)`}
+          bg={`linear-gradient(to bottom, ${italianGold}, ${THEME.accentDark})`}
           borderRadius="full"
         />
         {t('familyConnections')}

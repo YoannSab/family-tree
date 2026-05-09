@@ -17,6 +17,7 @@ import LoadingComponent from './FaceRecognition/LoadingComponent'
 import CameraComponent from './FaceRecognition/CameraComponent'
 import CapturedImageComponent from './FaceRecognition/CapturedImageComponent'
 import RecognitionResultsComponent from './FaceRecognition/RecognitionResultsComponent'
+import { THEME } from '../config/config'
 
 const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
     const { t } = useTranslation()
@@ -47,8 +48,8 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
         restart
     } = useFaceRecognition(familyData, isOpen)
 
-    const italianGreen = '#2d5a27'
-    const italianGold = '#c8a882'
+    const italianGreen = THEME.primary
+    const italianGold = THEME.accent
     
     // Responsive values
     const isMobile = useBreakpointValue({ base: true, md: false })
@@ -58,10 +59,9 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
     const avatarSize = useBreakpointValue({ base: 'sm', md: 'md' })
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} size={modalSize} closeOnOverlayClick={true}>
+        <Modal isOpen={isOpen} onClose={onClose} size={modalSize} closeOnOverlayClick={true} motionPreset="none">
             <ModalOverlay
                 bg="blackAlpha.600"
-                backdropFilter="blur(10px)"
                 onClick={onClose}
             />
             <ModalContent

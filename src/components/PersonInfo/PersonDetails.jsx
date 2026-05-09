@@ -10,9 +10,9 @@ import {
   Text,
   Input,
   Select,
-  useColorModeValue,
 } from '@chakra-ui/react';
 import { CalendarIcon } from '@chakra-ui/icons';
+import { THEME } from '../../config/config';
 
 const PersonDetails = memo(({
   person,
@@ -40,7 +40,7 @@ const PersonDetails = memo(({
         <Box
           w={1}
           h={5}
-          bg={`linear-gradient(to bottom, ${italianGold}, #d4af37)`}
+          bg={`linear-gradient(to bottom, ${italianGold}, ${THEME.accentDark})`}
           borderRadius="full"
         />
         {t('personalInfo')}
@@ -50,15 +50,15 @@ const PersonDetails = memo(({
         templateColumns={isMobile ? "1fr" : "repeat(2, 1fr)"}
         gap={4}
         p={3}
-        bg={useColorModeValue('white', 'gray.800')}
+        bg={'white'}
         borderRadius="md"
         boxShadow="sm"
         border="1px solid"
-        borderColor={useColorModeValue('gray.200', 'gray.700')}
+        borderColor={'gray.200'}
       >
         <GridItem>
           <Flex align="center" gap={3}>
-            <Icon as={CalendarIcon} color={italianGreen} boxSize={5} />
+            <Text fontSize="xl">📅</Text>
             <VStack align="start" spacing={0} flex="1">
               <Text fontSize="xs" color="gray.500">{t('birthdate')}</Text>
               {isEditing ? (
@@ -102,9 +102,7 @@ const PersonDetails = memo(({
 
         <GridItem>
           <Flex align="center" gap={3}>
-            <Box p={1} borderRadius="full" bg={`rgba(${isLiving ? '45, 90, 39, 0.1' : '200, 168, 130, 0.1'})`}>
-              <Text fontSize="sm">{isLiving ? '👤' : '⌛'}</Text>
-            </Box>
+              <Text fontSize="xl">🕯️</Text>
             <VStack align="start" spacing={0}>
               <Text fontSize="xs" color="gray.500">{t('age')}</Text>
               <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">{age} {t('yearsOld')}</Text>
@@ -115,9 +113,7 @@ const PersonDetails = memo(({
         {(isEditing || person.data.occupation) && (
           <GridItem>
             <Flex align="center" gap={3}>
-              <Box p={1} borderRadius="full" bg="rgba(200, 168, 130, 0.1)">
-                <Text fontSize="sm">💼</Text>
-              </Box>
+                <Text fontSize="xl">💼</Text>
               <VStack align="start" spacing={0} flex="1">
                 <Text fontSize="xs" color="gray.500">{t('occupation')}</Text>
                 {isEditing ? (
