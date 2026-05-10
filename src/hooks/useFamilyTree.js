@@ -64,8 +64,6 @@ export const useFamilyTree = (familyData, onPersonClick, onResetView, onContextM
         .setSingleParentEmptyCard(false)
 
       const f3Card = f3Chart.setCard(f3.CardHtml)
-      
-
         .setCardInnerHtmlCreator(d => {
           const fontSize = isMobile ? '12px' : '14px';
           const cardWidth = isMobile ? '160px' : '200px';
@@ -98,7 +96,7 @@ export const useFamilyTree = (familyData, onPersonClick, onResetView, onContextM
           onPersonClick(d.data);
         }
         // Center the tree on the clicked person
-        centerOnPerson(d.data);
+        // centerOnPerson(d.data);
         f3Card.onCardClickDefault(e, d);
       });
 
@@ -106,8 +104,8 @@ export const useFamilyTree = (familyData, onPersonClick, onResetView, onContextM
       
       chartRef.current = f3Chart;
     }
-
-    create(familyData);
+    const sortedData = [...familyData].sort((a, b) => a.id.localeCompare(b.id));
+    create(sortedData);
 
   }, [familyData, isMobile, isTablet, onPersonClick]);
 
