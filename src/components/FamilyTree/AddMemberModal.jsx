@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import {
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody,
   ModalFooter, ModalCloseButton,
@@ -7,7 +7,7 @@ import {
   Input, Select, Button,
 } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import { THEME } from '../../config/config';
+import { DATA_SOURCE } from '../../config/config';
 
 // Relations where gender is determined automatically
 const FIXED_GENDER = { father: 'M', mother: 'F' };
@@ -21,13 +21,15 @@ const RELATION_META = {
 
 const AddMemberModal = ({ isOpen, onClose, relationType, relatedPerson, spouses = [], onSubmit, isLoading }) => {
   const { t } = useTranslation();
+  const fileInputRef = useRef(null);
 
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
     birthday: '',
     death: '',
-    image: '',
+    imageFile: null,
+    imagePreview: null,
     gender: FIXED_GENDER[relationType] || 'M',
     selectedSpouseId: '',
   });
@@ -64,16 +66,25 @@ const AddMemberModal = ({ isOpen, onClose, relationType, relatedPerson, spouses 
       lastName:         form.lastName.trim(),
       birthday:         form.birthday ? parseInt(form.birthday, 10) : null,
       death:            form.death    ? parseInt(form.death,    10) : null,
-      image:            form.image.trim() || 'default',
+      imageFile:        form.imageFile || null,
       gender:           genderIsFixed ? FIXED_GENDER[relationType] : form.gender,
       selectedSpouseId: form.selectedSpouseId || null,
     });
   };
 
   const handleClose = () => {
-    setForm({ firstName: '', lastName: '', birthday: '', death: '', image: '', gender: FIXED_GENDER[relationType] || 'M', selectedSpouseId: '' });
+    if (form.imagePreview) URL.revokeObjectURL(form.imagePreview);
+    setForm({ firstName: '', lastName: '', birthday: '', death: '', imageFile: null, imagePreview: null, gender: FIXED_GENDER[relationType] || 'M', selectedSpouseId: '' });
     setErrors({});
     onClose();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const preview = URL.createObjectURL(file);
+    setForm(prev => ({ ...prev, imageFile: file, imagePreview: preview }));
+    e.target.value = '';
   };
 
   if (!relatedPerson) return null;
@@ -86,6 +97,7 @@ const AddMemberModal = ({ isOpen, onClose, relationType, relatedPerson, spouses 
         border={`2px solid var(--theme-accent)`}
         maxW="420px"
         overflow="hidden"
+         mx={4}
       >
         {/* Italian flag top accent */}
         <Box
@@ -110,7 +122,7 @@ const AddMemberModal = ({ isOpen, onClose, relationType, relatedPerson, spouses 
         </ModalHeader>
         <ModalCloseButton top={5} isDisabled={isLoading} color={'var(--theme-primary-dark)'} />
 
-        <ModalBody pb={2}>
+        <ModalBody pb={2} px={6}>
           <VStack spacing={4}>
             {/* First name / Last name */}
             <HStack w="full" spacing={3} align="start">
@@ -187,18 +199,67 @@ const AddMemberModal = ({ isOpen, onClose, relationType, relatedPerson, spouses 
               </FormControl>
             )}
 
-            {/* Image filename (optional) */}
-            <FormControl>
-              <FormLabel fontSize="sm" mb={1}>{t('imageFilename')}</FormLabel>
-              <Input
-                value={form.image}
-                onChange={set('image')}
-                placeholder="jean_dupont"
-                border={`1.5px solid var(--theme-accent)`}
-                _focus={{ borderColor: 'var(--theme-accent-dark)', boxShadow: `0 0 0 1px var(--theme-accent-dark)` }}
-                isDisabled={isLoading}
-              />
-            </FormControl>
+            {/* Photo optionnelle (Firebase mode only) */}
+            {DATA_SOURCE === 'firebase' && (
+              <FormControl>
+                <FormLabel fontSize="sm" mb={1}>{t('photo')} ({t('optional')})</FormLabel>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={handleFileChange}
+                />
+                <HStack spacing={3} align="center">
+                  {form.imagePreview ? (
+                    <Box
+                      as="img"
+                      src={form.imagePreview}
+                      alt="preview"
+                      w="60px"
+                      h="60px"
+                      objectFit="cover"
+                      borderRadius="full"
+                      border={`2px solid var(--theme-accent)`}
+                    />
+                  ) : (
+                    <Box
+                      w="60px" h="60px"
+                      borderRadius="full"
+                      border={`2px dashed var(--theme-accent)`}
+                      display="flex" alignItems="center" justifyContent="center"
+                      fontSize="24px" color="gray.400"
+                    >
+                      ?
+                    </Box>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    borderColor="var(--theme-accent)"
+                    color="var(--theme-primary)"
+                    onClick={() => fileInputRef.current?.click()}
+                    isDisabled={isLoading}
+                  >
+                    {form.imageFile ? t('changePhoto') : t('addPhoto')}
+                  </Button>
+                  {form.imageFile && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      colorScheme="red"
+                      onClick={() => {
+                        if (form.imagePreview) URL.revokeObjectURL(form.imagePreview);
+                        setForm(prev => ({ ...prev, imageFile: null, imagePreview: null }));
+                      }}
+                      isDisabled={isLoading}
+                    >
+                      ✕
+                    </Button>
+                  )}
+                </HStack>
+              </FormControl>
+            )}
 
             {/* Other parent selector — only for child relation when spouses exist */}
             {relationType === 'child' && spouses.length > 0 && (

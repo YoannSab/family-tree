@@ -1,10 +1,11 @@
-﻿import { useEffect, useRef, useCallback } from 'react';
+﻿import { useEffect, useRef, useCallback, useMemo } from 'react';
 import { flushSync } from 'react-dom';
 import { useBreakpointValue } from '@chakra-ui/react';
 import f3 from 'family-chart';
 import { THEME, DATA_SOURCE } from '../config/config';
+import { getImageUrlCached, subscribeToCacheUpdate } from '../services/storageService';
 
-export const useFamilyTree = (familyData, onPersonClick, onResetView, onContextMenu) => {
+export const useFamilyTree = (familyData, onPersonClick, onResetView, onContextMenu, familyId = null) => {
   const chartRef = useRef(null);
   const isMobile = useBreakpointValue({ base: true, md: false });
   const isTablet = useBreakpointValue({ base: false, md: true, lg: false });
@@ -20,28 +21,47 @@ export const useFamilyTree = (familyData, onPersonClick, onResetView, onContextM
   const longPressTargetRef   = useRef(null);
   const isLongPressActiveRef = useRef(false);
 
+  // Find the root ancestor with the most descendants (works on raw data, no chart needed).
+  const findBestAncestor = (data) => {
+    const roots = data.filter(p => !p.rels?.father && !p.rels?.mother);
+    if (roots.length === 0) return data[0];
+    if (roots.length === 1) return roots[0];
+
+    // BFS count of all descendants
+    const countDescendants = (personId) => {
+      const visited = new Set();
+      const queue = [personId];
+      while (queue.length) {
+        const id = queue.shift();
+        if (visited.has(id)) continue;
+        visited.add(id);
+        const p = data.find(x => x.id === id);
+        if (!p) continue;
+        (p.rels?.children || []).forEach(cid => queue.push(cid));
+      }
+      return visited.size - 1; // exclude self
+    };
+
+    return roots.reduce((best, p) =>
+      countDescendants(p.id) > countDescendants(best.id) ? p : best
+    , roots[0]);
+  };
+
+  const bestAncestor = useMemo(() => findBestAncestor(familyData), [familyData]);
+
   const centerOnPerson = useCallback((person) => {
     if (chartRef.current && person) {
-      const tree = chartRef.current.store.getTree();
-      // Find the datum for the specific person
-      const datum = tree.data.find(d => d.data.id === person.id);
-      if (datum) {
-        f3.handlers.cardToMiddle({ 
-          datum, 
-          svg: chartRef.current.svg, 
-          svg_dim: chartRef.current.svg.getBoundingClientRect(), 
-          transition_time: 1000 
-        });
-      }
+      chartRef.current.updateMainId(person.id);
+      chartRef.current.updateTree({ tree_position: 'main_to_middle' });
     }
   }, []);
 
   const resetTreeView = useCallback(() => {
     if (chartRef.current) {
-      // Re-render the tree to reset view
-      chartRef.current.updateTree({ initial: false });
+      chartRef.current.updateMainId(bestAncestor?.id);
+      chartRef.current.updateTree({ tree_position: 'fit' });
     }
-  }, []);
+  }, [bestAncestor]);
 
   useEffect(() => {
     if (!familyData || familyData.length === 0) {
@@ -62,19 +82,40 @@ export const useFamilyTree = (familyData, onPersonClick, onResetView, onContextM
         .setCardXSpacing(cardXSpacing)
         .setCardYSpacing(cardYSpacing)
         .setSingleParentEmptyCard(false)
+        // Sort children oldest-first by birth year
+        .setSortChildrenFunction((a, b) => {
+          const yearA = parseInt(a.data?.birthday) || 9999;
+          const yearB = parseInt(b.data?.birthday) || 9999;
+          return yearA - yearB;
+        })
+        // Sort spouses by birth year (consistent ordering for multi-spouse cases)
+        .setSortSpousesFunction((d, allData) => {
+          const spouses = [...(d.data?.rels?.spouses || [])];
+          return spouses.sort((a, b) => {
+            const spA = allData.find(p => p.id === a);
+            const spB = allData.find(p => p.id === b);
+            const yearA = parseInt(spA?.data?.birthday) || 9999;
+            const yearB = parseInt(spB?.data?.birthday) || 9999;
+            return yearA - yearB;
+          });
+        });
 
       const f3Card = f3Chart.setCard(f3.CardHtml)
         .setCardInnerHtmlCreator(d => {
           const fontSize = isMobile ? '12px' : '14px';
           const cardWidth = isMobile ? '160px' : '200px';
           const avatarSize = '60px';
-          const avatarImg = `<img src="/images/${d.data.data.image}.JPG" onerror="this.onerror=null; this.src='/images/default.png';" style="width: ${avatarSize}; height: ${avatarSize}; object-fit: cover; border-radius: 50%; border: 1px solid var(--theme-accent);">`;
+          const avatarSrc = getImageUrlCached(familyId, d.data.data.image);
+          const initials = `${(d.data.data.firstName?.[0] || '').toUpperCase()}${(d.data.data.lastName?.[0] || '').toUpperCase()}`;
+          const avatarHtml = avatarSrc
+            ? `<img src="${avatarSrc}" onerror="this.style.display='none'" style="width:${avatarSize};height:${avatarSize};object-fit:cover;border-radius:50%;border:1px solid var(--theme-accent);">`
+            : `<div style="width:${avatarSize};height:${avatarSize};border-radius:50%;background:var(--theme-primary);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:20px;border:1px solid var(--theme-accent);flex-shrink:0;">${initials}</div>`;
 
           return `
           <div class="card-inner tree-card" data-person-id="${d.data.id}" style="position: relative; width: ${cardWidth}; font-size: ${fontSize}; background: ${THEME.bgCard}; border: 2px solid var(--theme-accent); border-radius: 8px; padding: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
             <div style="display: flex; align-items: center; gap: 8px;">
               <div class="avatar" style="flex-shrink: 0;">
-                ${avatarImg}
+                ${avatarHtml}
               </div>
               <div style="flex-grow: 1;">
                 <div class="card-name" style="font-weight: bold; margin-bottom: 4px; font-size: ${isMobile ? '13px' : '15px'}; color: var(--theme-primary); text-align: center;">
@@ -95,19 +136,51 @@ export const useFamilyTree = (familyData, onPersonClick, onResetView, onContextM
         if (onPersonClick) {
           onPersonClick(d.data);
         }
-        // Center the tree on the clicked person
-        // centerOnPerson(d.data);
         f3Card.onCardClickDefault(e, d);
       });
 
-      f3Chart.updateTree({ initial: true });
-      
+      // Set the best ancestor as main person, then render with 'fit' to show the full tree
+      f3Chart.updateMainId(bestAncestor.id);
+      f3Chart.updateTree({ initial: true, tree_position: 'fit' });
+
       chartRef.current = f3Chart;
     }
-    const sortedData = [...familyData].sort((a, b) => a.id.localeCompare(b.id));
-    create(sortedData);
+
+    create(familyData);
 
   }, [familyData, isMobile, isTablet, onPersonClick]);
+
+  // Patch tree card avatars in-place when blob URLs arrive (prefetch / upload).
+  // Debounced: rapid updates (parallel prefetch) are batched into a single DOM pass.
+  useEffect(() => {
+    if (DATA_SOURCE !== 'firebase' || !familyId) return;
+    let timer = null;
+    const patchAll = () => {
+      const container = document.getElementById('FamilyChart');
+      if (!container) return;
+      const avatarSize = '60px';
+      container.querySelectorAll('[data-person-id]').forEach(card => {
+        const person = familyDataRef.current?.find(p => p.id === card.dataset.personId);
+        if (!person?.data?.image) return;
+        const blobUrl = getImageUrlCached(familyId, person.data.image);
+        if (!blobUrl) return;
+        const avatarContainer = card.querySelector('.avatar');
+        if (!avatarContainer) return;
+        const current = avatarContainer.firstElementChild;
+        if (current?.tagName === 'IMG' && current.src === blobUrl) return;
+        const img = document.createElement('img');
+        img.src = blobUrl;
+        img.style.cssText = `width:${avatarSize};height:${avatarSize};object-fit:cover;border-radius:50%;border:1px solid var(--theme-accent);`;
+        img.onerror = () => { img.style.display = 'none'; };
+        if (current) avatarContainer.replaceChild(img, current);
+        else avatarContainer.appendChild(img);
+      });
+    };
+    return subscribeToCacheUpdate(() => {
+      clearTimeout(timer);
+      timer = setTimeout(patchAll, 80);
+    });
+  }, [familyId]);
 
   // Expose the reset function to the parent component
   useEffect(() => {

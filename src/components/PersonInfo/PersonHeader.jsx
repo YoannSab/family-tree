@@ -1,15 +1,17 @@
-﻿import React, { memo } from 'react';
+﻿import React, { memo, useRef } from 'react';
 import {
   VStack,
   HStack,
-  Avatar,
+  Box,
   Heading,
   Flex,
   Input,
   IconButton,
+  Spinner,
 } from '@chakra-ui/react';
 import { EditIcon, CheckIcon, CloseIcon } from '@chakra-ui/icons';
-import { THEME } from '../../config/config';
+import { useImageUrl } from '../../hooks/useImageUrl';
+import StorageAvatar, { InitialsAvatar } from '../StorageAvatar';
 
 const PersonHeader = memo(({
   person,
@@ -20,32 +22,75 @@ const PersonHeader = memo(({
   italianGreen,
   isLoading,
   DATA_SOURCE,
+  familyId,
   handleImageClick,
+  handlePhotoUpload,
   handleEditStart,
   handleEditSave,
   handleEditCancel,
   handleInputChange,
   t
 }) => {
+  const fileInputRef = useRef(null);
+  const { url: avatarUrl } = useImageUrl(familyId, person.data.image);
+  const fullName = `${person.data.firstName} ${person.data.lastName}`;
+  const avatarOutline = `3px solid ${italianGold}`;
+
+  const onAvatarClick = () => {
+    if (isEditing && DATA_SOURCE === 'firebase') {
+      fileInputRef.current?.click();
+    } else if (avatarUrl) {
+      handleImageClick(avatarUrl, `${person.data.firstName} ${person.data.lastName}`);
+    }
+  };
+
+  const onFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file && handlePhotoUpload) handlePhotoUpload(file);
+    e.target.value = ''; // allow re-selecting same file
+  };
+
   return (
     <Flex direction={{ base: 'column', sm: 'row' }} align={{ base: 'center', sm: 'center' }} gap={4}>
-      <Avatar
-        size={"xl"}
-        src={`/images/${person.data.image}.JPG`}
-        name={person.data.firstName}
-        ring={3}
-        ringColor={italianGold}
-        bg={`linear-gradient(135deg, var(--theme-primary), var(--theme-primary-dark))`}
-        cursor="pointer"
-        onClick={() => handleImageClick(
-          `/images/${person.data.image}.JPG`,
-          `${person.data.firstName} ${person.data.lastName}`
+      {/* Avatar — clickable for view, or for upload in edit mode */}
+      <Box position="relative" flexShrink={0}>
+        {DATA_SOURCE === 'firebase' && isEditing && (
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={onFileChange}
+          />
         )}
-        _hover={{
-          transform: 'scale(1.05)',
-          transition: 'transform 0.2s ease'
-        }}
-      />
+        <Box
+          position="relative"
+          display="inline-block"
+          cursor={isEditing && DATA_SOURCE === 'firebase' ? 'pointer' : avatarUrl ? 'zoom-in' : 'default'}
+          onClick={onAvatarClick}
+        >
+          {avatarUrl
+            ? <StorageAvatar familyId={familyId} filename={person.data.image} name={fullName} size="80px" outline={avatarOutline} />
+            : <InitialsAvatar name={fullName} size="80px" outline={avatarOutline} />}
+          {/* Edit overlay shown only in edit mode (Firebase) */}
+          {isEditing && DATA_SOURCE === 'firebase' && (
+            <Box
+              className="avatar-overlay"
+              position="absolute"
+              inset={0}
+              borderRadius="full"
+              bg="rgba(0,0,0,0.45)"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              transition="opacity 0.2s"
+              fontSize="22px"
+            >
+              {'🔄'}
+            </Box>
+          )}
+        </Box>
+      </Box>
 
       <VStack align={{ base: 'center', sm: 'start' }} spacing={2}>
         <HStack spacing={3} align="center">
@@ -56,14 +101,14 @@ const PersonHeader = memo(({
                 onChange={(e) => handleInputChange('firstName', e.target.value)}
                 size="md"
                 mr={2}
-                placeholder={t('firstName')} 
+                placeholder={t('firstName')}
               />
               <Input
                 value={editForm.lastName}
                 onChange={(e) => handleInputChange('lastName', e.target.value)}
                 size="md"
                 mr={2}
-                placeholder={t('lastName')} 
+                placeholder={t('lastName')}
               />
             </Flex>
           ) : (

@@ -1,0 +1,15 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Legacy flat images (migration source) — read public
+    match /family-images/{filename} {
+      allow read: if true;
+      allow write: if false;
+    }
+    // Family-scoped images (new structure) — read/write allowed
+    match /family-images/{familyId}/{filename} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import * as faceapi from 'face-api.js'
+import { getImageUrl } from '../services/storageService'
 
 export const useFaceRecognition = (familyData, isOpen, familyId = null) => {
     const [isLoading, setIsLoading] = useState(false)
@@ -138,7 +139,8 @@ export const useFaceRecognition = (familyData, isOpen, familyId = null) => {
             for (const person of familyData) {
                 if (person.data.image && person.data.image !== 'default') {
                     try {
-                        const img = await faceapi.fetchImage(`/images/${person.data.image}.JPG`)
+                        const imageUrl = await getImageUrl(familyId, person.data.image)
+                        const img = await faceapi.fetchImage(imageUrl)
                         const detection = await faceapi
                             .detectSingleFace(img)
                             .withFaceLandmarks()

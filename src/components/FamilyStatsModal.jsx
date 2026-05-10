@@ -102,7 +102,7 @@ const FamilyStatsModal = memo(({ isOpen, onClose, familyData }) => {
           mt={2}
           fontSize={{ base: 'lg', md: 'xl' }}
         />
-        <ModalBody pb={6} px={{ base: 4, md: 6 }}>
+        <ModalBody pb={6} px={{ base: 3, md: 6 }} py={{ base: 4, md: 6 }}>
           <VStack spacing={{ base: 6, md: 8 }} align="stretch">
             {/* Quick Statistics Grid */}
             <QuickStatsGrid

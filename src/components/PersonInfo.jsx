@@ -28,6 +28,7 @@ const PersonInfo = memo(({ person, familyData, setPerson, compact = false, onPer
     handleEditSave,
     handleInputChange,
     handleImageClick,
+    handlePhotoUpload,
     isLiving,
     age,
     relatedPeople,
@@ -69,7 +70,9 @@ const PersonInfo = memo(({ person, familyData, setPerson, compact = false, onPer
             italianGreen={italianGreen}
             isLoading={isLoading}
             DATA_SOURCE={DATA_SOURCE}
+            familyId={familyId}
             handleImageClick={handleImageClick}
+            handlePhotoUpload={handlePhotoUpload}
             handleEditStart={handleEditStart}
             handleEditSave={handleEditSave}
             handleEditCancel={handleEditCancel}
@@ -112,6 +115,7 @@ const PersonInfo = memo(({ person, familyData, setPerson, compact = false, onPer
             italianGreen={italianGreen}
             handlePersonClick={handlePersonClick}
             handleImageClick={handleImageClick}
+            familyId={familyId}
             t={t}
           />
 

@@ -1,18 +1,19 @@
-﻿import { useState } from 'react';
+﻿import { useState, useRef } from 'react';
 import {
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody,
   ModalFooter, ModalCloseButton,
-  VStack, HStack,
+  VStack, HStack, Box,
   FormControl, FormLabel, FormErrorMessage,
   Input, Select, Button,
 } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import { THEME } from '../../config/config';
+import { THEME, DATA_SOURCE } from '../../config/config';
 
-const EMPTY_FORM = { firstName: '', lastName: '', birthday: '', death: '', gender: 'M' };
+const EMPTY_FORM = { firstName: '', lastName: '', birthday: '', death: '', gender: 'M', imageFile: null, imagePreview: null };
 
 const CreateFirstMemberModal = ({ isOpen, onClose, onSubmit, isLoading }) => {
   const { t } = useTranslation();
+  const fileInputRef = useRef(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
 
@@ -28,6 +29,14 @@ const CreateFirstMemberModal = ({ isOpen, onClose, onSubmit, isLoading }) => {
     return errs;
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (form.imagePreview) URL.revokeObjectURL(form.imagePreview);
+    setForm(prev => ({ ...prev, imageFile: file, imagePreview: URL.createObjectURL(file) }));
+    e.target.value = '';
+  };
+
   const handleSubmit = () => {
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
@@ -37,11 +46,13 @@ const CreateFirstMemberModal = ({ isOpen, onClose, onSubmit, isLoading }) => {
       birthday:  form.birthday ? parseInt(form.birthday, 10) : null,
       death:     form.death    ? parseInt(form.death,    10) : null,
       gender:    form.gender,
+      imageFile: form.imageFile || null,
       image:     'default',
     });
   };
 
   const handleClose = () => {
+    if (form.imagePreview) URL.revokeObjectURL(form.imagePreview);
     setForm(EMPTY_FORM);
     setErrors({});
     onClose();
@@ -96,6 +107,53 @@ const CreateFirstMemberModal = ({ isOpen, onClose, onSubmit, isLoading }) => {
                 <Input type="number" value={form.death} onChange={set('death')} placeholder={t('ifDeceased', 'If deceased')} min="1000" max="2100" />
               </FormControl>
             </HStack>
+
+            {/* Photo optionnelle */}
+            {DATA_SOURCE === 'firebase' && (
+              <FormControl>
+                <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileChange} />
+                <HStack spacing={3} align="center">
+                  {form.imagePreview ? (
+                    <Box
+                      as="img"
+                      src={form.imagePreview}
+                      w="60px" h="60px"
+                      objectFit="cover"
+                      borderRadius="full"
+                      border={`2px solid var(--theme-accent)`}
+                      cursor="pointer"
+                      onClick={() => fileInputRef.current?.click()}
+                      style={{ flexShrink: 0 }}
+                    />
+                  ) : (
+                    <Box
+                      w="60px" h="60px"
+                      borderRadius="full"
+                      border={`2px dashed var(--theme-accent)`}
+                      display="flex" alignItems="center" justifyContent="center"
+                      fontSize="24px" color="gray.400"
+                      cursor="pointer"
+                      onClick={() => fileInputRef.current?.click()}
+                      flexShrink={0}
+                    >
+                      ?
+                    </Box>
+                  )}
+                  <HStack spacing={2}>
+                    <Button size="sm" variant="outline" borderColor="var(--theme-accent)" color="var(--theme-primary)"
+                      onClick={() => fileInputRef.current?.click()} isDisabled={isLoading}>
+                      {form.imageFile ? t('changePhoto') : `${t('photo')} (${t('optional')})`}
+                    </Button>
+                    {form.imageFile && (
+                      <Button size="sm" variant="ghost" colorScheme="red" isDisabled={isLoading}
+                        onClick={() => { if (form.imagePreview) URL.revokeObjectURL(form.imagePreview); setForm(p => ({ ...p, imageFile: null, imagePreview: null })); }}>
+                        ✕
+                      </Button>
+                    )}
+                  </HStack>
+                </HStack>
+              </FormControl>
+            )}
           </VStack>
         </ModalBody>
 

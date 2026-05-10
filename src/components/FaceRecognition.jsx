@@ -133,6 +133,7 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect, familyId
                             isMobile={isMobile}
                             fontSize={fontSize}
                             avatarSize={avatarSize}
+                            familyId={familyId}
                         />
 
                         {/* Canvas caché pour la capture */}

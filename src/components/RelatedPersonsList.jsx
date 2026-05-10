@@ -6,14 +6,81 @@ import {
   Card,
   CardBody,
   HStack,
-  Avatar,
   VStack,
   Text,
 } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { THEME } from '../config/config';
+import StorageAvatar from './StorageAvatar';
+import { useImageUrl } from '../hooks/useImageUrl';
 
-const RelatedPersonsList = memo(({ title, people, handlePersonClick, handleImageClick, isMobile }) => {
+// Sub-component so each card can use the useImageUrl hook
+const PersonCard = memo(({ relatedPerson, familyId, italianGold, italianGreen, handlePersonClick, handleImageClick, t }) => {
+  const { url: avatarUrl } = useImageUrl(familyId, relatedPerson.data.image);
+  return (
+    <Card
+      size="sm"
+      bg={THEME.bgCard}
+      border={`1px solid ${italianGold}`}
+      borderRadius="lg"
+      onClick={() => handlePersonClick(relatedPerson)}
+      style={{ cursor: 'pointer' }}
+      _hover={{
+        boxShadow: `0 8px 25px rgba(200, 168, 130, 0.2)`,
+        transform: 'translateY(-2px)',
+        borderColor: 'var(--theme-accent-dark)'
+      }}
+      _active={{ transform: 'translateY(0px)' }}
+      transition="all 0.3s ease"
+      position="relative"
+      overflow="hidden"
+    >
+      <Box
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        h="3px"
+        bg={`linear-gradient(90deg, var(--theme-flag-left) 33%, #fff 33% 66%, var(--theme-flag-right) 66%)`}
+      />
+      <CardBody p={3} pt={4}>
+        <HStack spacing={3}>
+          <StorageAvatar
+            familyId={familyId}
+            filename={relatedPerson.data.image}
+            name={`${relatedPerson.data.firstName} ${relatedPerson.data.lastName}`}
+            size="lg"
+            cursor={avatarUrl ? 'pointer' : 'default'}
+            onClick={avatarUrl ? (e) => {
+              e.stopPropagation();
+              handleImageClick(avatarUrl, `${relatedPerson.data.firstName} ${relatedPerson.data.lastName}`);
+            } : undefined}
+            _hover={avatarUrl ? { transform: 'scale(1.05)', transition: 'transform 0.2s ease' } : undefined}
+          />
+          <VStack align="start" spacing={1} flex={1}>
+            <HStack spacing={2} align="center">
+              <Text fontSize="sm" fontWeight="bold" color={italianGreen} fontFamily="serif">
+                {relatedPerson.data.firstName} {relatedPerson.data.lastName} {relatedPerson.data.death ? '✞' : ''}
+              </Text>
+            </HStack>
+            {relatedPerson.data.death ? (
+              <Text fontSize="xs" color="gray.600">
+                {relatedPerson.data.birthday} - {relatedPerson.data.death}
+              </Text>
+            ) : (
+              <Text fontSize="xs" color="gray.600">
+                {t('birthdate')} {relatedPerson.data.birthday}
+              </Text>
+            )}
+          </VStack>
+        </HStack>
+      </CardBody>
+    </Card>
+  );
+});
+PersonCard.displayName = 'PersonCard';
+
+const RelatedPersonsList = memo(({ title, people, familyId, handlePersonClick, handleImageClick, isMobile }) => {
   const { t } = useTranslation();
   const cardBg = THEME.bgCard;
   const italianGold = 'var(--theme-accent)';
@@ -70,72 +137,16 @@ const RelatedPersonsList = memo(({ title, people, handlePersonClick, handleImage
         gap={3}
       >
         {people.map(relatedPerson => (
-          <Card
+          <PersonCard
             key={relatedPerson.id}
-            size="sm"
-            bg={cardBg}
-            border={`1px solid ${italianGold}`}
-            borderRadius="lg"
-            onClick={() => handlePersonClick(relatedPerson)}
-            style={{ cursor: 'pointer' }}
-            _hover={{
-              boxShadow: `0 8px 25px rgba(200, 168, 130, 0.2)`,
-              transform: 'translateY(-2px)',
-              borderColor: 'var(--theme-accent-dark)'
-            }}
-            _active={{ transform: 'translateY(0px)' }}
-            transition="all 0.3s ease"
-            position="relative"
-            overflow="hidden"
-          >
-            <Box
-              position="absolute"
-              top={0}
-              left={0}
-              right={0}
-              h="3px"
-              bg={`linear-gradient(90deg, var(--theme-flag-left) 33%, #fff 33% 66%, var(--theme-flag-right) 66%)`}
-            />
-            <CardBody p={3} pt={4}>
-              <HStack spacing={3}>
-                <Avatar
-                  size="lg"
-                  src={`/images/${relatedPerson.data.image}.JPG`}
-                  name={relatedPerson.data.firstName}
-                  ring={2}
-                  ringColor={italianGold}
-                  cursor="pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleImageClick(
-                      `/images/${relatedPerson.data.image}.JPG`,
-                      `${relatedPerson.data.firstName} ${relatedPerson.data.lastName}`
-                    );
-                  }}
-                  _hover={{
-                    transform: 'scale(1.05)',
-                    transition: 'transform 0.2s ease'
-                  }}
-                />
-                <VStack align="start" spacing={1} flex={1}>
-                  <HStack spacing={2} align="center">
-                    <Text fontSize="sm" fontWeight="bold" color={italianGreen} fontFamily="serif">
-                      {relatedPerson.data.firstName} {relatedPerson.data.lastName} {relatedPerson.data.death ? "✞" : ""}
-                    </Text>
-                  </HStack>
-                  {relatedPerson.data.death ? (
-                    <Text fontSize="xs" color="gray.600">
-                      {relatedPerson.data.birthday} - {relatedPerson.data.death}
-                    </Text>
-                  ) : (
-                    <Text fontSize="xs" color="gray.600">
-                      {t('birthdate')} {relatedPerson.data.birthday}
-                    </Text>
-                  )}
-                </VStack>
-              </HStack>
-            </CardBody>
-          </Card>
+            relatedPerson={relatedPerson}
+            familyId={familyId}
+            italianGold={italianGold}
+            italianGreen={italianGreen}
+            handlePersonClick={handlePersonClick}
+            handleImageClick={handleImageClick}
+            t={t}
+          />
         ))}
       </Grid>
     </Box>

@@ -211,6 +211,7 @@ const App = memo(({ familyId = null, familyConfig: familyConfigProp = null, pass
                     onResetView={handleResetView}
                     onCenterPerson={handleCenterPerson}
                     onContextMenu={handleContextMenu}
+                    familyId={familyId}
                   />
                 )}
                 {/* Mobile "See more" button */}

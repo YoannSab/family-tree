@@ -69,13 +69,14 @@ const RecognitionResultsComponent = memo(({
                                     <CardBody p={isMobile ? 3 : 4}>
                                         <Flex align="center" gap={isMobile ? 2 : 4}>
                                             {result.person ? (
-                                                <Avatar
-                                                    src={`/images/${result.person.data.image}.JPG`}
+                                                <StorageAvatar
+                                                    familyId={familyId}
+                                                    filename={result.person.data.image}
                                                     name={`${result.person.data.firstName} ${result.person.data.lastName}`}
                                                     size={avatarSize}
                                                 />
                                             ) : (
-                                                <Avatar size={avatarSize} />
+                                                <StorageAvatar familyId={null} filename={null} name="" size={avatarSize} />
                                             )}
 
                                             <VStack align="start" flex={1} spacing={isMobile ? 0.5 : 1}>

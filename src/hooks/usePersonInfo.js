@@ -3,6 +3,7 @@ import { useDisclosure, useToast } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { updateFamilyMemberByInternalId } from '../services/familyService';
 import { DATA_SOURCE, THEME } from '../config/config';
+import { uploadImage, deleteImageFromStorage, getImageUrl } from '../services/storageService';
 
 export const usePersonInfo = (person, familyData, setPerson, onPersonUpdate, isEditing, setIsEditing, familyId = null) => {
   const { t } = useTranslation();
@@ -93,10 +94,52 @@ export const usePersonInfo = (person, familyData, setPerson, onPersonUpdate, isE
     setEditForm(prev => ({ ...prev, [field]: value }));
   }, []);
 
-  const handleImageClick = useCallback((imageSrc, personName) => {
-    setSelectedImage({ src: imageSrc, name: personName });
+  const handleImageClick = useCallback(async (imageSrc, personName) => {
+    if (!imageSrc) return; // no image — don't open modal
+    // Resolve the actual URL if we only have a filename (not a blob/http/local URL)
+    let resolvedSrc = imageSrc;
+    const isResolved = imageSrc.startsWith('http') || imageSrc.startsWith('blob:') || imageSrc.startsWith('/');
+    if (!isResolved && familyId) {
+      resolvedSrc = await getImageUrl(familyId, imageSrc);
+    }
+    if (!resolvedSrc) return; // image failed to load
+    setSelectedImage({ src: resolvedSrc, name: personName });
     onOpen();
-  }, [onOpen]);
+  }, [onOpen, familyId]);
+
+  const handlePhotoUpload = useCallback(async (file) => {
+    if (!file || DATA_SOURCE !== 'firebase') return;
+    setIsLoading(true);
+    try {
+      const oldFilename = person.data.image;
+      const filename = await uploadImage(
+        familyId,
+        person.id,
+        editForm.firstName || person.data.firstName,
+        editForm.lastName  || person.data.lastName,
+        file,
+      );
+      const updatedData = { data: { ...person.data, image: filename } };
+      await updateFamilyMemberByInternalId(person.id, updatedData, familyId);
+      // Delete old photo from Storage only if it's a DIFFERENT file.
+      // buildImageFilename is deterministic (firstName+lastName+personId),
+      // so re-uploading for the same person often generates the same filename —
+      // in that case Firebase Storage already overwrote it in place; don't delete.
+      if (oldFilename && oldFilename !== 'default' && oldFilename !== filename) {
+        deleteImageFromStorage(familyId, oldFilename);
+      }
+      const updatedPerson = { ...person, ...updatedData };
+      setPerson(updatedPerson);
+      if (onPersonUpdate) onPersonUpdate(updatedPerson);
+      setIsEditing(false);
+      toast({ title: t('photoUpdated'), status: 'success', duration: 3000, isClosable: true });
+    } catch (err) {
+      console.error('Photo upload failed:', err);
+      toast({ title: t('uploadError'), description: err.message, status: 'error', duration: 5000, isClosable: true });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [person, familyId, editForm, setPerson, onPersonUpdate, setIsEditing, toast, t]);
 
   const isLiving = useMemo(() => !person?.data.death, [person]);
   const age = useMemo(() => {
@@ -133,6 +176,7 @@ export const usePersonInfo = (person, familyData, setPerson, onPersonUpdate, isE
     handleEditSave,
     handleInputChange,
     handleImageClick,
+    handlePhotoUpload,
     isLiving,
     age,
     relatedPeople,

@@ -3,11 +3,11 @@ import '../css/FamilyTree.css';
 import { useFamilyTree } from '../hooks/useFamilyTree';
 import { THEME } from '../config/config';
 
-export default function FamilyTree({ onPersonClick, familyData, onResetView, onCenterPerson, onContextMenu }) {
+export default function FamilyTree({ onPersonClick, familyData, onResetView, onCenterPerson, onContextMenu, familyId }) {
   const memoizedFamilyData = useMemo(() => familyData, [familyData]);
   const memoizedOnPersonClick = React.useCallback(onPersonClick, [onPersonClick]);
 
-  const { centerOnPerson } = useFamilyTree(memoizedFamilyData, memoizedOnPersonClick, onResetView, onContextMenu);
+  const { centerOnPerson } = useFamilyTree(memoizedFamilyData, memoizedOnPersonClick, onResetView, onContextMenu, familyId);
 
   // Expose centerOnPerson function to parent
   React.useEffect(() => {
