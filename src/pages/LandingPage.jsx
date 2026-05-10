@@ -35,6 +35,7 @@ export default function LandingPage() {
       alignItems="center"
       justifyContent="center"
       bg={`linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 50%, var(--theme-primary-darker) 100%)`}
+      px={{ base: 4, md: 0 }}
     >
       <Container maxW="md">
         <VStack spacing={8} align="stretch">
@@ -89,11 +90,11 @@ export default function LandingPage() {
 
               {/* Create new family */}
               <Button
-                size="lg"
+                size="xl"
                 variant="outline"
-                borderColor={'var(--theme-accent)'}
-                color={'var(--theme-accent-dark)'}
-                _hover={{ bg: 'var(--theme-accent)' + '22' }}
+                borderColor={'var(--theme-primary)'}
+                color={'var(--theme-primary)' }
+                _hover={{ bg: 'var(--theme-primary)' + '22' }}
                 onClick={() => navigate('/new')}
               >
                 {t('createNewFamily', 'Create a new family tree')}

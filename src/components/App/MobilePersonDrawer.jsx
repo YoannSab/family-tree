@@ -95,7 +95,7 @@ const MobilePersonDrawer = memo(({
             </Box>
           </Flex>
         </DrawerHeader>
-        <DrawerBody pb={6} overflowY="auto">
+        <DrawerBody px={4} pb={6} overflowY="auto">
           {selectedPerson && (
             <PersonInfo
               person={selectedPerson}

@@ -3,6 +3,12 @@
   width: 100%;
   height: 100%;
 }
+
+/* Prevent text selection during long-press context menu on touch devices */
+.tree-container, .tree-container * {
+  -webkit-user-select: none;
+  user-select: none;
+}
 .f3 g.card_add text {
   fill: #fff;
 }

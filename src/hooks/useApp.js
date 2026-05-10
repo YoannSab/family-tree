@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useDisclosure, useToast } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import CryptoJS from 'crypto-js';
-import { fetchFamilyMembers, addFamilyMemberWithRelation, deleteFamilyMemberAndCleanRefs, createFirstMember } from '../services/familyService';
+import { fetchFamilyMembers, addFamilyMemberWithRelation, deleteFamilyMemberAndCleanRefs, createFirstMember, updateFamilyMember } from '../services/familyService';
+import { prefetchImageUrls, uploadImage, deleteImageFromStorage } from '../services/storageService';
 import { FAMILY_CONFIG as DEFAULT_FAMILY_CONFIG, THEME } from '../config/config';
 
 // Custom hook for responsive design that updates in real-time
@@ -82,6 +83,7 @@ export const useApp = ({ familyId = null, familyConfigProp = null, passwordHash 
   const isDragging = useRef(false);
   const canSwipe = useRef(false);
   const isPersonEditingModeRef = useRef(isPersonEditingMode);
+  const selectedPersonRef = useRef(selectedPerson);
   const resetTreeViewRef = useRef(null);
   const centerOnPersonRef = useRef(null);
 
@@ -108,6 +110,9 @@ export const useApp = ({ familyId = null, familyConfigProp = null, passwordHash 
       const data = await fetchFamilyMembers(familyId);
       setFamilyData(data);
       setIsFamilyDataLoaded(true);
+      // Prefetch images in background — cache updates are broadcast via
+      // subscribeToCacheUpdate so the D3 tree patches avatars in-place.
+      prefetchImageUrls(familyId, data);
     };
     fetchData();
   }, [familyId]);
@@ -115,6 +120,10 @@ export const useApp = ({ familyId = null, familyConfigProp = null, passwordHash 
   useEffect(() => {
     isPersonEditingModeRef.current = isPersonEditingMode;
   }, [isPersonEditingMode]);
+
+  useEffect(() => {
+    selectedPersonRef.current = selectedPerson;
+  }, [selectedPerson]);
 
   const handlePersonUpdate = useCallback((updatedPerson) => {
     setFamilyData(prevData =>
@@ -266,7 +275,19 @@ export const useApp = ({ familyId = null, familyConfigProp = null, passwordHash 
   const handleCreateFirstMember = useCallback(async (newData) => {
     setMemberActionLoading(true);
     try {
-      const { newId, newMemberDocument } = await createFirstMember(newData, familyId);
+      const { imageFile, ...memberData } = newData;
+      const { newId, newMemberDocument } = await createFirstMember(memberData, familyId);
+
+      if (imageFile && familyId) {
+        try {
+          const filename = await uploadImage(familyId, newId, memberData.firstName, memberData.lastName, imageFile);
+          await updateFamilyMember(newId, { 'data.image': filename }, familyId);
+          newMemberDocument.data.image = filename;
+        } catch (uploadErr) {
+          console.warn('Photo upload failed (member created without photo):', uploadErr);
+        }
+      }
+
       setFamilyData([{ ...newMemberDocument, _firestoreId: newId }]);
       onCreateFirstMemberClose();
       toast({ title: t('memberAdded'), status: 'success', duration: 3000, isClosable: true });
@@ -310,8 +331,8 @@ export const useApp = ({ familyId = null, familyConfigProp = null, passwordHash 
   const handleAddMemberSubmit = useCallback(async (newData) => {
     if (!contextMenuPerson || !addRelationType) return;
 
-    // Extract spouse selection (not a member field) before passing to service
-    const { selectedSpouseId, ...memberData } = newData;
+    // Extract spouse selection and optional image file before passing to service
+    const { selectedSpouseId, imageFile, ...memberData } = newData;
     const otherParentPerson = selectedSpouseId
       ? familyData.find(p => p.id === selectedSpouseId) ?? null
       : null;
@@ -321,6 +342,17 @@ export const useApp = ({ familyId = null, familyConfigProp = null, passwordHash 
       const { newId, newMemberDocument, existingOtherParentId } = await addFamilyMemberWithRelation(
         memberData, addRelationType, contextMenuPerson, otherParentPerson, familyId
       );
+
+      // Upload photo after member creation so we have the newId for the filename
+      if (imageFile && familyId) {
+        try {
+          const filename = await uploadImage(familyId, newId, memberData.firstName, memberData.lastName, imageFile);
+          await updateFamilyMember(newId, { 'data.image': filename }, familyId);
+          newMemberDocument.data.image = filename;
+        } catch (uploadErr) {
+          console.warn('Photo upload failed (member created without photo):', uploadErr);
+        }
+      }
 
       // Optimistic local update — no Firestore re-fetch needed
       const contextPersonId = contextMenuPerson.id;
@@ -369,6 +401,11 @@ export const useApp = ({ familyId = null, familyConfigProp = null, passwordHash 
     if (!personToDelete) return;
     setMemberActionLoading(true);
     try {
+      // Delete photo from Storage first (silently ignores errors)
+      const imageFilename = personToDelete.data?.image;
+      if (familyId && imageFilename && imageFilename !== 'default') {
+        await deleteImageFromStorage(familyId, imageFilename);
+      }
       await deleteFamilyMemberAndCleanRefs(personToDelete.id, familyData, familyId);
 
       // Optimistic local update — no Firestore re-fetch needed

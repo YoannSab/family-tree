@@ -14,6 +14,7 @@ const FamilyConnections = memo(({
   italianGreen,
   handlePersonClick,
   handleImageClick,
+  familyId,
   t
 }) => {
   return (
@@ -39,6 +40,7 @@ const FamilyConnections = memo(({
         <RelatedPersonsList
           title={t('parents')}
           people={relatedPeople.parents}
+          familyId={familyId}
           handlePersonClick={handlePersonClick}
           handleImageClick={handleImageClick}
           isMobile={isMobile}
@@ -49,6 +51,7 @@ const FamilyConnections = memo(({
         <RelatedPersonsList
           title={t('spouse')}
           people={relatedPeople.spouses}
+          familyId={familyId}
           handlePersonClick={handlePersonClick}
           handleImageClick={handleImageClick}
           isMobile={isMobile}
@@ -59,6 +62,7 @@ const FamilyConnections = memo(({
         <RelatedPersonsList
           title={t('children')}
           people={relatedPeople.children}
+          familyId={familyId}
           handlePersonClick={handlePersonClick}
           handleImageClick={handleImageClick}
           isMobile={isMobile}
@@ -69,6 +73,7 @@ const FamilyConnections = memo(({
         <RelatedPersonsList
           title={t('siblings')}
           people={relatedPeople.siblings}
+          familyId={familyId}
           handlePersonClick={handlePersonClick}
           handleImageClick={handleImageClick}
           isMobile={isMobile}

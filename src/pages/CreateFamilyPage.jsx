@@ -96,17 +96,17 @@ export default function CreateFamilyPage() {
         display="flex"
         alignItems="center"
         justifyContent="center"
+        px={2}
         bg={`linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 50%, var(--theme-primary-darker) 100%)`}
       >
-        <Container maxW="md">
-          <Box bg="white" borderRadius="2xl" p={8} shadow="2xl">
+        <Container maxW="md" px={{ base: 4, md: 0 }}>
             <VStack spacing={6} align="stretch">
               <VStack spacing={2} textAlign="center">
                 <Box fontSize="4xl">✅</Box>
-                <Heading size="lg" color="gray.800">
+                <Heading size="lg" color="gray.200">
                   {t('familyCreated', 'Family tree created!')}
                 </Heading>
-                <Text color="gray.500" fontSize="sm">
+                <Text color="gray.400" fontSize="sm">
                   {t('familyCreatedDesc', 'Save this link — it\'s the only way to access your family tree.')}
                 </Text>
               </VStack>
@@ -140,9 +140,8 @@ export default function CreateFamilyPage() {
                 {t('openMyTree', 'Open my family tree')}
               </Button>
             </VStack>
-          </Box>
-        </Container>
-      </Box>
+          </Container>
+        </Box>
     );
   }
 
@@ -154,7 +153,7 @@ export default function CreateFamilyPage() {
       justifyContent="center"
       bg={`linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 50%, var(--theme-primary-darker) 100%)`}
     >
-      <Container maxW="md">
+      <Container maxW="md" px={{ base: 4, md: 0 }}>
         <VStack spacing={6} align="stretch">
           <VStack spacing={2} textAlign="center">
             <Box fontSize="5xl">🌳</Box>

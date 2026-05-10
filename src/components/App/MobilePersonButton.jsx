@@ -31,14 +31,13 @@ const MobilePersonButton = memo(({
         _active={{ transform: "translateY(0)" }}
         boxShadow={`0 4px 12px rgba(var(--theme-primary-rgb), 0.3)`}
         borderRadius="xl"
-        leftIcon={<ViewIcon />}
+        leftIcon={<ViewIcon flexShrink={0} />}
         transition="all 0.2s"
         fontWeight="bold"
         border="1px solid rgba(255,255,255,0.1)"
+        overflow="hidden"
       >
-        <VStack spacing={0}>
-          <Text fontSize="sm">{t('seeDetailsOn')} {selectedPerson.data.firstName} {selectedPerson.data.lastName}</Text>
-        </VStack>
+        <Text fontSize="sm" isTruncated>{t('seeDetailsOn')} {selectedPerson.data.firstName} {selectedPerson.data.lastName}</Text>
       </Button>
     </Box>
   );
