@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+﻿import { useMemo } from 'react';
 import { useBreakpointValue } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { THEME } from '../config/config';
@@ -6,8 +6,8 @@ import { THEME } from '../config/config';
 export const useFamilyStatsModal = (familyData) => {
   const { t } = useTranslation();
   const cardBg = THEME.bgCard;
-  const italianGold = THEME.accent;
-  const italianGreen = THEME.primary;
+  const italianGold = 'var(--theme-accent)';
+  const italianGreen = 'var(--theme-primary)';
 
   const modalSize = useBreakpointValue({ base: 'full', md: '6xl' });
   const cardGridColumns = useBreakpointValue({ base: 2, md: 5 });

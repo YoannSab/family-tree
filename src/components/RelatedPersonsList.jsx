@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+﻿import React, { memo } from 'react';
 import {
   Box,
   Heading,
@@ -16,8 +16,8 @@ import { THEME } from '../config/config';
 const RelatedPersonsList = memo(({ title, people, handlePersonClick, handleImageClick, isMobile }) => {
   const { t } = useTranslation();
   const cardBg = THEME.bgCard;
-  const italianGold = THEME.accent;
-  const italianGreen = THEME.primary;
+  const italianGold = 'var(--theme-accent)';
+  const italianGreen = 'var(--theme-primary)';
 
   if (!people || people.length === 0) {
     return (
@@ -34,7 +34,7 @@ const RelatedPersonsList = memo(({ title, people, handlePersonClick, handleImage
           <Box
             w={1}
             h={4}
-              bg={`linear-gradient(to bottom, ${italianGold}, ${THEME.accentDark})`}
+              bg={`linear-gradient(to bottom, ${italianGold}, var(--theme-accent-dark))`}
             borderRadius="full"
           />
           {title} (0)
@@ -60,7 +60,7 @@ const RelatedPersonsList = memo(({ title, people, handlePersonClick, handleImage
         <Box
           w={1}
           h={4}
-          bg={`linear-gradient(to bottom, ${italianGold}, ${THEME.accentDark})`}
+          bg={`linear-gradient(to bottom, ${italianGold}, var(--theme-accent-dark))`}
           borderRadius="full"
         />
         {title} ({people.length})
@@ -81,7 +81,7 @@ const RelatedPersonsList = memo(({ title, people, handlePersonClick, handleImage
             _hover={{
               boxShadow: `0 8px 25px rgba(200, 168, 130, 0.2)`,
               transform: 'translateY(-2px)',
-              borderColor: THEME.accentDark
+              borderColor: 'var(--theme-accent-dark)'
             }}
             _active={{ transform: 'translateY(0px)' }}
             transition="all 0.3s ease"
@@ -94,7 +94,7 @@ const RelatedPersonsList = memo(({ title, people, handlePersonClick, handleImage
               left={0}
               right={0}
               h="3px"
-              bg={`linear-gradient(90deg, ${THEME.flagLeft} 33%, #fff 33% 66%, ${THEME.flagRight} 66%)`}
+              bg={`linear-gradient(90deg, var(--theme-flag-left) 33%, #fff 33% 66%, var(--theme-flag-right) 66%)`}
             />
             <CardBody p={3} pt={4}>
               <HStack spacing={3}>

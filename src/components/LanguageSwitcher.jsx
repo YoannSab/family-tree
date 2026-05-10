@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { 
   Button, 
   Menu, 
@@ -71,15 +71,15 @@ const LanguageSwitcher = ({ size = 'sm', variant = 'solid' }) => {
             borderRadius="lg"
             mx={1}
             fontWeight={i18n.language === language.code ? 'bold' : 'normal'}
-            color={i18n.language === language.code ? THEME.primary : 'inherit'}
-            _hover={{ bg: `rgba(${THEME.primaryRgb},0.1)` }}
+            color={i18n.language === language.code ? 'var(--theme-primary)' : 'inherit'}
+            _hover={{ bg: `rgba(var(--theme-primary-rgb),0.1)` }}
           >
             <HStack spacing={3} w="full">
               <Box fontSize="lg">{language.flag}</Box>
               <Text fontSize="sm">{language.name}</Text>
               {i18n.language === language.code && (
                 <Box ml="auto">
-                  <Box w={2} h={2} bg={THEME.primary} borderRadius="full" />
+                  <Box w={2} h={2} bg={'var(--theme-primary)'} borderRadius="full" />
                 </Box>
               )}
             </HStack>

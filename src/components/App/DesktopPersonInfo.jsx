@@ -15,6 +15,7 @@ const DesktopPersonInfo = memo(({
   isPersonEditingMode,
   setIsPersonEditingMode,
   handlePersonClick,
+  familyId,
   t
 }) => {
   if (!selectedPerson) {
@@ -65,6 +66,7 @@ const DesktopPersonInfo = memo(({
         isEditing={isPersonEditingMode}
         setIsEditing={setIsPersonEditingMode}
         handlePersonClick={handlePersonClick}
+        familyId={familyId}
       />
     </Box>
   );

@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {
     Box,
     VStack,
@@ -17,8 +17,9 @@ import {
 import { ViewIcon, ViewOffIcon, LockIcon } from '@chakra-ui/icons';
 import { FAMILY_CONFIG, THEME } from '../config/config.js';
 import { usePasswordProtection } from '../hooks/usePasswordProtection.js';
+import { useEffect } from 'react';
 
-const PasswordProtection = ({ onUnlock }) => {
+const PasswordProtection = ({ onUnlock, onAuthChecked, passwordHash = '' }) => {
     const {
         t,
         password,
@@ -32,7 +33,13 @@ const PasswordProtection = ({ onUnlock }) => {
         cardBg,
         italianGold,
         italianGreen,
-    } = usePasswordProtection(onUnlock);
+        isAuthChecked,
+    } = usePasswordProtection(onUnlock, passwordHash);
+
+    // Once we know the user needs to enter a password, signal the app is ready to render
+    useEffect(() => {
+        if (isAuthChecked && onAuthChecked) onAuthChecked();
+    }, [isAuthChecked, onAuthChecked]);
 
     return (
         <Box minH="100vh" bg={bgColor} display="flex" alignItems="center" justifyContent="center">
@@ -43,7 +50,7 @@ const PasswordProtection = ({ onUnlock }) => {
                 left={0}
                 right={0}
                 bottom={0}
-                bg={`linear-gradient(135deg, ${THEME.primary} 0%, ${THEME.primaryDark} 50%, ${THEME.primaryDarker} 100%)`}
+                bg={`linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 50%, var(--theme-primary-darker) 100%)`}
                 opacity={0.95}
             />
 
@@ -75,7 +82,7 @@ const PasswordProtection = ({ onUnlock }) => {
                         <Box
                             w="200px"
                             h="2px"
-                            bg={`linear-gradient(90deg, transparent 0%, ${italianGold} 20%, ${THEME.accentDark} 50%, ${italianGold} 80%, transparent 100%)`}
+                            bg={`linear-gradient(90deg, transparent 0%, ${italianGold} 20%, var(--theme-accent-dark) 50%, ${italianGold} 80%, transparent 100%)`}
                             borderRadius="full"
                         />
                     </VStack>
@@ -98,14 +105,14 @@ const PasswordProtection = ({ onUnlock }) => {
                             left={0}
                             right={0}
                             h="4px"
-                            bg={`linear-gradient(90deg, ${THEME.flagLeft} 33%, #fff 33% 66%, ${THEME.flagRight} 66%)`}
+                            bg={`linear-gradient(90deg, var(--theme-flag-left) 33%, #fff 33% 66%, var(--theme-flag-right) 66%)`}
                         />
 
                         <VStack spacing={6} pt={2}>
                             <VStack spacing={2} textAlign="center">
                                 <Box
                                     p={4}
-                                    bg={`linear-gradient(135deg, ${italianGreen}, ${THEME.primaryDark})`}
+                                    bg={`linear-gradient(135deg, ${italianGreen}, var(--theme-primary-dark))`}
                                     borderRadius="full"
                                     color="white"
                                     fontSize="2xl"
@@ -133,11 +140,11 @@ const PasswordProtection = ({ onUnlock }) => {
                                             borderColor={error ? 'red.300' : italianGold}
                                             borderRadius="lg"
                                             _focus={{
-                                                borderColor: error ? 'red.400' : THEME.accentDark,
-                                                boxShadow: `0 0 0 1px ${error ? '#f56565' : THEME.accentDark}`
+                                                borderColor: error ? 'red.400' : 'var(--theme-accent-dark)',
+                                                boxShadow: `0 0 0 1px ${error ? '#f56565' : 'var(--theme-accent-dark)'}`
                                             }}
                                             _hover={{
-                                                borderColor: error ? 'red.400' : THEME.accentDark
+                                                borderColor: error ? 'red.400' : 'var(--theme-accent-dark)'
                                             }}
                                             required
                                         />
@@ -165,15 +172,15 @@ const PasswordProtection = ({ onUnlock }) => {
                                         type="submit"
                                         size="lg"
                                         w="full"
-                                        bg={`linear-gradient(135deg, ${italianGreen} 0%, ${THEME.primaryDark} 100%)`}
+                                        bg={`linear-gradient(135deg, ${italianGreen} 0%, var(--theme-primary-dark) 100%)`}
                                         color="white"
                                         _hover={{
-                                            bg: `linear-gradient(135deg, ${THEME.primaryDark} 0%, ${THEME.primaryDarker} 100%)`,
+                                            bg: `linear-gradient(135deg, var(--theme-primary-dark) 0%, var(--theme-primary-darker) 100%)`,
                                             transform: "translateY(-1px)",
-                                            boxShadow: `0 6px 20px rgba(${THEME.primaryRgb}, 0.4)`
+                                            boxShadow: `0 6px 20px rgba(var(--theme-primary-rgb), 0.4)`
                                         }}
                                         _active={{ transform: "translateY(0)" }}
-                                        boxShadow={`0 4px 12px rgba(${THEME.primaryRgb}, 0.3)`}
+                                        boxShadow={`0 4px 12px rgba(var(--theme-primary-rgb), 0.3)`}
                                         borderRadius="lg"
                                         fontWeight="bold"
                                         isLoading={isLoading}

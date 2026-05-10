@@ -1,4 +1,4 @@
-import {
+﻿import {
     Modal,
     ModalOverlay,
     ModalContent,
@@ -19,7 +19,7 @@ import CapturedImageComponent from './FaceRecognition/CapturedImageComponent'
 import RecognitionResultsComponent from './FaceRecognition/RecognitionResultsComponent'
 import { THEME } from '../config/config'
 
-const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
+const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect, familyId }) => {
     const { t } = useTranslation()
 
     // Utilisation du hook personnalisé
@@ -46,10 +46,10 @@ const FaceRecognition = ({ isOpen, onClose, familyData, onPersonSelect }) => {
         captureImage,
         switchCamera,
         restart
-    } = useFaceRecognition(familyData, isOpen)
+    } = useFaceRecognition(familyData, isOpen, familyId)
 
-    const italianGreen = THEME.primary
-    const italianGold = THEME.accent
+    const italianGreen = 'var(--theme-primary)'
+    const italianGold = 'var(--theme-accent)'
     
     // Responsive values
     const isMobile = useBreakpointValue({ base: true, md: false })

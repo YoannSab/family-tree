@@ -1,4 +1,4 @@
-import './css/App.css';
+﻿import './css/App.css';
 import FamilyTree from './components/FamilyTree.jsx';
 import FamilyStatsModal from './components/FamilyStatsModal.jsx';
 import FaceRecognition from './components/FaceRecognition.jsx';
@@ -11,16 +11,48 @@ import MobilePersonDrawer from './components/App/MobilePersonDrawer.jsx';
 import TreeContextMenu from './components/FamilyTree/TreeContextMenu.jsx';
 import AddMemberModal from './components/FamilyTree/AddMemberModal.jsx';
 import DeleteConfirmModal from './components/FamilyTree/DeleteConfirmModal.jsx';
+import CreateFirstMemberModal from './components/FamilyTree/CreateFirstMemberModal.jsx';
 import {
   Box,
   Flex,
   VStack,
   Container,
+  Center,
+  Button,
+  Text,
+  Spinner,
 } from '@chakra-ui/react';
 import { useApp } from './hooks/useApp';
-import { useMemo, memo } from 'react';
+import { useMemo, memo, useEffect } from 'react';
 
-const App = memo(() => {
+// Converts #rrggbb → 'r, g, b'
+const hexToRgb = (hex) => {
+  const n = parseInt(hex.replace('#', ''), 16);
+  return `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`;
+};
+
+const applyCssVars = (theme) => {
+  if (theme?.primary) {
+    document.documentElement.style.setProperty('--theme-primary',        theme.primary);
+    document.documentElement.style.setProperty('--theme-primary-dark',   theme.primaryDark    || theme.primary);
+    document.documentElement.style.setProperty('--theme-primary-darker', theme.primaryDarker  || theme.primary);
+    document.documentElement.style.setProperty('--theme-primary-rgb',    hexToRgb(theme.primary));
+  }
+  if (theme?.accent) {
+    document.documentElement.style.setProperty('--theme-accent',     theme.accent);
+    document.documentElement.style.setProperty('--theme-accent-dark', theme.accentDark || theme.accent);
+    document.documentElement.style.setProperty('--theme-accent-rgb',  hexToRgb(theme.accent));
+  }
+  if (theme?.flagLeft)  document.documentElement.style.setProperty('--theme-flag-left',  theme.flagLeft);
+  if (theme?.flagRight) document.documentElement.style.setProperty('--theme-flag-right', theme.flagRight);
+};
+
+const App = memo(({ familyId = null, familyConfig: familyConfigProp = null, passwordHash = '', theme = null }) => {
+  // Apply per-family theme CSS vars whenever theme changes
+  useEffect(() => {
+    if (theme) applyCssVars(theme);
+  }, [theme]);
+
   const {
     t,
     isAuthenticated,
@@ -54,6 +86,8 @@ const App = memo(() => {
     handleSearchChange,
     handleSearchSelect,
     handleUnlock,
+    handleAuthChecked,
+    isAppReady,
     handleResetView,
     handleCenterPerson,
     resetTreeView,
@@ -83,14 +117,28 @@ const App = memo(() => {
     personToDelete,
     handleOpenDeleteConfirm,
     handleDeleteMember,
-  } = useApp();
+    // First member creation
+    isCreateFirstMemberOpen,
+    onCreateFirstMemberOpen,
+    onCreateFirstMemberClose,
+    handleCreateFirstMember,
+  } = useApp({ familyId, familyConfigProp, passwordHash });
 
   const memoizedFamilyData = useMemo(() => familyData, [familyData]);
   const memoizedSelectedPerson = useMemo(() => selectedPerson, [selectedPerson]);
   const memoizedSearchResults = useMemo(() => searchResults, [searchResults]);
 
+  // Show full-screen spinner until auth check AND initial data fetch are both settled
+  if (!isAppReady) {
+    return (
+      <Center minH="100vh" bg="var(--theme-bg-page)">
+        <Spinner size="xl" color="var(--theme-primary)" thickness="4px" speed="0.7s" />
+      </Center>
+    );
+  }
+
   if (!isAuthenticated) {
-    return <PasswordProtection onUnlock={handleUnlock} />;
+    return <PasswordProtection onUnlock={handleUnlock} passwordHash={passwordHash} />;
   }
 
   return (
@@ -128,13 +176,43 @@ const App = memo(() => {
 
             <Flex flexDirection='row' gap={6} alignItems="stretch">
               <VStack spacing={4} alignItems="stretch" flex={1}>
-                <FamilyTree 
-                  onPersonClick={handlePersonClick} 
-                  familyData={memoizedFamilyData} 
-                  onResetView={handleResetView}
-                  onCenterPerson={handleCenterPerson}
-                  onContextMenu={handleContextMenu}
-                />
+                {familyData.length === 0 ? (
+                  <Center
+                    h="400px"
+                    flexDirection="column"
+                    gap={5}
+                    bg={`linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%)`}
+                    borderRadius="12px"
+                    border={`3px solid var(--theme-accent)`}
+                    boxShadow={`0 8px 32px rgba(var(--theme-primary-rgb), 0.3)`}
+                  >
+                    <Text fontSize="5xl">🌱</Text>
+                    <Text color="white" fontSize="lg" fontWeight="semibold" textAlign="center">
+                      {t('emptyTreeTitle', 'This family tree is empty')}
+                    </Text>
+                    <Text color="whiteAlpha.700" fontSize="sm" textAlign="center" px={8}>
+                      {t('emptyTreeSubtitle', 'Add the first person to get started')}
+                    </Text>
+                    <Button
+                      bg={'var(--theme-accent)'}
+                      color={'var(--theme-primary-darker)'}
+                      _hover={{ bg: 'var(--theme-accent-dark)', color: 'white' }}
+                      fontWeight="bold"
+                      size="lg"
+                      onClick={onCreateFirstMemberOpen}
+                    >
+                      {t('addFirstPerson', '+ Add first person')}
+                    </Button>
+                  </Center>
+                ) : (
+                  <FamilyTree
+                    onPersonClick={handlePersonClick}
+                    familyData={memoizedFamilyData}
+                    onResetView={handleResetView}
+                    onCenterPerson={handleCenterPerson}
+                    onContextMenu={handleContextMenu}
+                  />
+                )}
                 {/* Mobile "See more" button */}
                 {isMobile && (
                   <MobilePersonButton
@@ -156,6 +234,7 @@ const App = memo(() => {
                   isPersonEditingMode={isPersonEditingMode}
                   setIsPersonEditingMode={setIsPersonEditingMode}
                   handlePersonClick={handlePersonClick}
+                  familyId={familyId}
                   t={t}
                 />
               )}
@@ -180,6 +259,7 @@ const App = memo(() => {
         setIsPersonEditingMode={setIsPersonEditingMode}
         handlePersonClick={handlePersonClick}
         FAMILY_CONFIG={FAMILY_CONFIG}
+        familyId={familyId}
         t={t}
       />
 
@@ -196,6 +276,7 @@ const App = memo(() => {
         onClose={onFaceRecognitionClose}
         familyData={memoizedFamilyData}
         onPersonSelect={handleFaceRecognitionPersonSelect}
+        familyId={familyId}
       />
 
       {/* ── Dynamic member management ────────────────────────────────────── */}
@@ -227,6 +308,13 @@ const App = memo(() => {
         onClose={onDeleteConfirmClose}
         person={personToDelete}
         onConfirm={handleDeleteMember}
+        isLoading={memberActionLoading}
+      />
+
+      <CreateFirstMemberModal
+        isOpen={isCreateFirstMemberOpen}
+        onClose={onCreateFirstMemberClose}
+        onSubmit={handleCreateFirstMember}
         isLoading={memberActionLoading}
       />
     </Box>

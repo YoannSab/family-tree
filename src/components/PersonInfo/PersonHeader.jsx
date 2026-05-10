@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+﻿import React, { memo } from 'react';
 import {
   VStack,
   HStack,
@@ -35,7 +35,7 @@ const PersonHeader = memo(({
         name={person.data.firstName}
         ring={3}
         ringColor={italianGold}
-        bg={`linear-gradient(135deg, ${THEME.primary}, ${THEME.primaryDark})`}
+        bg={`linear-gradient(135deg, var(--theme-primary), var(--theme-primary-dark))`}
         cursor="pointer"
         onClick={() => handleImageClick(
           `/images/${person.data.image}.JPG`,

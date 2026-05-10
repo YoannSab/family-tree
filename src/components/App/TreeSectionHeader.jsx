@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+﻿import React, { memo } from 'react';
 import {
   Box,
   Flex,
@@ -39,12 +39,12 @@ const TreeSectionHeader = memo(({
           <Box
             w={12}
             h={12}
-            bg={`linear-gradient(135deg, ${THEME.primary} 0%, ${THEME.primaryDark} 100%)`}
+            bg={`linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%)`}
             borderRadius="xl"
             display="flex"
             alignItems="center"
             justifyContent="center"
-            boxShadow={`0 4px 12px rgba(${THEME.primaryRgb}, 0.3)`}
+            boxShadow={`0 4px 12px rgba(var(--theme-primary-rgb), 0.3)`}
           >
             <Text fontSize="2xl">🌳</Text>
           </Box>
@@ -78,12 +78,12 @@ const TreeSectionHeader = memo(({
             size={isMobile ? "md" : "lg"}
             aria-label={t('resetView')}
             bg="white"
-            border={`2px solid ${THEME.accent}`}
+            border={`2px solid var(--theme-accent)`}
             borderRadius="xl"
-            color={THEME.primary}
+            color={'var(--theme-primary)'}
             _hover={{
-              bg: `rgba(${THEME.accentRgb}, 0.1)`,
-              borderColor: THEME.accentDark,
+              bg: `rgba(var(--theme-accent-rgb), 0.1)`,
+              borderColor: 'var(--theme-accent-dark)',
               transform: "scale(1.05)"
             }}
             _active={{
@@ -104,14 +104,14 @@ const TreeSectionHeader = memo(({
               value={searchQuery}
               onChange={handleSearchChange}
               bg="white"
-              border={`2px solid ${THEME.accent}`}
+              border={`2px solid var(--theme-accent)`}
               borderRadius="xl"
               _focus={{
-                borderColor: THEME.accentDark,
-                boxShadow: `0 0 0 1px ${THEME.accentDark}`
+                borderColor: 'var(--theme-accent-dark)',
+                boxShadow: `0 0 0 1px var(--theme-accent-dark)`
               }}
               _hover={{
-                borderColor: THEME.accentDark
+                borderColor: 'var(--theme-accent-dark)'
               }}
             />
 
@@ -137,7 +137,7 @@ const TreeSectionHeader = memo(({
               right={0}
               mt={2}
               bg="white"
-                border={`2px solid ${THEME.accent}`}
+                border={`2px solid var(--theme-accent)`}
               borderRadius="xl"
               boxShadow="0 8px 25px rgba(0,0,0,0.15)"
               zIndex={10}
@@ -159,7 +159,7 @@ const TreeSectionHeader = memo(({
                   >
                     <HStack spacing={3}>
                       <Box>
-                        <Text fontWeight="bold" color={THEME.primary} fontSize="sm">
+                        <Text fontWeight="bold" color={'var(--theme-primary)'} fontSize="sm">
                           {person.data.firstName} {person.data.lastName}
                         </Text>
                         <Text fontSize="xs" color="gray.600">
@@ -192,7 +192,7 @@ const TreeSectionHeader = memo(({
       <Box
         w="full"
         h="2px"
-        bg={`linear-gradient(90deg, transparent 0%, ${THEME.accent} 20%, ${THEME.accentDark} 50%, ${THEME.accent} 80%, transparent 100%)`}
+        bg={`linear-gradient(90deg, transparent 0%, var(--theme-accent) 20%, var(--theme-accent-dark) 50%, var(--theme-accent) 80%, transparent 100%)`}
         borderRadius="full"
         mb={4}
       />

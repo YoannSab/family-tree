@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import {
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody,
   ModalFooter, ModalCloseButton,
@@ -26,6 +26,7 @@ const AddMemberModal = ({ isOpen, onClose, relationType, relatedPerson, spouses 
     firstName: '',
     lastName: '',
     birthday: '',
+    death: '',
     image: '',
     gender: FIXED_GENDER[relationType] || 'M',
     selectedSpouseId: '',
@@ -62,6 +63,7 @@ const AddMemberModal = ({ isOpen, onClose, relationType, relatedPerson, spouses 
       firstName:        form.firstName.trim(),
       lastName:         form.lastName.trim(),
       birthday:         form.birthday ? parseInt(form.birthday, 10) : null,
+      death:            form.death    ? parseInt(form.death,    10) : null,
       image:            form.image.trim() || 'default',
       gender:           genderIsFixed ? FIXED_GENDER[relationType] : form.gender,
       selectedSpouseId: form.selectedSpouseId || null,
@@ -69,7 +71,7 @@ const AddMemberModal = ({ isOpen, onClose, relationType, relatedPerson, spouses 
   };
 
   const handleClose = () => {
-    setForm({ firstName: '', lastName: '', birthday: '', image: '', gender: FIXED_GENDER[relationType] || 'M', selectedSpouseId: '' });
+    setForm({ firstName: '', lastName: '', birthday: '', death: '', image: '', gender: FIXED_GENDER[relationType] || 'M', selectedSpouseId: '' });
     setErrors({});
     onClose();
   };
@@ -78,10 +80,10 @@ const AddMemberModal = ({ isOpen, onClose, relationType, relatedPerson, spouses 
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} isCentered motionPreset="none">
-      <ModalOverlay bg={`rgba(${THEME.primaryRgb}, 0.5)`} />
+      <ModalOverlay bg={`rgba(var(--theme-primary-rgb), 0.5)`} />
       <ModalContent
         borderRadius="xl"
-        border={`2px solid ${THEME.accent}`}
+        border={`2px solid var(--theme-accent)`}
         maxW="420px"
         overflow="hidden"
       >
@@ -90,14 +92,14 @@ const AddMemberModal = ({ isOpen, onClose, relationType, relatedPerson, spouses 
           position="absolute"
           top={0} left={0} right={0}
           h="3px"
-          bg={`linear-gradient(90deg, ${THEME.flagLeft} 33%, #fff 33% 66%, ${THEME.flagRight} 66%)`}
+          bg={`linear-gradient(90deg, var(--theme-flag-left) 33%, #fff 33% 66%, var(--theme-flag-right) 66%)`}
         />
 
         <ModalHeader pt={6} pb={2}>
           <HStack spacing={2}>
             <Text fontSize="2xl">{meta.emoji}</Text>
             <VStack align="start" spacing={0}>
-              <Text fontSize="md" fontWeight="bold" color={THEME.primary} fontFamily="serif">
+              <Text fontSize="md" fontWeight="bold" color={'var(--theme-primary)'} fontFamily="serif">
                 {t(meta.key)}
               </Text>
               <Text fontSize="xs" color="gray.500">
@@ -106,7 +108,7 @@ const AddMemberModal = ({ isOpen, onClose, relationType, relatedPerson, spouses 
             </VStack>
           </HStack>
         </ModalHeader>
-        <ModalCloseButton top={5} isDisabled={isLoading} color={THEME.primaryDark} />
+        <ModalCloseButton top={5} isDisabled={isLoading} color={'var(--theme-primary-dark)'} />
 
         <ModalBody pb={2}>
           <VStack spacing={4}>
@@ -118,8 +120,8 @@ const AddMemberModal = ({ isOpen, onClose, relationType, relatedPerson, spouses 
                   value={form.firstName}
                   onChange={set('firstName')}
                   placeholder="Marie"
-                  border={`1.5px solid ${THEME.accent}`}
-                  _focus={{ borderColor: THEME.accentDark, boxShadow: `0 0 0 1px ${THEME.accentDark}` }}
+                  border={`1.5px solid var(--theme-accent)`}
+                  _focus={{ borderColor: 'var(--theme-accent-dark)', boxShadow: `0 0 0 1px var(--theme-accent-dark)` }}
                   isDisabled={isLoading}
                 />
                 <FormErrorMessage>{errors.firstName}</FormErrorMessage>
@@ -131,15 +133,15 @@ const AddMemberModal = ({ isOpen, onClose, relationType, relatedPerson, spouses 
                   value={form.lastName}
                   onChange={set('lastName')}
                   placeholder="Dupont"
-                  border={`1.5px solid ${THEME.accent}`}
-                  _focus={{ borderColor: THEME.accentDark, boxShadow: `0 0 0 1px ${THEME.accentDark}` }}
+                  border={`1.5px solid var(--theme-accent)`}
+                  _focus={{ borderColor: 'var(--theme-accent-dark)', boxShadow: `0 0 0 1px var(--theme-accent-dark)` }}
                   isDisabled={isLoading}
                 />
                 <FormErrorMessage>{errors.lastName}</FormErrorMessage>
               </FormControl>
             </HStack>
 
-            {/* Birth year + optional gender selector */}
+            {/* Birth year / Death year */}
             <HStack w="full" spacing={3} align="start">
               <FormControl>
                 <FormLabel fontSize="sm" mb={1}>{t('birthYear')}</FormLabel>
@@ -148,29 +150,42 @@ const AddMemberModal = ({ isOpen, onClose, relationType, relatedPerson, spouses 
                   value={form.birthday}
                   onChange={set('birthday')}
                   placeholder="1950"
-                  border={`1.5px solid ${THEME.accent}`}
-                  _focus={{ borderColor: THEME.accentDark, boxShadow: `0 0 0 1px ${THEME.accentDark}` }}
+                  border={`1.5px solid var(--theme-accent)`}
+                  _focus={{ borderColor: 'var(--theme-accent-dark)', boxShadow: `0 0 0 1px var(--theme-accent-dark)` }}
                   isDisabled={isLoading}
                 />
               </FormControl>
 
-              {/* Gender only needed when not auto-determined */}
-              {!genderIsFixed && (
-                <FormControl>
-                  <FormLabel fontSize="sm" mb={1}>{t('genderLabel')}</FormLabel>
-                  <Select
-                    value={form.gender}
-                    onChange={set('gender')}
-                    border={`1.5px solid ${THEME.accent}`}
-                    _focus={{ borderColor: THEME.accentDark, boxShadow: `0 0 0 1px ${THEME.accentDark}` }}
-                    isDisabled={isLoading}
-                  >
-                    <option value="M">{t('male')}</option>
-                    <option value="F">{t('female')}</option>
-                  </Select>
-                </FormControl>
-              )}
+              <FormControl>
+                <FormLabel fontSize="sm" mb={1}>{t('deathYear')}</FormLabel>
+                <Input
+                  type="number"
+                  value={form.death}
+                  onChange={set('death')}
+                  placeholder="2010"
+                  border={`1.5px solid var(--theme-accent)`}
+                  _focus={{ borderColor: 'var(--theme-accent-dark)', boxShadow: `0 0 0 1px var(--theme-accent-dark)` }}
+                  isDisabled={isLoading}
+                />
+              </FormControl>
             </HStack>
+
+            {/* Gender — only when not auto-determined */}
+            {!genderIsFixed && (
+              <FormControl w="full">
+                <FormLabel fontSize="sm" mb={1}>{t('genderLabel')}</FormLabel>
+                <Select
+                  value={form.gender}
+                  onChange={set('gender')}
+                  border={`1.5px solid var(--theme-accent)`}
+                  _focus={{ borderColor: 'var(--theme-accent-dark)', boxShadow: `0 0 0 1px var(--theme-accent-dark)` }}
+                  isDisabled={isLoading}
+                >
+                  <option value="M">{t('male')}</option>
+                  <option value="F">{t('female')}</option>
+                </Select>
+              </FormControl>
+            )}
 
             {/* Image filename (optional) */}
             <FormControl>
@@ -179,8 +194,8 @@ const AddMemberModal = ({ isOpen, onClose, relationType, relatedPerson, spouses 
                 value={form.image}
                 onChange={set('image')}
                 placeholder="jean_dupont"
-                border={`1.5px solid ${THEME.accent}`}
-                _focus={{ borderColor: THEME.accentDark, boxShadow: `0 0 0 1px ${THEME.accentDark}` }}
+                border={`1.5px solid var(--theme-accent)`}
+                _focus={{ borderColor: 'var(--theme-accent-dark)', boxShadow: `0 0 0 1px var(--theme-accent-dark)` }}
                 isDisabled={isLoading}
               />
             </FormControl>
@@ -192,8 +207,8 @@ const AddMemberModal = ({ isOpen, onClose, relationType, relatedPerson, spouses 
                 <Select
                   value={form.selectedSpouseId}
                   onChange={set('selectedSpouseId')}
-                  border={`1.5px solid ${THEME.accent}`}
-                  _focus={{ borderColor: THEME.accentDark, boxShadow: `0 0 0 1px ${THEME.accentDark}` }}
+                  border={`1.5px solid var(--theme-accent)`}
+                  _focus={{ borderColor: 'var(--theme-accent-dark)', boxShadow: `0 0 0 1px var(--theme-accent-dark)` }}
                   isDisabled={isLoading}
                 >
                   <option value="">{t('otherParentUnknown')}</option>
@@ -216,12 +231,12 @@ const AddMemberModal = ({ isOpen, onClose, relationType, relatedPerson, spouses 
             onClick={handleSubmit}
             isLoading={isLoading}
             loadingText={t('saving')}
-            bg={`linear-gradient(135deg, ${THEME.primary} 0%, ${THEME.primaryDark} 100%)`}
+            bg={`linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%)`}
             color="white"
-            _hover={{ bg: `linear-gradient(135deg, ${THEME.primaryDark} 0%, ${THEME.primaryDarker} 100%)` }}
+            _hover={{ bg: `linear-gradient(135deg, var(--theme-primary-dark) 0%, var(--theme-primary-darker) 100%)` }}
             _active={{ transform: 'scale(0.97)' }}
             borderRadius="lg"
-            boxShadow={`0 4px 12px rgba(${THEME.primaryRgb}, 0.3)`}
+            boxShadow={`0 4px 12px rgba(var(--theme-primary-rgb), 0.3)`}
           >
             {t('add')}
           </Button>

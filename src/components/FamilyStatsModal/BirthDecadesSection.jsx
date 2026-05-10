@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+﻿import React, { memo } from 'react';
 import {
   VStack,
   Box,
@@ -36,7 +36,7 @@ const BirthDecadesSection = memo(({
         <Box
           w={1}
           h={5}
-          bg={`linear-gradient(to bottom, ${italianGold}, ${THEME.accentDark})`}
+          bg={`linear-gradient(to bottom, ${italianGold}, var(--theme-accent-dark))`}
           borderRadius="full"
         />
         {t('birthDecades')}

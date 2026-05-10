@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import * as faceapi from 'face-api.js'
 
-export const useFaceRecognition = (familyData, isOpen) => {
+export const useFaceRecognition = (familyData, isOpen, familyId = null) => {
     const [isLoading, setIsLoading] = useState(false)
     const [isModelLoaded, setIsModelLoaded] = useState(false)
     const [isCameraActive, setIsCameraActive] = useState(false)
@@ -61,8 +61,10 @@ export const useFaceRecognition = (familyData, isOpen) => {
             const imageNames = Array.from(familyData.values()).map(person => person.data.image).sort()
 
             // Sauvegarder dans localStorage
-            localStorage.setItem('faceDescriptors', JSON.stringify(descriptorsData))
-            localStorage.setItem('faceDescriptorsImageNames', JSON.stringify(imageNames))
+            const cacheKey = familyId ? `faceDescriptors_${familyId}` : 'faceDescriptors'
+            const cacheImgKey = familyId ? `faceDescriptorsImageNames_${familyId}` : 'faceDescriptorsImageNames'
+            localStorage.setItem(cacheKey, JSON.stringify(descriptorsData))
+            localStorage.setItem(cacheImgKey, JSON.stringify(imageNames))
             console.log(`${descriptorsData.length} descripteurs sauvegardés dans le cache local`)
 
         } catch (error) {
@@ -74,20 +76,22 @@ export const useFaceRecognition = (familyData, isOpen) => {
     const loadDescriptors = async () => {
         try {
             // Vérifier si les images ont changé
+            const cacheKey = familyId ? `faceDescriptors_${familyId}` : 'faceDescriptors'
+            const cacheImgKey = familyId ? `faceDescriptorsImageNames_${familyId}` : 'faceDescriptorsImageNames'
             const currentImageNames = Array.from(familyData.values()).map(person => person.data.image).sort()
-            const savedImageNames = JSON.parse(localStorage.getItem('faceDescriptorsImageNames') || '[]')
+            const savedImageNames = JSON.parse(localStorage.getItem(cacheImgKey) || '[]')
 
             const imagesChanged = JSON.stringify(currentImageNames) !== JSON.stringify(savedImageNames)
 
             if (imagesChanged) {
                 console.log('Les images ont changé, recréation des descripteurs nécessaire')
-                localStorage.removeItem('faceDescriptors')
-                localStorage.removeItem('faceDescriptorsImageNames')
+                localStorage.removeItem(cacheKey)
+                localStorage.removeItem(cacheImgKey)
                 return false
             }
 
             // Charger depuis localStorage
-            const stored = localStorage.getItem('faceDescriptors')
+            const stored = localStorage.getItem(cacheKey)
             if (stored) {
                 const descriptorsData = JSON.parse(stored)
                 const descriptors = []
