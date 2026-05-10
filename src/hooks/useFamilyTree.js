@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+﻿import { useEffect, useRef, useCallback } from 'react';
 import { flushSync } from 'react-dom';
 import { useBreakpointValue } from '@chakra-ui/react';
 import f3 from 'family-chart';
@@ -70,16 +70,16 @@ export const useFamilyTree = (familyData, onPersonClick, onResetView, onContextM
           const fontSize = isMobile ? '12px' : '14px';
           const cardWidth = isMobile ? '160px' : '200px';
           const avatarSize = '60px';
-          const avatarImg = `<img src="/images/${d.data.data.image}.JPG" onerror="this.onerror=null; this.src='/images/default.png';" style="width: ${avatarSize}; height: ${avatarSize}; object-fit: cover; border-radius: 50%; border: 1px solid ${THEME.accent};">`;
+          const avatarImg = `<img src="/images/${d.data.data.image}.JPG" onerror="this.onerror=null; this.src='/images/default.png';" style="width: ${avatarSize}; height: ${avatarSize}; object-fit: cover; border-radius: 50%; border: 1px solid var(--theme-accent);">`;
 
           return `
-          <div class="card-inner tree-card" data-person-id="${d.data.id}" style="position: relative; width: ${cardWidth}; font-size: ${fontSize}; background: ${THEME.bgCard}; border: 2px solid ${THEME.accent}; border-radius: 8px; padding: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+          <div class="card-inner tree-card" data-person-id="${d.data.id}" style="position: relative; width: ${cardWidth}; font-size: ${fontSize}; background: ${THEME.bgCard}; border: 2px solid var(--theme-accent); border-radius: 8px; padding: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
             <div style="display: flex; align-items: center; gap: 8px;">
               <div class="avatar" style="flex-shrink: 0;">
                 ${avatarImg}
               </div>
               <div style="flex-grow: 1;">
-                <div class="card-name" style="font-weight: bold; margin-bottom: 4px; font-size: ${isMobile ? '13px' : '15px'}; color: ${THEME.primary}; text-align: center;">
+                <div class="card-name" style="font-weight: bold; margin-bottom: 4px; font-size: ${isMobile ? '13px' : '15px'}; color: var(--theme-primary); text-align: center;">
               ${d.data.data.firstName} ${d.data.data.lastName}
                 </div>
                 <div class="card-birthday" style="font-size: ${isMobile ? '10px' : '12px'}; color: ${THEME.textMuted}; margin-bottom: 2px; text-align: center;">

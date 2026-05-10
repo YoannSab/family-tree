@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+﻿import React, { memo } from 'react';
 import {
   Modal,
   ModalOverlay,
@@ -51,7 +51,7 @@ const FamilyStatsModal = memo(({ isOpen, onClose, familyData }) => {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={modalSize} scrollBehavior="inside" motionPreset="none">
-      <ModalOverlay bg={`rgba(${THEME.primaryRgb}, 0.4)`} />
+      <ModalOverlay bg={`rgba(var(--theme-primary-rgb), 0.4)`} />
       <ModalContent
         maxW={modalSize === 'full' ? 'full' : '1200px'}
         bg="linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)"
@@ -69,7 +69,7 @@ const FamilyStatsModal = memo(({ isOpen, onClose, familyData }) => {
           left={0}
           right={0}
           h="4px"
-          bg={`linear-gradient(90deg, ${THEME.flagLeft} 33%, #fff 33% 66%, ${THEME.flagRight} 66%)`}
+          bg={`linear-gradient(90deg, var(--theme-flag-left) 33%, #fff 33% 66%, var(--theme-flag-right) 66%)`}
           zIndex={2}
         />
 
@@ -91,7 +91,7 @@ const FamilyStatsModal = memo(({ isOpen, onClose, familyData }) => {
           {/* Decorative line */}
           <Box
             h="2px"
-            bg={`linear-gradient(90deg, transparent 0%, ${italianGold} 20%, ${THEME.accentDark} 50%, ${italianGold} 80%, transparent 100%)`}
+            bg={`linear-gradient(90deg, transparent 0%, ${italianGold} 20%, var(--theme-accent-dark) 50%, ${italianGold} 80%, transparent 100%)`}
             borderRadius="full"
             mt={3}
           />

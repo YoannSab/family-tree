@@ -1,0 +1,23 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Multi-family structure.
+    // Access is secured by the non-guessable Firestore auto-ID (UUID-equivalent).
+    // Anyone who knows the familyId can read and write its data.
+    match /families/{familyId} {
+      allow read, write: if true;
+
+      match /members/{memberId} {
+        allow read, write: if true;
+      }
+    }
+
+    // Legacy flat collection — kept during migration transition.
+    // Read-only after migration (set to false once you've verified the new structure).
+    match /familyMembers/{document} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}

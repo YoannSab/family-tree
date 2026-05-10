@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+﻿import { useEffect, useRef } from 'react';
 import { Box, VStack, Text, Divider } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { THEME } from '../../config/config';
@@ -17,8 +17,8 @@ const ContextMenuItem = ({ onClick, children, isDestructive = false }) => (
     color={isDestructive ? 'red.500' : 'gray.800'}
     cursor="pointer"
     userSelect="none"
-    _hover={{ bg: isDestructive ? 'red.50' : `rgba(${THEME.accentRgb}, 0.12)` }}
-    _active={{ bg: isDestructive ? 'red.100' : `rgba(${THEME.accentRgb}, 0.22)` }}
+    _hover={{ bg: isDestructive ? 'red.50' : `rgba(var(--theme-accent-rgb), 0.12)` }}
+    _active={{ bg: isDestructive ? 'red.100' : `rgba(var(--theme-accent-rgb), 0.22)` }}
     onClick={onClick}
   >
     {children}
@@ -82,7 +82,7 @@ const TreeContextMenu = ({
         w={`${MENU_WIDTH}px`}
         bg="white"
         borderRadius="xl"
-        border={`1px solid ${THEME.accent}`}
+        border={`1px solid var(--theme-accent)`}
         boxShadow="0 8px 30px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.1)"
         py={1}
         zIndex={2001}
@@ -94,13 +94,13 @@ const TreeContextMenu = ({
         <Box
           px={4}
           py={2}
-          bg={`rgba(${THEME.primaryRgb}, 0.05)`}
-          borderBottom={`1px solid rgba(${THEME.accentRgb}, 0.3)`}
+          bg={`rgba(var(--theme-primary-rgb), 0.05)`}
+          borderBottom={`1px solid rgba(var(--theme-accent-rgb), 0.3)`}
         >
           <Text
             fontSize="xs"
             fontWeight="bold"
-            color={THEME.primary}
+            color={'var(--theme-primary)'}
             textTransform="uppercase"
             letterSpacing="0.6px"
             noOfLines={1}
@@ -128,7 +128,7 @@ const TreeContextMenu = ({
           </ContextMenuItem>
 
           <Box px={3} my={1}>
-            <Divider borderColor={`rgba(${THEME.accentRgb}, 0.4)`} />
+            <Divider borderColor={`rgba(var(--theme-accent-rgb), 0.4)`} />
           </Box>
 
           <ContextMenuItem isDestructive onClick={action(onDelete)}>

@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+﻿import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useDisclosure, useToast } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { updateFamilyMemberByInternalId } from '../services/familyService';
 import { DATA_SOURCE, THEME } from '../config/config';
 
-export const usePersonInfo = (person, familyData, setPerson, onPersonUpdate, isEditing, setIsEditing) => {
+export const usePersonInfo = (person, familyData, setPerson, onPersonUpdate, isEditing, setIsEditing, familyId = null) => {
   const { t } = useTranslation();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedImage, setSelectedImage] = useState({ src: '', name: '' });
@@ -13,8 +13,8 @@ export const usePersonInfo = (person, familyData, setPerson, onPersonUpdate, isE
   const toast = useToast();
 
   const cardBg = THEME.bgCard;
-  const italianGold = THEME.accent;
-  const italianGreen = THEME.primary;
+  const italianGold = 'var(--theme-accent)';
+  const italianGreen = 'var(--theme-primary)';
 
   useEffect(() => {
     if (person) {
@@ -61,7 +61,7 @@ export const usePersonInfo = (person, familyData, setPerson, onPersonUpdate, isE
           reliable: editForm.reliable,
         },
       };
-      await updateFamilyMemberByInternalId(person.id, updatedData);
+      await updateFamilyMemberByInternalId(person.id, updatedData, familyId);
       const updatedPerson = { ...person, ...updatedData };
       setPerson(updatedPerson);
       if (onPersonUpdate) {

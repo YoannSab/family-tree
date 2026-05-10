@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+﻿import React, { useMemo } from 'react';
 import '../css/FamilyTree.css';
 import { useFamilyTree } from '../hooks/useFamilyTree';
 import { THEME } from '../config/config';
@@ -24,13 +24,13 @@ export default function FamilyTree({ onPersonClick, familyData, onResetView, onC
         width: '100%',
         height: '100%',
         margin: 'auto',
-        background: `linear-gradient(135deg, ${THEME.primary} 0%, ${THEME.primaryDark} 100%)`,
+        background: `linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%)`,
         color: '#fff',
         overflow: 'auto',
         borderRadius: '12px',
         position: 'relative',
-        border: `3px solid ${THEME.accent}`,
-        boxShadow: `0 8px 32px rgba(${THEME.primaryRgb}, 0.3)`,
+        border: `3px solid var(--theme-accent)`,
+        boxShadow: `0 8px 32px rgba(var(--theme-primary-rgb), 0.3)`,
       }}
     />
   );

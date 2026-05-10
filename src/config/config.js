@@ -32,17 +32,15 @@ const THEME = {
 // If local, it will use public/data/data.json file.
 // If firebase, it will use Firebase Firestore, make sure to set up Firebase config.
 const DATA_SOURCE = "firebase";
-// Collection name in Firestore
-const COLLECTION_NAME = "familyMembers";
 
-// Password Hash
-const TARGET_HASH = import.meta.env.VITE_TARGET_HASH || "";
-
-// Family Configuration - Edit these values to customize your family tree
-const FAMILY_CONFIG = {
-  familyName: "Famiglia Colanero",
-  subtitle: "Dalle montagne Abruzzesi",
-  countryIcon: "🇮🇹",
+// ── Legacy single-family config (used only when DATA_SOURCE === 'local') ──────
+// For Firebase, all of these live in Firestore under families/{familyId}
+const COLLECTION_NAME = "familyMembers"; // kept for local mode only
+const TARGET_HASH     = import.meta.env.VITE_TARGET_HASH || "";
+const FAMILY_CONFIG   = {
+  familyName:  "Family Tree",
+  subtitle:    "",
+  countryIcon: "🌳",
 };
 
 let app, db;

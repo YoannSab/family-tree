@@ -31,6 +31,7 @@ const MobilePersonDrawer = memo(({
   setIsPersonEditingMode,
   handlePersonClick,
   FAMILY_CONFIG,
+  familyId,
   t
 }) => {
   return (
@@ -105,6 +106,7 @@ const MobilePersonDrawer = memo(({
               isEditing={isPersonEditingMode}
               setIsEditing={setIsPersonEditingMode}
               handlePersonClick={handlePersonClick}
+              familyId={familyId}
             />
           )}
         </DrawerBody>

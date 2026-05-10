@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useDisclosure, useToast } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import { fetchFamilyMembers, addFamilyMemberWithRelation, deleteFamilyMemberAndCleanRefs } from '../services/familyService';
-import { FAMILY_CONFIG, THEME } from '../config/config';
+import CryptoJS from 'crypto-js';
+import { fetchFamilyMembers, addFamilyMemberWithRelation, deleteFamilyMemberAndCleanRefs, createFirstMember } from '../services/familyService';
+import { FAMILY_CONFIG as DEFAULT_FAMILY_CONFIG, THEME } from '../config/config';
 
 // Custom hook for responsive design that updates in real-time
 const useResponsive = () => {
@@ -38,9 +39,12 @@ const useResponsive = () => {
   return screenSize;
 };
 
-export const useApp = () => {
+export const useApp = ({ familyId = null, familyConfigProp = null, passwordHash = '' } = {}) => {
+  const FAMILY_CONFIG = familyConfigProp || DEFAULT_FAMILY_CONFIG;
   const { t } = useTranslation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const [isFamilyDataLoaded, setIsFamilyDataLoaded] = useState(false);
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [familyData, setFamilyData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -52,6 +56,7 @@ export const useApp = () => {
   const { isOpen: isFaceRecognitionOpen, onOpen: onFaceRecognitionOpen, onClose: onFaceRecognitionClose } = useDisclosure();
   const { isOpen: isAddMemberOpen, onOpen: onAddMemberOpen, onClose: onAddMemberClose } = useDisclosure();
   const { isOpen: isDeleteConfirmOpen, onOpen: onDeleteConfirmOpen, onClose: onDeleteConfirmClose } = useDisclosure();
+  const { isOpen: isCreateFirstMemberOpen, onOpen: onCreateFirstMemberOpen, onClose: onCreateFirstMemberClose } = useDisclosure();
 
   const toast = useToast();
 
@@ -84,13 +89,28 @@ export const useApp = () => {
   const bgColor = THEME.bgPage;
   const cardBg = THEME.bgSurface;
 
+  // ── Auth check — runs from localStorage, no component mounting required ──
+  useEffect(() => {
+    if (!passwordHash) {
+      setIsAuthenticated(true);
+      setIsAuthChecked(true);
+      return;
+    }
+    const stored = localStorage.getItem(`familyTreePassword_${passwordHash}`);
+    if (stored && CryptoJS.SHA256(stored).toString() === passwordHash) {
+      setIsAuthenticated(true);
+    }
+    setIsAuthChecked(true);
+  }, [passwordHash]);
+
   useEffect(() => {
     const fetchData = async () => {
-      const data = await fetchFamilyMembers();
+      const data = await fetchFamilyMembers(familyId);
       setFamilyData(data);
+      setIsFamilyDataLoaded(true);
     };
     fetchData();
-  }, []);
+  }, [familyId]);
 
   useEffect(() => {
     isPersonEditingModeRef.current = isPersonEditingMode;
@@ -223,6 +243,11 @@ export const useApp = () => {
     setIsAuthenticated(true);
   }, []);
 
+  const handleAuthChecked = useCallback(() => {
+    // kept for PasswordProtection compat but no longer needed for the gate
+    setIsAuthChecked(true);
+  }, []);
+
   const handleResetView = useCallback((resetFunction) => {
     resetTreeViewRef.current = resetFunction;
   }, []);
@@ -237,11 +262,27 @@ export const useApp = () => {
     }
   }, []);
 
+  // ── Create first member (empty tree) ────────────────────────────────────────
+  const handleCreateFirstMember = useCallback(async (newData) => {
+    setMemberActionLoading(true);
+    try {
+      const { newId, newMemberDocument } = await createFirstMember(newData, familyId);
+      setFamilyData([{ ...newMemberDocument, _firestoreId: newId }]);
+      onCreateFirstMemberClose();
+      toast({ title: t('memberAdded'), status: 'success', duration: 3000, isClosable: true });
+    } catch (err) {
+      console.error('Failed to create first member:', err);
+      toast({ title: t('error'), description: err.message, status: 'error', duration: 5000, isClosable: true });
+    } finally {
+      setMemberActionLoading(false);
+    }
+  }, [familyId, onCreateFirstMemberClose, toast, t]);
+
   // ── Re-fetch family data from Firestore ────────────────────────────────────
   const refreshFamilyData = useCallback(async () => {
-    const data = await fetchFamilyMembers();
+    const data = await fetchFamilyMembers(familyId);
     setFamilyData(data);
-  }, []);
+  }, [familyId]);
 
   // ── Context menu ───────────────────────────────────────────────────────────
   const handleContextMenu = useCallback((person, position) => {
@@ -277,8 +318,8 @@ export const useApp = () => {
 
     setMemberActionLoading(true);
     try {
-      const { newId, newMemberDocument } = await addFamilyMemberWithRelation(
-        memberData, addRelationType, contextMenuPerson, otherParentPerson
+      const { newId, newMemberDocument, existingOtherParentId } = await addFamilyMemberWithRelation(
+        memberData, addRelationType, contextMenuPerson, otherParentPerson, familyId
       );
 
       // Optimistic local update — no Firestore re-fetch needed
@@ -294,6 +335,10 @@ export const useApp = () => {
               case 'child':   updatedRels.children = [...(updatedRels.children || []), newId]; break;
             }
             return { ...p, rels: updatedRels };
+          }
+          // existing opposite parent gets the new parent wired as a spouse
+          if (existingOtherParentId && p.id === existingOtherParentId) {
+            return { ...p, rels: { ...p.rels, spouses: [...(p.rels?.spouses || []), newId] } };
           }
           if (otherParentPerson && p.id === otherParentPerson.id) {
             return { ...p, rels: { ...p.rels, children: [...(p.rels?.children || []), newId] } };
@@ -324,7 +369,7 @@ export const useApp = () => {
     if (!personToDelete) return;
     setMemberActionLoading(true);
     try {
-      await deleteFamilyMemberAndCleanRefs(personToDelete.id, familyData);
+      await deleteFamilyMemberAndCleanRefs(personToDelete.id, familyData, familyId);
 
       // Optimistic local update — no Firestore re-fetch needed
       const deletedId = personToDelete.id;
@@ -392,6 +437,8 @@ export const useApp = () => {
     handleSearchChange,
     handleSearchSelect,
     handleUnlock,
+    handleAuthChecked,
+    isAppReady: isAuthChecked && isFamilyDataLoaded,
     handleResetView,
     handleCenterPerson,
     resetTreeView,
@@ -421,5 +468,10 @@ export const useApp = () => {
     personToDelete,
     handleOpenDeleteConfirm,
     handleDeleteMember,
+    // First member creation
+    isCreateFirstMemberOpen,
+    onCreateFirstMemberOpen,
+    onCreateFirstMemberClose,
+    handleCreateFirstMember,
   };
 };

@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+﻿import React, { memo } from 'react';
 import {
   VStack,
   Text,
@@ -11,7 +11,7 @@ import FamilyConnections from './PersonInfo/FamilyConnections';
 import { usePersonInfo } from '../hooks/usePersonInfo';
 import { THEME } from '../config/config';
 
-const PersonInfo = memo(({ person, familyData, setPerson, compact = false, onPersonUpdate, isEditing, setIsEditing, handlePersonClick }) => {
+const PersonInfo = memo(({ person, familyData, setPerson, compact = false, onPersonUpdate, isEditing, setIsEditing, handlePersonClick, familyId }) => {
   const isMobile = compact;
 
   const {
@@ -32,14 +32,14 @@ const PersonInfo = memo(({ person, familyData, setPerson, compact = false, onPer
     age,
     relatedPeople,
     DATA_SOURCE,
-  } = usePersonInfo(person, familyData, setPerson, onPersonUpdate, isEditing, setIsEditing);
+  } = usePersonInfo(person, familyData, setPerson, onPersonUpdate, isEditing, setIsEditing, familyId);
 
 
   if (!person) return null;
 
   return (
     <Box
-      bg={`linear-gradient(135deg, ${THEME.bgPage} 0%, rgb(252, 252, 236) 100%)`}
+      bg={`linear-gradient(135deg, ${THEME.bgPage} 0%, rgb(255, 255, 255) 100%)`}
       borderRadius="xl"
       p={isMobile ? 4 : 6}
       border={`2px solid ${italianGold}`}
@@ -53,7 +53,7 @@ const PersonInfo = memo(({ person, familyData, setPerson, compact = false, onPer
         left={0}
         right={0}
         h="4px"
-          bg={`linear-gradient(90deg, ${THEME.flagLeft} 33%, #fff 33% 66%, ${THEME.flagRight} 66%)`}
+        bg={`linear-gradient(90deg, var(--theme-flag-left) 33%, #fff 33% 66%, var(--theme-flag-right) 66%)`}
         zIndex={1}
       />
 
@@ -100,7 +100,7 @@ const PersonInfo = memo(({ person, familyData, setPerson, compact = false, onPer
 
           <Box
             h="1px"
-            bg={`linear-gradient(90deg, transparent 0%, ${italianGold} 20%, ${THEME.accentDark} 50%, ${italianGold} 80%, transparent 100%)`}
+            bg={`linear-gradient(90deg, transparent 0%, ${italianGold} 20%, var(--theme-accent-dark) 50%, ${italianGold} 80%, transparent 100%)`}
             borderRadius="full"
           />
 
@@ -118,7 +118,7 @@ const PersonInfo = memo(({ person, familyData, setPerson, compact = false, onPer
           {/* Decorative separator */}
           <Box
             h="1px"
-            bg={`linear-gradient(90deg, transparent 0%, ${italianGold} 20%, ${THEME.accentDark} 50%, ${italianGold} 80%, transparent 100%)`}
+            bg={`linear-gradient(90deg, transparent 0%, ${italianGold} 20%, var(--theme-accent-dark) 50%, ${italianGold} 80%, transparent 100%)`}
             borderRadius="full"
           />
         </VStack>

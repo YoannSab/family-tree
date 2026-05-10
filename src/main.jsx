@@ -1,10 +1,15 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ChakraProvider, extendTheme } from '@chakra-ui/react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
-import App from './App.jsx'
 import './i18n/i18n.js'
-import { THEME } from './config/config.js'
+import { THEME, DATA_SOURCE } from './config/config.js'
+import App from './App.jsx'
+import LandingPage from './pages/LandingPage.jsx'
+import CreateFamilyPage from './pages/CreateFamilyPage.jsx'
+import FamilyPage from './pages/FamilyPage.jsx'
+import { FAMILY_CONFIG, TARGET_HASH } from './config/config.js'
 
 // Inject ALL THEME values as CSS custom properties so CSS files stay in sync automatically.
 // Edit colors only in config.js — CSS uses var(--theme-*) everywhere.
@@ -43,7 +48,18 @@ const forceLightManager = {
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ChakraProvider theme={chakraTheme} colorModeManager={forceLightManager}>
-      <App />
+      {DATA_SOURCE === 'local' ? (
+        // Local mode: single family from public/data/data.json, no router needed
+        <App familyConfig={FAMILY_CONFIG} passwordHash={TARGET_HASH} />
+      ) : (
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/new" element={<CreateFamilyPage />} />
+            <Route path="/f/:familyId" element={<FamilyPage />} />
+          </Routes>
+        </BrowserRouter>
+      )}
     </ChakraProvider>
   </StrictMode>,
 )

@@ -1,20 +1,21 @@
-import { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect, useCallback } from 'react';
 
 import { useTranslation } from 'react-i18next';
 import CryptoJS from 'crypto-js';
-import { TARGET_HASH, THEME } from '../config/config';
+import { THEME } from '../config/config';
 
-export const usePasswordProtection = (onUnlock) => {
+export const usePasswordProtection = (onUnlock, passwordHash = '') => {
   const { t } = useTranslation();
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
 
   const bgColor = THEME.bgPage;
   const cardBg = THEME.bgSurface;
-  const italianGold = THEME.accent;
-  const italianGreen = THEME.primary;
+  const italianGold = 'var(--theme-accent)';
+  const italianGreen = 'var(--theme-primary)';
 
   const handleSubmit = useCallback((e) => {
     e.preventDefault();
@@ -23,25 +24,32 @@ export const usePasswordProtection = (onUnlock) => {
 
     const hashedPassword = CryptoJS.SHA256(password).toString();
 
-    if (hashedPassword === TARGET_HASH) {
-      localStorage.setItem('familyTreePassword', password);
+    if (hashedPassword === passwordHash) {
+      localStorage.setItem(`familyTreePassword_${passwordHash}`, password);
       onUnlock();
     } else {
       setError(t('passwordError'));
       setPassword('');
     }
     setIsLoading(false);
-  }, [password, onUnlock, t]);
+  }, [password, onUnlock, t, passwordHash]);
 
   useEffect(() => {
-    const storedPassword = localStorage.getItem('familyTreePassword');
+    // No password required — auto-unlock
+    if (!passwordHash) {
+      onUnlock();
+      setIsAuthChecked(true);
+      return;
+    }
+    const storedPassword = localStorage.getItem(`familyTreePassword_${passwordHash}`);
     if (storedPassword) {
       const hashedStoredPassword = CryptoJS.SHA256(storedPassword).toString();
-      if (hashedStoredPassword === TARGET_HASH) {
+      if (hashedStoredPassword === passwordHash) {
         onUnlock();
       }
     }
-  }, [onUnlock]);
+    setIsAuthChecked(true);
+  }, [onUnlock, passwordHash]);
 
   const toggleShowPassword = useCallback(() => {
     setShowPassword(prev => !prev);
@@ -60,5 +68,6 @@ export const usePasswordProtection = (onUnlock) => {
     cardBg,
     italianGold,
     italianGreen,
+    isAuthChecked,
   };
 };
