@@ -55,6 +55,7 @@ export const useApp = ({ familyId = null, familyConfigProp = null, passwordHash 
   const { isOpen: isStatsModalOpen, onOpen: onStatsModalOpen, onClose: onStatsModalClose } = useDisclosure();
   const { isOpen: isPersonDrawerOpen, onOpen: onPersonDrawerOpen, onClose: onPersonDrawerClose } = useDisclosure();
   const { isOpen: isFaceRecognitionOpen, onOpen: onFaceRecognitionOpen, onClose: onFaceRecognitionClose } = useDisclosure();
+  const { isOpen: isUpcomingEventsOpen, onOpen: onUpcomingEventsOpen, onClose: onUpcomingEventsClose } = useDisclosure();
   const { isOpen: isAddMemberOpen, onOpen: onAddMemberOpen, onClose: onAddMemberClose } = useDisclosure();
   const { isOpen: isDeleteConfirmOpen, onOpen: onDeleteConfirmOpen, onClose: onDeleteConfirmClose } = useDisclosure();
   const { isOpen: isCreateFirstMemberOpen, onOpen: onCreateFirstMemberOpen, onClose: onCreateFirstMemberClose } = useDisclosure();
@@ -452,6 +453,7 @@ export const useApp = ({ familyId = null, familyConfigProp = null, passwordHash 
     isStatsModalOpen,
     isPersonDrawerOpen,
     isFaceRecognitionOpen,
+    isUpcomingEventsOpen,
     drawerRef,
     drawerHeaderRef,
     isMobile,
@@ -465,6 +467,8 @@ export const useApp = ({ familyId = null, familyConfigProp = null, passwordHash 
     onPersonDrawerClose,
     onFaceRecognitionOpen,
     onFaceRecognitionClose,
+    onUpcomingEventsOpen,
+    onUpcomingEventsClose,
     handlePersonUpdate,
     handleTouchStart,
     handleTouchMove,

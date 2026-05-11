@@ -40,6 +40,13 @@ export const fetchFamilyMeta = async (familyId) => {
   return snap.exists() ? snap.data() : null;
 };
 
+export const fetchAllFamilies = async () => {
+  if (DATA_SOURCE !== 'firebase') return [];
+  const { collection, getDocs } = await getFirebaseDeps();
+  const snapshot = await getDocs(collection(db, 'families'));
+  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+};
+
 export const createFamily = async ({ name, passwordHash, theme = null }) => {
   if (DATA_SOURCE !== 'firebase') throw new Error('Only supported with Firebase');
   const { collection, doc: docFn, setDoc } = await getFirebaseDeps();

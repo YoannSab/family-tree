@@ -3,16 +3,15 @@ import {
   VStack,
   Box,
   Heading,
-  Grid,
-  GridItem,
   Flex,
-  Icon,
   Text,
   Input,
   Select,
+  Tooltip,
 } from '@chakra-ui/react';
-import { CalendarIcon } from '@chakra-ui/icons';
+import { useTranslation } from 'react-i18next';
 import { THEME } from '../../config/config';
+import { formatDate, isFullDate } from '../../utils/dateUtils';
 
 const PersonDetails = memo(({
   person,
@@ -26,6 +25,9 @@ const PersonDetails = memo(({
   handleInputChange,
   t
 }) => {
+  const { i18n } = useTranslation();
+  const lang = i18n.language?.split('-')[0] || 'fr';
+
   return (
     <Box>
       <Heading
@@ -46,114 +48,120 @@ const PersonDetails = memo(({
         {t('personalInfo')}
       </Heading>
 
-      <Grid
-        templateColumns={isMobile ? "1fr" : "repeat(2, 1fr)"}
-        gap={4}
+      <VStack
+        spacing={0}
         p={3}
         bg={'white'}
         borderRadius="md"
         boxShadow="sm"
         border="1px solid"
         borderColor={'gray.200'}
+        align="stretch"
+        divider={<Box h="1px" bg="gray.100" />}
       >
-        <GridItem>
-          <Flex align="center" gap={3}>
-            <Text fontSize="xl">📅</Text>
-            <VStack align="start" spacing={0} flex="1">
-              <Text fontSize="xs" color="gray.500">{t('birthdate')}</Text>
-              {isEditing ? (
-                <Input
-                  value={editForm.birthday}
-                  onChange={(e) => handleInputChange('birthday', e.target.value)}
-                  size="sm"
-                  type="number"
-                  placeholder="1990"
-                />
-              ) : (
-                <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">{person.data.birthday}</Text>
-              )}
-            </VStack>
-          </Flex>
-        </GridItem>
+        {/* Birthday */}
+        <Flex align="center" gap={3} py={2}>
+          <Text fontSize="xl" w={7} textAlign="center">📅</Text>
+          <Text fontSize="xs" color="gray.400" w="110px" flexShrink={0}>{t('birthdate')}</Text>
+          {isEditing ? (
+            <Input
+              value={editForm.birthday}
+              onChange={(e) => handleInputChange('birthday', e.target.value)}
+              size="sm"
+              type="text"
+              placeholder="1990 ou 15-03-1950"
+              flex="1"
+            />
+          ) : (
+            <Tooltip
+              label={isFullDate(person.data.birthday) ? person.data.birthday : undefined}
+              isDisabled={!isFullDate(person.data.birthday)}
+              placement="top"
+              hasArrow
+            >
+              <Text fontSize="sm" fontWeight="medium" color="gray.800">
+                {formatDate(person.data.birthday, lang) || '—'}
+              </Text>
+            </Tooltip>
+          )}
+        </Flex>
 
+        {/* Death */}
         {(isEditing || person.data.death) && (
-          <GridItem>
-            <Flex align="center" gap={3}>
-              <Text fontSize="xl">🕊️</Text>
-              <VStack align="start" spacing={0} flex="1">
-                <Text fontSize="xs" color="gray.500">{t('deathdate')}</Text>
-                {isEditing ? (
-                  <Input
-                    value={editForm.death}
-                    onChange={(e) => handleInputChange('death', e.target.value)}
-                    size="sm"
-                    type="number"
-                    placeholder="2025"
-                  />
-                ) : (
-                  <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">
-                    {person.data.death || t('living')}
-                  </Text>
-                )}
-              </VStack>
-            </Flex>
-          </GridItem>
-        )}
-
-        <GridItem>
-          <Flex align="center" gap={3}>
-              <Text fontSize="xl">🕯️</Text>
-            <VStack align="start" spacing={0}>
-              <Text fontSize="xs" color="gray.500">{t('age')}</Text>
-              <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">{age} {t('yearsOld')}</Text>
-            </VStack>
+          <Flex align="center" gap={3} py={2}>
+            <Text fontSize="xl" w={7} textAlign="center">🕊️</Text>
+            <Text fontSize="xs" color="gray.400" w="110px" flexShrink={0}>{t('deathdate')}</Text>
+            {isEditing ? (
+              <Input
+                value={editForm.death}
+                onChange={(e) => handleInputChange('death', e.target.value)}
+                size="sm"
+                type="text"
+                placeholder="2025 ou 15-03-2005"
+                flex="1"
+              />
+            ) : (
+              <Tooltip
+                label={isFullDate(person.data.death) ? person.data.death : undefined}
+                isDisabled={!isFullDate(person.data.death)}
+                placement="top"
+                hasArrow
+              >
+                <Text fontSize="sm" fontWeight="medium" color="gray.800">
+                  {person.data.death ? formatDate(person.data.death, lang) : t('living')}
+                </Text>
+              </Tooltip>
+            )}
           </Flex>
-        </GridItem>
+        )}
 
+        {/* Age */}
+        {age != null && (
+          <Flex align="center" gap={3} py={2}>
+            <Text fontSize="xl" w={7} textAlign="center">🕯️</Text>
+            <Text fontSize="xs" color="gray.400" w="110px" flexShrink={0}>{t('age')}</Text>
+            <Text fontSize="sm" fontWeight="medium" color="gray.800">{age} {t('yearsOld')}</Text>
+          </Flex>
+        )}
+
+        {/* Occupation */}
         {(isEditing || person.data.occupation) && (
-          <GridItem>
-            <Flex align="center" gap={3}>
-                <Text fontSize="xl">💼</Text>
-              <VStack align="start" spacing={0} flex="1">
-                <Text fontSize="xs" color="gray.500">{t('occupation')}</Text>
-                {isEditing ? (
-                  <Input
-                    value={editForm.occupation}
-                    onChange={(e) => handleInputChange('occupation', e.target.value)}
-                    size="sm"
-                    placeholder={t('occupation')}
-                  />
-                ) : (
-                  <Text fontSize={isMobile ? "sm" : "md"} fontWeight="medium">
-                    {person.data.occupation || t('notSpecified')}
-                  </Text>
-                )}
-              </VStack>
-            </Flex>
-          </GridItem>
+          <Flex align="center" gap={3} py={2}>
+            <Text fontSize="xl" w={7} textAlign="center">💼</Text>
+            <Text fontSize="xs" color="gray.400" w="110px" flexShrink={0}>{t('occupation')}</Text>
+            {isEditing ? (
+              <Input
+                value={editForm.occupation}
+                onChange={(e) => handleInputChange('occupation', e.target.value)}
+                size="sm"
+                placeholder={t('occupation')}
+                flex="1"
+              />
+            ) : (
+              <Text fontSize="sm" fontWeight="medium" color="gray.800">
+                {person.data.occupation || t('notSpecified')}
+              </Text>
+            )}
+          </Flex>
         )}
 
+        {/* Reliability (edit only) */}
         {isEditing && (
-          <GridItem>
-            <Flex align="center" gap={3}>
-              <Box p={1} borderRadius="full" bg="rgba(200, 168, 130, 0.1)">
-                <Text fontSize="sm">✓</Text>
-              </Box>
-              <VStack align="start" spacing={0} flex="1">
-                <Text fontSize="xs" color="gray.500">{t('reliable')}</Text>
-                <Select
-                  value={editForm.reliable}
-                  onChange={(e) => handleInputChange('reliable', e.target.value === 'true')}
-                  size="sm"
-                >
-                  <option value="true">{t('reliableInformation')}</option>
-                  <option value="false">{t('unreliableInformation')}</option>
-                </Select>
-              </VStack>
-            </Flex>
-          </GridItem>
+          <Flex align="center" gap={3} py={2}>
+            <Text fontSize="xl" w={7} textAlign="center">✓</Text>
+            <Text fontSize="xs" color="gray.400" w="110px" flexShrink={0}>{t('reliable')}</Text>
+            <Select
+              value={editForm.reliable}
+              onChange={(e) => handleInputChange('reliable', e.target.value === 'true')}
+              size="sm"
+              flex="1"
+            >
+              <option value="true">{t('reliableInformation')}</option>
+              <option value="false">{t('unreliableInformation')}</option>
+            </Select>
+          </Flex>
         )}
-      </Grid>
+      </VStack>
     </Box>
   );
 });

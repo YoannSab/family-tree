@@ -9,18 +9,23 @@
   Container,
   IconButton,
 } from '@chakra-ui/react';
-import { InfoIcon } from '@chakra-ui/icons';
+import { InfoIcon, CalendarIcon } from '@chakra-ui/icons';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
+import { useUpcomingEvents } from '../../hooks/useUpcomingEvents';
 
 const Header = ({
   onStatsModalOpen,
+  onUpcomingEventsOpen,
   livingMembers,
   deceasedMembers,
   FAMILY_CONFIG,
-  isMobile
+  isMobile,
+  familyData,
 }) => {
   const { t } = useTranslation();
+  const { soonEvents } = useUpcomingEvents(familyData || [], 7);
+  const hasUpcoming = soonEvents.length > 0;
 
   return (
     <Box
@@ -90,6 +95,66 @@ const Header = ({
             )}
             <HStack spacing={2}>
               <LanguageSwitcher size="sm" />
+
+              {/* Upcoming events — mobile icon */}
+              <Box position="relative" display={{ base: 'flex', md: 'none' }}>
+                <IconButton
+                  icon={<CalendarIcon />}
+                  onClick={onUpcomingEventsOpen}
+                  size="sm"
+                  aria-label="Upcoming events"
+                  bg="rgba(255,255,255,0.15)"
+                  color="white"
+                  _hover={{ bg: "rgba(255,255,255,0.25)" }}
+                  backdropFilter="blur(10px)"
+                />
+                {hasUpcoming && (
+                  <Box
+                    position="absolute"
+                    top="-2px"
+                    right="-2px"
+                    w="10px"
+                    h="10px"
+                    borderRadius="full"
+                    bg="yellow.300"
+                    border="2px solid"
+                    borderColor="var(--theme-primary)"
+                    animation="pulse 2s infinite"
+                  />
+                )}
+              </Box>
+
+              {/* Upcoming events — desktop button */}
+              <Box position="relative" display={{ base: 'none', md: 'flex' }}>
+                <Button
+                  leftIcon={<CalendarIcon />}
+                  onClick={onUpcomingEventsOpen}
+                  size="sm"
+                  bg="rgba(255,255,255,0.15)"
+                  color="white"
+                  _hover={{ bg: "rgba(255,255,255,0.25)" }}
+                  backdropFilter="blur(10px)"
+                  border="1px solid rgba(255,255,255,0.2)"
+                >
+                  {t('upcomingEvents')}
+                </Button>
+                {hasUpcoming && (
+                  <Box
+                    position="absolute"
+                    top="-3px"
+                    right="-3px"
+                    w="10px"
+                    h="10px"
+                    borderRadius="full"
+                    bg="yellow.300"
+                    border="2px solid"
+                    borderColor="var(--theme-primary)"
+                    animation="pulse 2s infinite"
+                  />
+                )}
+              </Box>
+
+              {/* Statistics — mobile icon */}
               <IconButton
                 icon={<InfoIcon />}
                 onClick={onStatsModalOpen}
@@ -103,6 +168,8 @@ const Header = ({
                 _hover={{ bg: "rgba(255,255,255,0.25)" }}
                 backdropFilter="blur(10px)"
               />
+
+              {/* Statistics — desktop button */}
               <Button
                 leftIcon={<InfoIcon />}
                 onClick={onStatsModalOpen}

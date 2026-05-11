@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { updateFamilyMemberByInternalId } from '../services/familyService';
 import { DATA_SOURCE, THEME } from '../config/config';
 import { uploadImage, deleteImageFromStorage, getImageUrl } from '../services/storageService';
+import { parseDate } from '../utils/dateUtils';
 
 export const usePersonInfo = (person, familyData, setPerson, onPersonUpdate, isEditing, setIsEditing, familyId = null) => {
   const { t } = useTranslation();
@@ -56,8 +57,8 @@ export const usePersonInfo = (person, familyData, setPerson, onPersonUpdate, isE
           ...person.data,
           firstName: editForm.firstName,
           lastName: editForm.lastName,
-          birthday: editForm.birthday ? parseInt(editForm.birthday) : person.data.birthday,
-          death: editForm.death ? parseInt(editForm.death) : (editForm.death === '' ? null : person.data.death),
+          birthday: editForm.birthday ? String(editForm.birthday).trim() : (person.data.birthday != null ? String(person.data.birthday) : null),
+          death: editForm.death !== undefined ? (editForm.death === '' ? null : String(editForm.death).trim()) : (person.data.death != null ? String(person.data.death) : null),
           occupation: editForm.occupation,
           reliable: editForm.reliable,
         },
@@ -144,9 +145,12 @@ export const usePersonInfo = (person, familyData, setPerson, onPersonUpdate, isE
   const isLiving = useMemo(() => !person?.data.death, [person]);
   const age = useMemo(() => {
     if (!person) return null;
-    return person.data.death
-      ? person.data.death - person.data.birthday
-      : new Date().getFullYear() - person.data.birthday;
+    const birthParsed = parseDate(person.data.birthday);
+    const deathParsed = parseDate(person.data.death);
+    if (!birthParsed) return null;
+    return deathParsed
+      ? deathParsed.year - birthParsed.year
+      : new Date().getFullYear() - birthParsed.year;
   }, [person]);
 
   const relatedPeople = useMemo(() => {
