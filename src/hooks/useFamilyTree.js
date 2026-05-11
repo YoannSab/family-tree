@@ -107,9 +107,11 @@ export const useFamilyTree = (familyData, onPersonClick, onResetView, onContextM
           const avatarSize = '60px';
           const avatarSrc = getImageUrlCached(familyId, d.data.data.image);
           const initials = `${(d.data.data.firstName?.[0] || '').toUpperCase()}${(d.data.data.lastName?.[0] || '').toUpperCase()}`;
+          const initialsStyle = `width:${avatarSize};height:${avatarSize};border-radius:50%;background:var(--theme-primary);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:20px;border:1px solid var(--theme-accent);flex-shrink:0;`;
+          const initialsHtml = `<div style="${initialsStyle}">${initials}</div>`;
           const avatarHtml = avatarSrc
-            ? `<img src="${avatarSrc}" onerror="this.style.display='none'" style="width:${avatarSize};height:${avatarSize};object-fit:cover;border-radius:50%;border:1px solid var(--theme-accent);">`
-            : `<div style="width:${avatarSize};height:${avatarSize};border-radius:50%;background:var(--theme-primary);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:20px;border:1px solid var(--theme-accent);flex-shrink:0;">${initials}</div>`;
+            ? `<img src="${avatarSrc}" data-fallback="${initialsHtml.replace(/"/g, '&quot;')}" onerror="this.outerHTML=this.dataset.fallback" style="width:${avatarSize};height:${avatarSize};object-fit:cover;border-radius:50%;border:1px solid var(--theme-accent);">`
+            : initialsHtml;
 
           return `
           <div class="card-inner tree-card" data-person-id="${d.data.id}" style="position: relative; width: ${cardWidth}; font-size: ${fontSize}; background: ${THEME.bgCard}; border: 2px solid var(--theme-accent); border-radius: 8px; padding: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">

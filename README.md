@@ -1,61 +1,38 @@
-# 🌳 Family Tree - Arbre Généalogique Interactif
+# 🌳 Family Tree
 
-Une application web moderne pour visualiser et explorer votre arbre généalogique avec reconnaissance faciale.
+Application web interactive pour visualiser un arbre généalogique avec reconnaissance faciale.
 
-## 🛠️ Technologies
-
-- **React 19** + **Vite** - Interface moderne et performante
-- **D3.js** + [**Family Chart**](https://donatso.github.io/family-chart-doc/) - Visualisation interactive de l'arbre
-- **Chakra UI** - Design responsive et élégant
-- **Face-api.js** - Reconnaissance faciale IA
-- **i18next** - Support multilingue (FR/EN/IT)
-
-## ✨ Fonctionnalités
-
-🌲 **Arbre interactif** • 👤 **Profils détaillés** • 🔍 **Reconnaissance faciale** • 🌍 **Multilingue** • 📊 **Statistiques** • 🔒 **Protection mot de passe** • 📱 **Responsive**
+**Stack** : React 19 + Vite · D3.js + Family Chart · Chakra UI · Face-api.js · i18next (FR/EN/IT)
 
 ## 🚀 Installation
 
 ```bash
-# 1. Cloner et installer
 git clone <url-du-repository>
 cd familytree
 npm install
-
-# 2. Lancer l'application
 npm run dev
 ```
 
-➡️ **L'application sera accessible sur `http://localhost:5173`**
+➡️ `http://localhost:5173`
 
-## ⚙️ Configuration
+---
 
-### 📊 Données de la famille
+## ⚙️ Modes de données
 
-**Choisissez votre mode de stockage dans `src/config/config.js` :**
-
-```javascript
-// Option 1: Données locales (recommandé pour débuter)
-const DATA_SOURCE = "local"; 
-// ➡️ Placez votre fichier dans public/data/data.json
-
-// Option 2: Firebase (pour partage/synchronisation)
-const DATA_SOURCE = "firebase";
-// ➡️ Configurez firebaseConfig et créez votre base Firestore
-```
-
-### 🏠 Nom et description de famille
-
-**Personnalisez dans `src/config/config.js` :**
+Dans `src/config/config.js`, choisissez votre mode :
 
 ```javascript
-const FAMILY_CONFIG = {
-  familyName: "Votre Nom de Famille",
-  subtitle: "Votre description courte"
-};
+const DATA_SOURCE = "local";    // données statiques locales
+const DATA_SOURCE = "firebase"; // Firestore en ligne
 ```
 
-### 📁 Structure des données JSON
+---
+
+### 🏠 Mode local
+
+Toutes les données sont lues depuis des fichiers statiques — aucun backend requis.
+
+**1. Données** — placez votre JSON dans `public/data/data.json` :
 
 ```json
 [
@@ -63,7 +40,7 @@ const FAMILY_CONFIG = {
     "id": "0",
     "data": {
       "firstName": "Jean",
-      "lastName": "Dupont", 
+      "lastName": "Dupont",
       "gender": "M",
       "birthday": "1950",
       "image": "jean_dupont_001",
@@ -77,49 +54,78 @@ const FAMILY_CONFIG = {
 ]
 ```
 
-### 🖼️ Images
+**2. Images** — placez les photos dans `public/images/` (format `prenom_nom_id.JPG`).  
+Ajoutez un fichier `default.png` pour les membres sans photo.
 
-- **Dossier** : `public/images/`
-- **Format** : `prenom_nom_id.JPG`
-- **Image par défaut** : `default.png`
+**3. Personnalisation** — modifiez `FAMILY_CONFIG` dans `src/config/config.js` :
 
-### 🔍 Reconnaissance faciale
+```javascript
+const FAMILY_CONFIG = {
+  familyName: "Votre Nom de Famille",
+  subtitle:   "Votre description courte",
+  countryIcon: "🌳",
+};
+```
 
-**Modèles requis dans `public/models/` :**
-- `ssd_mobilenetv1_model-weights_manifest.json`
-- `face_landmark_68_model-weights_manifest.json` 
-- `face_recognition_model-weights_manifest.json`
-- `age_gender_model-weights_manifest.json`
+---
 
-[Télécharger les modèles](https://github.com/justadudewhohacks/face-api.js/tree/master/weights)
+### 🔥 Mode Firebase
+
+Aucun fichier de données à gérer — tout est dans Firestore.
+
+**1.** Créez un projet Firebase et activez Firestore + Storage.
+
+**2.** Copiez `.env.example` en `.env` et remplissez vos identifiants :
+
+```env
+VITE_FIREBASE_API_KEY=...
+VITE_FIREBASE_AUTH_DOMAIN=...
+VITE_FIREBASE_PROJECT_ID=...
+VITE_FIREBASE_STORAGE_BUCKET=...
+VITE_FIREBASE_MESSAGING_SENDER_ID=...
+VITE_FIREBASE_APP_ID=...
+```
+
+C'est tout — l'interface permet ensuite de créer et gérer les familles directement.
+
+---
+
+## 🔒 Protection par mot de passe (mode local uniquement)
+
+Dans `.env`, définissez `VITE_TARGET_HASH` :
+
+- **Vide** (`VITE_TARGET_HASH=`) → aucune authentification requise, l'arbre s'ouvre directement.
+- **Rempli** → mettez le hash SHA-256 du mot de passe souhaité.
+
+```bash
+# Générer le hash d'un mot de passe (Node.js)
+node -e "const c=require('crypto');console.log(c.createHash('sha256').update('monMotDePasse').digest('hex'))"
+```
+
+---
+
+## 🔍 Reconnaissance faciale
+
+Téléchargez les modèles depuis [face-api.js weights](https://github.com/justadudewhohacks/face-api.js/tree/master/weights) et placez-les dans `public/models/`.
+
+---
 
 ## 🛠️ Scripts
 
 ```bash
-npm run dev      # 🔧 Développement
-npm run build    # 📦 Production  
-npm run preview  # 👀 Prévisualisation
-npm run deploy   # 🚀 Déploiement GitHub Pages
+npm run dev      # Développement
+npm run build    # Build production
+npm run preview  # Prévisualisation du build
+npm run deploy   # Déploiement GitHub Pages
 ```
-
-## 🔐 Sécurité
-
-- **Mot de passe** : Protection optionnelle avec hashage sécurisé
-- **Données privées** : Tout reste dans votre navigateur
-- **Pas de tracking** : Configuré pour la confidentialité
 
 ## 🐛 Problèmes courants
 
-**L'app ne démarre pas ?**
+**L'app ne démarre pas**
 ```bash
-rm -rf node_modules package-lock.json
-npm install && npm run dev
+rm -rf node_modules package-lock.json && npm install && npm run dev
 ```
 
-**Images invisibles ?** ➡️ Vérifiez `public/images/` et `default.png`
+**Images invisibles** → vérifiez `public/images/` et la présence de `default.png`
 
-**Reconnaissance faciale ?** ➡️ Téléchargez les modèles dans `public/models/`
-
----
-
-**Préservez votre histoire familiale avec style ! 👨‍👩‍👧‍👦**
+**Reconnaissance faciale** → vérifiez que les modèles sont bien dans `public/models/`
