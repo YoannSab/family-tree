@@ -83,7 +83,7 @@ export const createFirstMember = async (newData, familyId = null) => {
 
 export const fetchFamilyMembers = async (familyId = null) => {
   if (DATA_SOURCE === 'local') {
-    const response = await fetch('/data/data.json');
+    const response = await fetch(`${import.meta.env.BASE_URL}data/data.json`);
     if (!response.ok) throw new Error('Failed to fetch local data');
     return await response.json();
   }

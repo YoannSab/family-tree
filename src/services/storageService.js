@@ -108,7 +108,7 @@ export const compressImage = (file, maxDimension = 1200, quality = 0.82) =>
 export const getImageUrlCached = (familyId, filename) => {
   const normalized = normalizeFilename(filename);
   if (!normalized) return null;
-  if (DATA_SOURCE !== 'firebase') return `/images/${normalized}`;
+  if (DATA_SOURCE !== 'firebase') return `${import.meta.env.BASE_URL}images/${normalized}`;
   const cacheKey = `${familyId}::${normalized}`;
   return urlCache.has(cacheKey) ? urlCache.get(cacheKey) : null;
 };
@@ -134,7 +134,7 @@ export const hasCachedUrl = (familyId, filename) => {
 export const getImageUrl = async (familyId, filename) => {
   const normalized = normalizeFilename(filename);
   if (!normalized) return null;
-  if (DATA_SOURCE !== 'firebase') return `/images/${normalized}`;
+  if (DATA_SOURCE !== 'firebase') return `${import.meta.env.BASE_URL}images/${normalized}`;
 
   const cacheKey = `${familyId}::${normalized}`;
   if (urlCache.has(cacheKey)) return urlCache.get(cacheKey);

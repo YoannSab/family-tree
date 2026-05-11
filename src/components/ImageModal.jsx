@@ -57,7 +57,7 @@ const ImageModal = ({ isOpen, onClose, imageSrc, personName }) => {
                                 objectFit="contain"
                                 borderRadius="lg"
                                 boxShadow="0 20px 25px -5px rgba(0, 0, 0, 0.1)"
-                                fallbackSrc="/images/default.png"
+                                fallbackSrc={`${import.meta.env.BASE_URL}images/default.png`}
                                 border="4px solid hsla(59, 100.00%, 68.00%, 0.80)"
                             />
                         </Box>
