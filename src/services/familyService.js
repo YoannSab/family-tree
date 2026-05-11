@@ -1,4 +1,4 @@
-import { db, DATA_SOURCE, COLLECTION_NAME } from '../config/config.js';
+import { db, DATA_SOURCE } from '../config/config.js';
 
 let firestoreDeps;
 
@@ -24,8 +24,7 @@ const getFirebaseDeps = async () => {
 };
 
 // ── Path helpers ────────────────────────────────────────────────────────────────────
-const getMembersColPath = (familyId) =>
-  familyId ? `families/${familyId}/members` : COLLECTION_NAME;
+const getMembersColPath = (familyId) => `families/${familyId}/members`;
 
 const getMembersCol = async (familyId) => {
   const { collection } = await getFirebaseDeps();

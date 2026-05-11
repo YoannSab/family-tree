@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { Box, Image } from '@chakra-ui/react';
 import { useImageUrl } from '../hooks/useImageUrl';
 import { THEME } from '../config/config';
@@ -37,12 +37,13 @@ const InitialsAvatar = ({ name, size = 'md', outline }) => {
 const StorageAvatar = memo(({ familyId, filename, name, size = 'md', outline, ...rest }) => {
   const px = resolveSize(size);
   const { url } = useImageUrl(familyId, filename);
-  if (!url) return <InitialsAvatar name={name} size={size} outline={outline} />;
+  const [imgError, setImgError] = useState(false);
+  if (!url || imgError) return <InitialsAvatar name={name} size={size} outline={outline} />;
   return (
     <Box
       as={Image}
       src={url}
-      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+      onError={() => setImgError(true)}
       w={px}
       h={px}
       borderRadius="full"
