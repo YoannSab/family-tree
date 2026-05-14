@@ -1,11 +1,14 @@
-import { db, DATA_SOURCE } from '../config/config.js';
+import { db, DATA_SOURCE, initFirebase } from '../config/config.js';
 
 let firestoreDeps;
 
 const getFirebaseDeps = async () => {
   if (!firestoreDeps && DATA_SOURCE === 'firebase') {
+    await initFirebase();
     const firestore = await import('firebase/firestore');
     firestoreDeps = {
+      query:           firestore.query,
+      where:           firestore.where,
       collection:      firestore.collection,
       doc:             firestore.doc,
       getDocs:         firestore.getDocs,
@@ -42,23 +45,28 @@ export const fetchFamilyMeta = async (familyId) => {
 
 export const fetchAllFamilies = async () => {
   if (DATA_SOURCE !== 'firebase') return [];
-  const { collection, getDocs } = await getFirebaseDeps();
-  const snapshot = await getDocs(collection(db, 'families'));
+  const { collection, getDocs, query, where } = await getFirebaseDeps();
+  const q = query(collection(db, 'families'), where('isPublic', '==', true));
+  const snapshot = await getDocs(q);
   return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 };
 
-export const createFamily = async ({ name, passwordHash, theme = null }) => {
+export const createFamily = async ({ name, passwordHash, theme = null, isPublic = false }) => {
   if (DATA_SOURCE !== 'firebase') throw new Error('Only supported with Firebase');
-  const { collection, doc: docFn, setDoc } = await getFirebaseDeps();
-  const familiesCol = collection(db, 'families');
-  const newRef = docFn(familiesCol);
-  await setDoc(newRef, {
-    name,
-    passwordHash: passwordHash || '',
-    createdAt: new Date().toISOString(),
-    ...(theme ? { theme } : {}),
-  });
-  return newRef.id;
+  const { getFunctions, httpsCallable } = await import('firebase/functions');
+  const { auth } = await import('../config/config.js');
+  const { signInWithCustomToken } = await import('firebase/auth');
+
+  const functions = getFunctions();
+  const createFamilyFn = httpsCallable(functions, 'createFamily');
+  const result = await createFamilyFn({ name, passwordHash: passwordHash || null, theme, isPublic });
+
+  const { familyId, token } = result.data;
+
+  // Sign in immediately with the token returned by the Cloud Function
+  await signInWithCustomToken(auth, token);
+
+  return familyId;
 };
 
 // ── Members ───────────────────────────────────────────────────────────────────────

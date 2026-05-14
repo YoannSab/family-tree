@@ -13,6 +13,7 @@ import { InfoIcon, CalendarIcon } from '@chakra-ui/icons';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 import { useUpcomingEvents } from '../../hooks/useUpcomingEvents';
+import { useNavigate } from 'react-router-dom';
 
 const Header = ({
   onStatsModalOpen,
@@ -24,6 +25,7 @@ const Header = ({
   familyData,
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { soonEvents } = useUpcomingEvents(familyData || [], 7);
   const hasUpcoming = soonEvents.length > 0;
 
@@ -46,7 +48,12 @@ const Header = ({
             px={{ base: 2, md: 4 }}
           >
             <HStack spacing={{ base: 3, md: 4 }}>
-              <Box fontSize={{ base: '2xl', md: '3xl' }}>{FAMILY_CONFIG.countryIcon}</Box>
+              <Box
+                fontSize={{ base: '2xl', md: '3xl' }}
+                cursor="pointer"
+                onClick={() => navigate('/')}
+                title="Home"
+              >{FAMILY_CONFIG.countryIcon}</Box>
               <VStack align="start" spacing={0}>
                 <Heading
                   size={{ base: 'lg', md: 'xl' }}

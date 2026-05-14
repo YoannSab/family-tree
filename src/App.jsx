@@ -143,7 +143,7 @@ const App = memo(({ familyId = null, familyConfig: familyConfigProp = null, pass
   }
 
   if (!isAuthenticated) {
-    return <PasswordProtection onUnlock={handleUnlock} passwordHash={passwordHash} />;
+    return <PasswordProtection onUnlock={handleUnlock} passwordHash={passwordHash} familyId={familyId} />;
   }
 
   return (

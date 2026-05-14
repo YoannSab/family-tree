@@ -21,6 +21,8 @@ import {
   SimpleGrid,
   Tooltip,
   useClipboard,
+  Switch,
+  FormHelperText as _FHT,
 } from '@chakra-ui/react';
 import { ViewIcon, ViewOffIcon, CopyIcon, CheckIcon } from '@chakra-ui/icons';
 import { useTranslation } from 'react-i18next';
@@ -65,6 +67,7 @@ export default function CreateFamilyPage() {
   const [loading,      setLoading]      = useState(false);
   const [error,        setError]        = useState('');
   const [createdUrl,   setCreatedUrl]   = useState('');
+  const [isPublic,     setIsPublic]     = useState(true);
   const [selectedPreset, setSelectedPreset] = useState('italian');
 
   const { hasCopied, onCopy } = useClipboard(createdUrl);
@@ -77,10 +80,14 @@ export default function CreateFamilyPage() {
     setLoading(true);
     setError('');
     try {
-      const passwordHash = password ? CryptoJS.SHA256(password).toString() : '';
-      const familyId = await createFamily({ name: familyName.trim(), passwordHash, theme: currentPreset.theme });
+      const passwordHash = password ? CryptoJS.SHA256(password).toString() : null;
+      const familyId = await createFamily({ name: familyName.trim(), passwordHash, theme: currentPreset.theme, isPublic });
       const url = `${window.location.origin}/f/${familyId}`;
-      setCreatedUrl(url);
+      if (isPublic) {
+        navigate(`/f/${familyId}`);
+      } else {
+        setCreatedUrl(url);
+      }
     } catch (err) {
       console.error(err);
       setError(err.message || t('error', 'An error occurred'));
@@ -89,6 +96,7 @@ export default function CreateFamilyPage() {
     }
   };
 
+  // if (createdUrl) — page de confirmation pour les familles privées (lien à copier)
   if (createdUrl) {
     return (
       <Box
@@ -100,48 +108,48 @@ export default function CreateFamilyPage() {
         bg={`linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 50%, var(--theme-primary-darker) 100%)`}
       >
         <Container maxW="md" px={{ base: 4, md: 0 }}>
-            <VStack spacing={6} align="stretch">
-              <VStack spacing={2} textAlign="center">
-                <Box fontSize="4xl">✅</Box>
-                <Heading size="lg" color="gray.200">
-                  {t('familyCreated', 'Family tree created!')}
-                </Heading>
-                <Text color="gray.400" fontSize="sm">
-                  {t('familyCreatedDesc', 'Save this link — it\'s the only way to access your family tree.')}
-                </Text>
-              </VStack>
-
-              <Box bg="gray.50" borderRadius="lg" p={4} border="1px" borderColor="gray.200">
-                <Text fontSize="xs" color="gray.500" mb={2} textTransform="uppercase" fontWeight="semibold">
-                  {t('yourFamilyLink', 'Your family link')}
-                </Text>
-                <HStack>
-                  <Code flex="1" p={2} borderRadius="md" fontSize="sm" bg="gray.100" wordBreak="break-all">
-                    {createdUrl}
-                  </Code>
-                  <IconButton
-                    icon={hasCopied ? <CheckIcon /> : <CopyIcon />}
-                    onClick={onCopy}
-                    colorScheme={hasCopied ? 'green' : 'gray'}
-                    aria-label="Copy link"
-                    size="sm"
-                    flexShrink={0}
-                  />
-                </HStack>
-              </Box>
-
-              <Button
-                size="lg"
-                bg={'var(--theme-primary)'}
-                color="white"
-                _hover={{ bg: 'var(--theme-primary-dark)' }}
-                onClick={() => navigate(createdUrl.replace(window.location.origin, ''))}
-              >
-                {t('openMyTree', 'Open my family tree')}
-              </Button>
+          <VStack spacing={6} align="stretch">
+            <VStack spacing={2} textAlign="center">
+              <Box fontSize="4xl">🔒</Box>
+              <Heading size="lg" color="gray.200">
+                {t('familyCreated', 'Family tree created!')}
+              </Heading>
+              <Text color="gray.400" fontSize="sm">
+                {t('familyCreatedPrivateDesc', 'Save this link — it\'s the only way to access your family tree.')}
+              </Text>
             </VStack>
-          </Container>
-        </Box>
+
+            <Box bg="gray.50" borderRadius="lg" p={4} border="1px" borderColor="gray.200">
+              <Text fontSize="xs" color="gray.500" mb={2} textTransform="uppercase" fontWeight="semibold">
+                {t('yourFamilyLink', 'Your family link')}
+              </Text>
+              <HStack>
+                <Code flex="1" p={2} borderRadius="md" fontSize="sm" bg="gray.100" wordBreak="break-all">
+                  {createdUrl}
+                </Code>
+                <IconButton
+                  icon={hasCopied ? <CheckIcon /> : <CopyIcon />}
+                  onClick={onCopy}
+                  colorScheme={hasCopied ? 'green' : 'gray'}
+                  aria-label="Copy link"
+                  size="sm"
+                  flexShrink={0}
+                />
+              </HStack>
+            </Box>
+
+            <Button
+              size="lg"
+              bg={'var(--theme-primary)'}
+              color="white"
+              _hover={{ bg: 'var(--theme-primary-dark)' }}
+              onClick={() => navigate(createdUrl.replace(window.location.origin, ''))}
+            >
+              {t('openMyTree', 'Open my family tree')}
+            </Button>
+          </VStack>
+        </Container>
+      </Box>
     );
   }
 
@@ -238,6 +246,25 @@ export default function CreateFamilyPage() {
                   <FormHelperText>
                     {t('passwordHelperText', 'Protects your tree with a password in addition to the secret link.')}
                   </FormHelperText>
+                </FormControl>
+
+                <FormControl>
+                  <HStack justify="space-between" align="center">
+                    <Box>
+                      <FormLabel mb={0}>{t('visibleOnHomepage', 'Visible sur la page d\'accueil')}</FormLabel>
+                      <FormHelperText mt={0}>
+                        {isPublic
+                          ? t('visibleOnHomepageOn', 'Votre famille apparaîtra dans la liste d\'accueil.')
+                          : t('visibleOnHomepageOff', 'Accès uniquement via le lien secret.')}
+                      </FormHelperText>
+                    </Box>
+                    <Switch
+                      isChecked={isPublic}
+                      onChange={(e) => setIsPublic(e.target.checked)}
+                      colorScheme="green"
+                      size="lg"
+                    />
+                  </HStack>
                 </FormControl>
 
                 <Button
