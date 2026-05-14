@@ -12,6 +12,8 @@ import TreeContextMenu from './components/FamilyTree/TreeContextMenu.jsx';
 import AddMemberModal from './components/FamilyTree/AddMemberModal.jsx';
 import DeleteConfirmModal from './components/FamilyTree/DeleteConfirmModal.jsx';
 import CreateFirstMemberModal from './components/FamilyTree/CreateFirstMemberModal.jsx';
+import UpcomingEventsModal from './components/UpcomingEventsModal.jsx';
+import TodayEventsBanner from './components/TodayEventsBanner.jsx';
 import {
   Box,
   Flex,
@@ -65,6 +67,9 @@ const App = memo(({ familyId = null, familyConfig: familyConfigProp = null, pass
     isStatsModalOpen,
     isPersonDrawerOpen,
     isFaceRecognitionOpen,
+    isUpcomingEventsOpen,
+    onUpcomingEventsOpen,
+    onUpcomingEventsClose,
     drawerRef,
     drawerHeaderRef,
     isMobile,
@@ -138,18 +143,26 @@ const App = memo(({ familyId = null, familyConfig: familyConfigProp = null, pass
   }
 
   if (!isAuthenticated) {
-    return <PasswordProtection onUnlock={handleUnlock} passwordHash={passwordHash} />;
+    return <PasswordProtection onUnlock={handleUnlock} passwordHash={passwordHash} familyId={familyId} />;
   }
 
   return (
     <Box minH="100vh" bg={bgColor}>
       <Header
         onStatsModalOpen={onStatsModalOpen}
+        onUpcomingEventsOpen={onUpcomingEventsOpen}
         totalMembers={totalMembers}
         livingMembers={livingMembers}
         deceasedMembers={deceasedMembers}
         FAMILY_CONFIG={FAMILY_CONFIG}
         isMobile={isMobile}
+        familyData={memoizedFamilyData}
+      />
+      <TodayEventsBanner
+        familyData={memoizedFamilyData}
+        familyId={familyId}
+        onPersonClick={handlePersonClick}
+        onOpenModal={onUpcomingEventsOpen}
       />
       {/* Main Content */}
       <Container maxW="full" px={0}>
@@ -160,7 +173,7 @@ const App = memo(({ familyId = null, familyConfig: familyConfigProp = null, pass
           borderRight={{ base: "none", md: "1px" }}
           borderColor="gray.200"
         >
-          <VStack spacing={{ base: 3, md: 4 }} p={{ base: 3, md: 6 }} align="stretch">
+          <VStack spacing={{ base: 3, md: 4 }} p={{ base: 3, md: 3 }} align="stretch">
             {/* Section Header */}
             <TreeSectionHeader
               t={t}
@@ -176,6 +189,14 @@ const App = memo(({ familyId = null, familyConfig: familyConfigProp = null, pass
 
             <Flex flexDirection='row' gap={6} alignItems="stretch">
               <VStack spacing={4} alignItems="stretch" flex={1}>
+                 {/* Mobile "See more" button */}
+                {isMobile && (
+                  <MobilePersonButton
+                    selectedPerson={memoizedSelectedPerson}
+                    onPersonDrawerOpen={onPersonDrawerOpen}
+                    t={t}
+                  />
+                )}
                 {familyData.length === 0 ? (
                   <Center
                     h="400px"
@@ -214,14 +235,7 @@ const App = memo(({ familyId = null, familyConfig: familyConfigProp = null, pass
                     familyId={familyId}
                   />
                 )}
-                {/* Mobile "See more" button */}
-                {isMobile && (
-                  <MobilePersonButton
-                    selectedPerson={memoizedSelectedPerson}
-                    onPersonDrawerOpen={onPersonDrawerOpen}
-                    t={t}
-                  />
-                )}
+               
               </VStack>
 
               {/* Desktop Person Info */}
@@ -269,6 +283,15 @@ const App = memo(({ familyId = null, familyConfig: familyConfigProp = null, pass
         isOpen={isStatsModalOpen}
         onClose={onStatsModalClose}
         familyData={memoizedFamilyData}
+      />
+
+      {/* Upcoming Events Modal */}
+      <UpcomingEventsModal
+        isOpen={isUpcomingEventsOpen}
+        onClose={onUpcomingEventsClose}
+        familyData={memoizedFamilyData}
+        familyId={familyId}
+        onPersonClick={handlePersonClick}
       />
 
       {/* Face Recognition Modal */}

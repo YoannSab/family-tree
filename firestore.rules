@@ -2,19 +2,34 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Helper: user is authenticated and their custom token claims match the familyId
+    function isAuthForFamily(familyId) {
+      return request.auth != null && request.auth.token.familyId == familyId;
+    }
+
     // Multi-family structure.
-    // Access is secured by the non-guessable Firestore auto-ID (UUID-equivalent).
-    // Anyone who knows the familyId can read and write its data.
     match /families/{familyId} {
-      allow read, write: if true;
+      // Public read for family display name, theme, countryIcon, hasPassword flag.
+      // passwordHash is NOT stored here — it lives in the private subcollection below.
+      allow read: if true;
+
+      // create/delete handled exclusively by Cloud Functions (Admin SDK).
+      // Authenticated family members can only update metadata (name, theme, etc.).
+      allow create, delete: if false;
+      allow update: if isAuthForFamily(familyId);
 
       match /members/{memberId} {
-        allow read, write: if true;
+        allow read, write: if isAuthForFamily(familyId);
+      }
+
+      // Private document — only accessible to authenticated members of this family.
+      // Stores passwordHash (and any other secrets).
+      match /private/{doc} {
+        allow read, write: if isAuthForFamily(familyId);
       }
     }
 
-    // Legacy flat collection — kept during migration transition.
-    // Read-only after migration (set to false once you've verified the new structure).
+    // Legacy flat collection — read-only, no auth required (migration data).
     match /familyMembers/{document} {
       allow read: if true;
       allow write: if false;

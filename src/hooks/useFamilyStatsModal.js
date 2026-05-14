@@ -2,6 +2,13 @@
 import { useBreakpointValue } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { THEME } from '../config/config';
+import { parseDate } from '../utils/dateUtils';
+
+/** Extract the year from a date string ("yyyy" or "dd-mm-yyyy"). Returns NaN if invalid. */
+const getYear = (dateStr) => {
+  const parsed = parseDate(dateStr);
+  return parsed ? parsed.year : NaN;
+};
 
 export const useFamilyStatsModal = (familyData) => {
   const { t } = useTranslation();
@@ -36,8 +43,10 @@ export const useFamilyStatsModal = (familyData) => {
     Object.keys(families).forEach(familyName => {
       const familyMembers = familyData.filter(person => person.data.family === familyName);
       const totalAge = familyMembers.reduce((sum, person) => {
-        const age = person.data.death ? person.data.death - person.data.birthday : new Date().getFullYear() - person.data.birthday;
-        return sum + age;
+        const birthY = getYear(person.data.birthday);
+        const deathY = getYear(person.data.death);
+        const age = person.data.death ? deathY - birthY : new Date().getFullYear() - birthY;
+        return sum + (isNaN(age) ? 0 : age);
       }, 0);
       families[familyName].avgAge = Math.round(totalAge / familyMembers.length);
     });
@@ -48,7 +57,10 @@ export const useFamilyStatsModal = (familyData) => {
       ageRanges[key] = 0;
     });
     familyData.forEach(person => {
-      const age = person.data.death ? person.data.death - person.data.birthday : new Date().getFullYear() - person.data.birthday;
+      const birthY = getYear(person.data.birthday);
+      const deathY = getYear(person.data.death);
+      const age = person.data.death ? deathY - birthY : new Date().getFullYear() - birthY;
+      if (isNaN(age)) return;
       if (age <= 17) ageRanges['children']++;
       else if (age <= 35) ageRanges['youngAdults']++;
       else if (age <= 55) ageRanges['adults']++;
@@ -59,8 +71,9 @@ export const useFamilyStatsModal = (familyData) => {
     const birthDecades = {};
     familyData.forEach(person => {
       const birthday = person.data.birthday;
-      if (birthday && !isNaN(birthday) && birthday > 1800) {
-        const decade = Math.floor(birthday / 10) * 10;
+      const birthY = getYear(birthday);
+      if (birthday && !isNaN(birthY) && birthY > 1800) {
+        const decade = Math.floor(birthY / 10) * 10;
         birthDecades[decade] = (birthDecades[decade] || 0) + 1;
       }
     });
@@ -74,7 +87,7 @@ export const useFamilyStatsModal = (familyData) => {
       person.rels.children &&
       person.rels.children.length > 0 &&
       person.data.birthday &&
-      !isNaN(person.data.birthday)
+      !isNaN(getYear(person.data.birthday))
     );
     let totalAgeAtFirstChild = 0;
     let validParents = 0;
@@ -82,12 +95,12 @@ export const useFamilyStatsModal = (familyData) => {
       if (parent.rels.children && parent.rels.children.length > 0) {
         const children = parent.rels.children.map(childId =>
           familyData.find(person => person.id === childId)
-        ).filter(child => child && child.data.birthday && !isNaN(child.data.birthday));
+        ).filter(child => child && child.data.birthday && !isNaN(getYear(child.data.birthday)));
         if (children.length > 0) {
           const oldestChild = children.reduce((oldest, child) =>
-            child.data.birthday < oldest.data.birthday ? child : oldest
+            getYear(child.data.birthday) < getYear(oldest.data.birthday) ? child : oldest
           );
-          const ageAtFirstChild = oldestChild.data.birthday - parent.data.birthday;
+          const ageAtFirstChild = getYear(oldestChild.data.birthday) - getYear(parent.data.birthday);
           if (ageAtFirstChild > 0 && ageAtFirstChild < 100) {
             totalAgeAtFirstChild += ageAtFirstChild;
             validParents++;
@@ -97,8 +110,13 @@ export const useFamilyStatsModal = (familyData) => {
     });
     const avgAgeAtFirstChild = validParents > 0 ? Math.round(totalAgeAtFirstChild / validParents) : 0;
 
-    const deceasedMembersWithData = familyData.filter(person => person.data.death && !isNaN(person.data.death) && person.data.birthday && !isNaN(person.data.birthday));
-    const longevityData = deceasedMembersWithData.map(person => person.data.death - person.data.birthday).filter(age => age > 0 && age < 120);
+    const deceasedMembersWithData = familyData.filter(person =>
+      person.data.death && !isNaN(getYear(person.data.death)) &&
+      person.data.birthday && !isNaN(getYear(person.data.birthday))
+    );
+    const longevityData = deceasedMembersWithData
+      .map(person => getYear(person.data.death) - getYear(person.data.birthday))
+      .filter(age => age > 0 && age < 120);
     const avgLifespan = longevityData.length > 0 ? Math.round(longevityData.reduce((sum, age) => sum + age, 0) / longevityData.length) : 0;
     const maxLifespan = longevityData.length > 0 ? Math.max(...longevityData) : 0;
 

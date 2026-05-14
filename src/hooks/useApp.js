@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useDisclosure, useToast } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import CryptoJS from 'crypto-js';
 import { fetchFamilyMembers, addFamilyMemberWithRelation, deleteFamilyMemberAndCleanRefs, createFirstMember, updateFamilyMember } from '../services/familyService';
 import { prefetchImageUrls, uploadImage, deleteImageFromStorage } from '../services/storageService';
-import { FAMILY_CONFIG as DEFAULT_FAMILY_CONFIG, THEME } from '../config/config';
+import { FAMILY_CONFIG as DEFAULT_FAMILY_CONFIG, THEME, DATA_SOURCE } from '../config/config';
 
 // Custom hook for responsive design that updates in real-time
 const useResponsive = () => {
@@ -55,6 +54,7 @@ export const useApp = ({ familyId = null, familyConfigProp = null, passwordHash 
   const { isOpen: isStatsModalOpen, onOpen: onStatsModalOpen, onClose: onStatsModalClose } = useDisclosure();
   const { isOpen: isPersonDrawerOpen, onOpen: onPersonDrawerOpen, onClose: onPersonDrawerClose } = useDisclosure();
   const { isOpen: isFaceRecognitionOpen, onOpen: onFaceRecognitionOpen, onClose: onFaceRecognitionClose } = useDisclosure();
+  const { isOpen: isUpcomingEventsOpen, onOpen: onUpcomingEventsOpen, onClose: onUpcomingEventsClose } = useDisclosure();
   const { isOpen: isAddMemberOpen, onOpen: onAddMemberOpen, onClose: onAddMemberClose } = useDisclosure();
   const { isOpen: isDeleteConfirmOpen, onOpen: onDeleteConfirmOpen, onClose: onDeleteConfirmClose } = useDisclosure();
   const { isOpen: isCreateFirstMemberOpen, onOpen: onCreateFirstMemberOpen, onClose: onCreateFirstMemberClose } = useDisclosure();
@@ -91,31 +91,55 @@ export const useApp = ({ familyId = null, familyConfigProp = null, passwordHash 
   const bgColor = THEME.bgPage;
   const cardBg = THEME.bgSurface;
 
-  // ── Auth check — runs from localStorage, no component mounting required ──
+  // ── Auth check — uses Firebase Auth state (set by PasswordProtection on login) ──
   useEffect(() => {
-    if (!passwordHash) {
-      setIsAuthenticated(true);
+    // Local mode: no Firebase auth needed
+    if (DATA_SOURCE === 'local') {
+      if (!passwordHash) setIsAuthenticated(true);
       setIsAuthChecked(true);
       return;
     }
-    const stored = localStorage.getItem(`familyTreePassword_${passwordHash}`);
-    if (stored && CryptoJS.SHA256(stored).toString() === passwordHash) {
-      setIsAuthenticated(true);
-    }
-    setIsAuthChecked(true);
-  }, [passwordHash]);
+
+    if (!familyId) return;
+
+    let unsubscribe;
+    (async () => {
+      const configModule = await import('../config/config.js');
+      await configModule.initFirebase();
+      const { auth } = configModule;
+      const { onAuthStateChanged } = await import('firebase/auth');
+      unsubscribe = onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          const idToken = await user.getIdTokenResult();
+          if (idToken.claims.familyId === familyId) {
+            setIsAuthenticated(true);
+            setIsAuthChecked(true);
+            return;
+          }
+        }
+        // Token not yet obtained (will be set by usePasswordProtection) — just mark checked
+        setIsAuthChecked(true);
+      });
+    })();
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [passwordHash, familyId]);
 
   useEffect(() => {
+    if (!isAuthenticated) return;
+    if (DATA_SOURCE === 'firebase' && !familyId) return;
     const fetchData = async () => {
       const data = await fetchFamilyMembers(familyId);
       setFamilyData(data);
       setIsFamilyDataLoaded(true);
       // Prefetch images in background — cache updates are broadcast via
       // subscribeToCacheUpdate so the D3 tree patches avatars in-place.
-      prefetchImageUrls(familyId, data);
+      if (familyId) prefetchImageUrls(familyId, data);
     };
     fetchData();
-  }, [familyId]);
+  }, [familyId, isAuthenticated]);
 
   useEffect(() => {
     isPersonEditingModeRef.current = isPersonEditingMode;
@@ -452,6 +476,7 @@ export const useApp = ({ familyId = null, familyConfigProp = null, passwordHash 
     isStatsModalOpen,
     isPersonDrawerOpen,
     isFaceRecognitionOpen,
+    isUpcomingEventsOpen,
     drawerRef,
     drawerHeaderRef,
     isMobile,
@@ -465,6 +490,8 @@ export const useApp = ({ familyId = null, familyConfigProp = null, passwordHash 
     onPersonDrawerClose,
     onFaceRecognitionOpen,
     onFaceRecognitionClose,
+    onUpcomingEventsOpen,
+    onUpcomingEventsClose,
     handlePersonUpdate,
     handleTouchStart,
     handleTouchMove,
@@ -475,7 +502,7 @@ export const useApp = ({ familyId = null, familyConfigProp = null, passwordHash 
     handleSearchSelect,
     handleUnlock,
     handleAuthChecked,
-    isAppReady: isAuthChecked && isFamilyDataLoaded,
+    isAppReady: isAuthChecked && (isAuthenticated ? isFamilyDataLoaded : true),
     handleResetView,
     handleCenterPerson,
     resetTreeView,

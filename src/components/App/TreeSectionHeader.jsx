@@ -115,7 +115,7 @@ const TreeSectionHeader = memo(({
               }}
             />
 
-            <InputRightElement>
+            {/* <InputRightElement>
               <IconButton
                 icon={<FiCamera />}
                 onClick={onFaceRecognitionOpen}
@@ -125,7 +125,7 @@ const TreeSectionHeader = memo(({
                 color="gray.600"
                 _hover={{ bg: "transparent", transform: "scale(1.2)" }}
               />
-            </InputRightElement>
+            </InputRightElement> */}
           </InputGroup>
 
           {/* Search Results */}

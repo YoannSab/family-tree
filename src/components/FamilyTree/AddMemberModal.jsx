@@ -8,6 +8,8 @@ import {
 } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { DATA_SOURCE } from '../../config/config';
+import ImageCropModal from '../ImageCropModal';
+import { useCropModal } from '../../hooks/useCropModal';
 
 // Relations where gender is determined automatically
 const FIXED_GENDER = { father: 'M', mother: 'F' };
@@ -22,6 +24,7 @@ const RELATION_META = {
 const AddMemberModal = ({ isOpen, onClose, relationType, relatedPerson, spouses = [], onSubmit, isLoading }) => {
   const { t } = useTranslation();
   const fileInputRef = useRef(null);
+  const { pendingFile, cropIsOpen, openCrop, onCropConfirm, onCropCancel } = useCropModal();
 
   const [form, setForm] = useState({
     firstName: '',
@@ -79,17 +82,21 @@ const AddMemberModal = ({ isOpen, onClose, relationType, relatedPerson, spouses 
     onClose();
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const preview = URL.createObjectURL(file);
-    setForm(prev => ({ ...prev, imageFile: file, imagePreview: preview }));
     e.target.value = '';
+    const croppedFile = await openCrop(file);
+    if (!croppedFile) return;
+    if (form.imagePreview) URL.revokeObjectURL(form.imagePreview);
+    const preview = URL.createObjectURL(croppedFile);
+    setForm(prev => ({ ...prev, imageFile: croppedFile, imagePreview: preview }));
   };
 
   if (!relatedPerson) return null;
 
   return (
+    <>
     <Modal isOpen={isOpen} onClose={handleClose} isCentered motionPreset="none">
       <ModalOverlay bg={`rgba(var(--theme-primary-rgb), 0.5)`} />
       <ModalContent
@@ -303,7 +310,14 @@ const AddMemberModal = ({ isOpen, onClose, relationType, relatedPerson, spouses 
           </Button>
         </ModalFooter>
       </ModalContent>
-    </Modal>
+      </Modal>
+      <ImageCropModal
+        file={pendingFile}
+        isOpen={cropIsOpen}
+        onConfirm={onCropConfirm}
+        onCancel={onCropCancel}
+      />
+    </>
   );
 };
 

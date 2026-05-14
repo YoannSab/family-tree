@@ -19,7 +19,7 @@ import { FAMILY_CONFIG, THEME } from '../config/config.js';
 import { usePasswordProtection } from '../hooks/usePasswordProtection.js';
 import { useEffect } from 'react';
 
-const PasswordProtection = ({ onUnlock, onAuthChecked, passwordHash = '' }) => {
+const PasswordProtection = ({ onUnlock, onAuthChecked, passwordHash = '', familyId = '' }) => {
     const {
         t,
         password,
@@ -34,7 +34,7 @@ const PasswordProtection = ({ onUnlock, onAuthChecked, passwordHash = '' }) => {
         italianGold,
         italianGreen,
         isAuthChecked,
-    } = usePasswordProtection(onUnlock, passwordHash);
+    } = usePasswordProtection(onUnlock, passwordHash, familyId);
 
     // Once we know the user needs to enter a password, signal the app is ready to render
     useEffect(() => {

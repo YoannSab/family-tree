@@ -13,9 +13,10 @@ import { useTranslation } from 'react-i18next';
 import { THEME } from '../config/config';
 import StorageAvatar from './StorageAvatar';
 import { useImageUrl } from '../hooks/useImageUrl';
+import { formatDate, isFullDate } from '../utils/dateUtils';
 
 // Sub-component so each card can use the useImageUrl hook
-const PersonCard = memo(({ relatedPerson, familyId, italianGold, italianGreen, handlePersonClick, handleImageClick, t }) => {
+const PersonCard = memo(({ relatedPerson, familyId, italianGold, italianGreen, handlePersonClick, handleImageClick, t, language }) => {
   const { url: avatarUrl } = useImageUrl(familyId, relatedPerson.data.image);
   return (
     <Card
@@ -63,15 +64,34 @@ const PersonCard = memo(({ relatedPerson, familyId, italianGold, italianGreen, h
                 {relatedPerson.data.firstName} {relatedPerson.data.lastName} {relatedPerson.data.death ? '✞' : ''}
               </Text>
             </HStack>
-            {relatedPerson.data.death ? (
-              <Text fontSize="xs" color="gray.600">
-                {relatedPerson.data.birthday} - {relatedPerson.data.death}
-              </Text>
-            ) : (
-              <Text fontSize="xs" color="gray.600">
-                {t('birthdate')} {relatedPerson.data.birthday}
-              </Text>
-            )}
+            {(() => {
+              const isFemale = relatedPerson.data.gender === 'F';
+              const birthday = relatedPerson.data.birthday;
+              const death = relatedPerson.data.death;
+              if (death) {
+                const birthStr = birthday ? formatDate(birthday, language) : t('dateUnknown');
+                return (
+                  <Text fontSize="xs" color="gray.600">
+                    {birthStr} - {formatDate(death, language)}
+                  </Text>
+                );
+              }
+              if (!birthday) {
+                return (
+                  <Text fontSize="xs" color="gray.600">
+                    {t('dateUnknown')}
+                  </Text>
+                );
+              }
+              const bornKey = isFullDate(birthday)
+                ? (isFemale ? 'bornOnF' : 'bornOn')
+                : (isFemale ? 'bornInF' : 'bornIn');
+              return (
+                <Text fontSize="xs" color="gray.600">
+                  {t(bornKey)} {formatDate(birthday, language)}
+                </Text>
+              );
+            })()}
           </VStack>
         </HStack>
       </CardBody>
@@ -81,7 +101,7 @@ const PersonCard = memo(({ relatedPerson, familyId, italianGold, italianGreen, h
 PersonCard.displayName = 'PersonCard';
 
 const RelatedPersonsList = memo(({ title, people, familyId, handlePersonClick, handleImageClick, isMobile }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const cardBg = THEME.bgCard;
   const italianGold = 'var(--theme-accent)';
   const italianGreen = 'var(--theme-primary)';
@@ -146,6 +166,7 @@ const RelatedPersonsList = memo(({ title, people, familyId, handlePersonClick, h
             handlePersonClick={handlePersonClick}
             handleImageClick={handleImageClick}
             t={t}
+            language={i18n.language}
           />
         ))}
       </Grid>

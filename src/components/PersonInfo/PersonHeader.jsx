@@ -1,4 +1,6 @@
 ﻿import React, { memo, useRef } from 'react';
+import ImageCropModal from '../ImageCropModal';
+import { useCropModal } from '../../hooks/useCropModal';
 import {
   VStack,
   HStack,
@@ -32,6 +34,7 @@ const PersonHeader = memo(({
   t
 }) => {
   const fileInputRef = useRef(null);
+  const { pendingFile, cropIsOpen, openCrop, onCropConfirm, onCropCancel } = useCropModal();
   const { url: avatarUrl } = useImageUrl(familyId, person.data.image);
   const fullName = `${person.data.firstName} ${person.data.lastName}`;
   const avatarOutline = `3px solid ${italianGold}`;
@@ -44,13 +47,17 @@ const PersonHeader = memo(({
     }
   };
 
-  const onFileChange = (e) => {
+  const onFileChange = async (e) => {
     const file = e.target.files?.[0];
-    if (file && handlePhotoUpload) handlePhotoUpload(file);
-    e.target.value = ''; // allow re-selecting same file
+    if (!file) return;
+    e.target.value = '';
+    const croppedFile = await openCrop(file);
+    if (!croppedFile) return;
+    if (handlePhotoUpload) handlePhotoUpload(croppedFile);
   };
 
   return (
+    <>
     <Flex direction={{ base: 'column', sm: 'row' }} align={{ base: 'center', sm: 'center' }} gap={4}>
       {/* Avatar — clickable for view, or for upload in edit mode */}
       <Box position="relative" flexShrink={0}>
@@ -157,7 +164,14 @@ const PersonHeader = memo(({
           )}
         </HStack>
       </VStack>
-    </Flex>
+      </Flex>
+      <ImageCropModal
+        file={pendingFile}
+        isOpen={cropIsOpen}
+        onConfirm={onCropConfirm}
+        onCancel={onCropCancel}
+      />
+    </>
   );
 });
 

@@ -1,0 +1,3 @@
+mettre date de naissance complète
+ajouter une page pour les annivs et aussi si c'est l'anniv de quelqu'un aujourd'hui
+ajouter une page pour les anniversaires du mois

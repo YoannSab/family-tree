@@ -1,14 +1,18 @@
 ﻿import { useEffect, useRef, useCallback, useMemo } from 'react';
 import { flushSync } from 'react-dom';
 import { useBreakpointValue } from '@chakra-ui/react';
+import { useTranslation } from 'react-i18next';
 import f3 from 'family-chart';
 import { THEME, DATA_SOURCE } from '../config/config';
 import { getImageUrlCached, subscribeToCacheUpdate } from '../services/storageService';
+import { parseDate, formatDate } from '../utils/dateUtils';
 
 export const useFamilyTree = (familyData, onPersonClick, onResetView, onContextMenu, familyId = null) => {
   const chartRef = useRef(null);
   const isMobile = useBreakpointValue({ base: true, md: false });
   const isTablet = useBreakpointValue({ base: false, md: true, lg: false });
+  const { i18n } = useTranslation();
+  const lang = (i18n.language || 'fr').split('-')[0];
 
   // Refs so event listeners always see the latest values without re-attaching
   const familyDataRef   = useRef(familyData);
@@ -74,8 +78,8 @@ export const useFamilyTree = (familyData, onPersonClick, onResetView, onContextM
         container.innerHTML = '';
       }
 
-      const cardXSpacing = isMobile ? 180 : isTablet ? 220 : 250;
-      const cardYSpacing = isMobile ? 120 : isTablet ? 140 : 150;
+      const cardXSpacing = isMobile ? 220 : isTablet ? 250 : 270;
+      const cardYSpacing = isMobile ? 180 : isTablet ? 220 : 210;
 
       const f3Chart = f3.createChart('#FamilyChart', data)
         .setTransitionTime(500)
@@ -84,53 +88,44 @@ export const useFamilyTree = (familyData, onPersonClick, onResetView, onContextM
         .setSingleParentEmptyCard(false)
         // Sort children oldest-first by birth year
         .setSortChildrenFunction((a, b) => {
-          const yearA = parseInt(a.data?.birthday) || 9999;
-          const yearB = parseInt(b.data?.birthday) || 9999;
+          const yearA = parseDate(a.data?.birthday)?.year || 9999;
+          const yearB = parseDate(b.data?.birthday)?.year || 9999;
           return yearA - yearB;
         })
-        // Sort spouses by birth year (consistent ordering for multi-spouse cases)
-        .setSortSpousesFunction((d, allData) => {
-          const spouses = [...(d.data?.rels?.spouses || [])];
-          return spouses.sort((a, b) => {
-            const spA = allData.find(p => p.id === a);
-            const spB = allData.find(p => p.id === b);
-            const yearA = parseInt(spA?.data?.birthday) || 9999;
-            const yearB = parseInt(spB?.data?.birthday) || 9999;
-            return yearA - yearB;
-          });
-        });
-
+        .setShowSiblingsOfMain(true);
+        
       const f3Card = f3Chart.setCard(f3.CardHtml)
         .setCardInnerHtmlCreator(d => {
           const fontSize = isMobile ? '12px' : '14px';
-          const cardWidth = isMobile ? '160px' : '200px';
-          const avatarSize = '60px';
+          const cardMinWidth = isMobile ? '150px' : '190px';
+          const avatarSize = isMobile ? '52px' : '60px';
           const avatarSrc = getImageUrlCached(familyId, d.data.data.image);
           const initials = `${(d.data.data.firstName?.[0] || '').toUpperCase()}${(d.data.data.lastName?.[0] || '').toUpperCase()}`;
-          const initialsStyle = `width:${avatarSize};height:${avatarSize};border-radius:50%;background:var(--theme-primary);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:20px;border:1px solid var(--theme-accent);flex-shrink:0;`;
+          const initialsStyle = `width:${avatarSize};height:${avatarSize};border-radius:50%;background:var(--theme-primary);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:18px;border:1px solid var(--theme-accent);`;
           const initialsHtml = `<div style="${initialsStyle}">${initials}</div>`;
           const avatarHtml = avatarSrc
             ? `<img src="${avatarSrc}" data-fallback="${initialsHtml.replace(/"/g, '&quot;')}" onerror="this.outerHTML=this.dataset.fallback" style="width:${avatarSize};height:${avatarSize};object-fit:cover;border-radius:50%;border:1px solid var(--theme-accent);">`
             : initialsHtml;
 
+          // Formatted dates & gender
+          const birthFormatted = d.data.data.birthday ? formatDate(d.data.data.birthday, lang) : '';
+          const deathFormatted = d.data.data.death   ? formatDate(d.data.data.death,   lang) : '';
+          const genderSymbol = d.data.data.gender === 'F' ? '\u2640' : '\u2642';
+          const genderColor  = d.data.data.gender === 'F' ? '#E879A0' : '#4A8BD4';
+          const dateFontSize = isMobile ? '10px' : '11px';
+          const birthLine = birthFormatted ? `<div style="display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;"><span style="color:#7cb98a;">&#10033;</span><span>${birthFormatted}</span></div>` : '';
+          const deathLine = deathFormatted ? `<div style="display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;"><span style="color:#999;">&dagger;</span><span>${deathFormatted}</span></div>` : '';
+
           return `
-          <div class="card-inner tree-card" data-person-id="${d.data.id}" style="position: relative; width: ${cardWidth}; font-size: ${fontSize}; background: ${THEME.bgCard}; border: 2px solid var(--theme-accent); border-radius: 8px; padding: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <div class="avatar" style="flex-shrink: 0;">
-                ${avatarHtml}
-              </div>
-              <div style="flex-grow: 1;">
-                <div class="card-name" style="font-weight: bold; margin-bottom: 4px; font-size: ${isMobile ? '13px' : '15px'}; color: var(--theme-primary); text-align: center;">
-              ${d.data.data.firstName} ${d.data.data.lastName}
-                </div>
-                <div class="card-birthday" style="font-size: ${isMobile ? '10px' : '12px'}; color: ${THEME.textMuted}; margin-bottom: 2px; text-align: center;">
-              ${d.data.data.birthday ? d.data.data.birthday : ''}${d.data.data.death ? ' - ' + d.data.data.death : ''}
-                </div>
-                <div class="card-occupation" style="font-size: ${isMobile ? '10px' : '11px'}; color: ${THEME.textSubtle}; font-style: italic; text-align: center;">
-              ${d.data.data.occupation ? d.data.data.occupation : ''}
-                </div>
-              </div>
+          <div class="card-inner tree-card" data-person-id="${d.data.id}" style="position:relative; min-width:${cardMinWidth}; font-size:${fontSize}; background:${THEME.bgCard}; border:2px solid var(--theme-accent); border-radius:8px; padding:6px 6px; box-shadow:0 4px 12px rgba(0,0,0,0.15); display:flex; flex-direction:column; align-items:center; gap:2px;">
+            <div class="avatar">${avatarHtml}</div>
+            <div class="card-name" style="font-weight:bold; font-size:${isMobile ? '13px' : '15px'}; color:var(--theme-primary); word-break:break-word; text-align:center; line-height:1.3;">
+              ${d.data.data.firstName} ${d.data.data.lastName}&nbsp;<span style="font-size:${isMobile ? '13px' : '15px'}; color:${genderColor}; font-weight:normal;">${genderSymbol}</span>
             </div>
+            <div class="card-birthday" style="font-size:${dateFontSize}; color:${THEME.textMuted}; line-height:1.7; text-align:center;">
+              ${birthLine}${deathLine}
+            </div>
+            ${d.data.data.occupation ? `<div class="card-occupation" style="font-size:${isMobile ? '10px' : '11px'}; color:${THEME.textSubtle}; font-style:italic; text-align:center;">${d.data.data.occupation}</div>` : ''}
           </div>`;
         });
 
@@ -150,7 +145,7 @@ export const useFamilyTree = (familyData, onPersonClick, onResetView, onContextM
 
     create(familyData);
 
-  }, [familyData, isMobile, isTablet, onPersonClick]);
+  }, [familyData, isMobile, isTablet, onPersonClick, lang]);
 
   // Patch tree card avatars in-place when blob URLs arrive (prefetch / upload).
   // Debounced: rapid updates (parallel prefetch) are batched into a single DOM pass.

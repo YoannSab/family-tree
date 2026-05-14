@@ -79,7 +79,7 @@ export default function FamilyPage() {
     <App
       familyId={familyId}
       familyConfig={familyConfig}
-      passwordHash={meta.passwordHash || ''}
+      passwordHash={meta.hasPassword ? '__protected__' : ''}
       theme={meta.theme || null}
     />
   );

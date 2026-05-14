@@ -30,7 +30,8 @@ const DATA_SOURCE = "firebase"; // Firestore en ligne
 
 ### 🏠 Mode local
 
-Toutes les données sont lues depuis des fichiers statiques — aucun backend requis.
+Toutes les données sont lues depuis un fichier JSON statique — aucun backend requis, pas d'authentification.  
+L'arbre s'ouvre directement au démarrage.
 
 **1. Données** — placez votre JSON dans `public/data/data.json` :
 
@@ -62,7 +63,6 @@ Ajoutez un fichier `default.png` pour les membres sans photo.
 ```javascript
 const FAMILY_CONFIG = {
   familyName: "Votre Nom de Famille",
-  subtitle:   "Votre description courte",
   countryIcon: "🌳",
 };
 ```
@@ -71,9 +71,12 @@ const FAMILY_CONFIG = {
 
 ### 🔥 Mode Firebase
 
-Aucun fichier de données à gérer — tout est dans Firestore.
+Toutes les données sont stockées dans Firestore, les images dans Firebase Storage.  
+Plusieurs familles peuvent coexister, chacune accessible via son URL (`/f/:familyId`).
 
-**1.** Créez un projet Firebase et activez Firestore + Storage.
+#### Prérequis Firebase
+
+**1.** Créez un projet Firebase et activez **Firestore**, **Storage**, **Authentication** et **Cloud Functions**.
 
 **2.** Copiez `.env.example` en `.env` et remplissez vos identifiants :
 
@@ -86,20 +89,37 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=...
 VITE_FIREBASE_APP_ID=...
 ```
 
-C'est tout — l'interface permet ensuite de créer et gérer les familles directement.
-
----
-
-## 🔒 Protection par mot de passe (mode local uniquement)
-
-Dans `.env`, définissez `VITE_TARGET_HASH` :
-
-- **Vide** (`VITE_TARGET_HASH=`) → aucune authentification requise, l'arbre s'ouvre directement.
-- **Rempli** → mettez le hash SHA-256 du mot de passe souhaité.
+**3.** Déployez les Cloud Functions :
 
 ```bash
-# Générer le hash d'un mot de passe (Node.js)
-node -e "const c=require('crypto');console.log(c.createHash('sha256').update('monMotDePasse').digest('hex'))"
+cd functions
+npm install
+cd ..
+firebase deploy --only functions
+```
+
+**4.** Déployez les règles Firestore et Storage :
+
+```bash
+firebase deploy --only firestore:rules,storage:rules
+```
+
+#### Authentification (mode Firebase)
+
+La sécurité repose sur des **Firebase Custom Auth Tokens** côté serveur — le mot de passe n'est jamais stocké en clair ni vérifié côté client.
+
+- Lors de la création d'une famille, le hash SHA-256 du mot de passe est envoyé à une Cloud Function qui le stocke dans une sous-collection privée de Firestore (`families/{id}/private/auth`), inaccessible publiquement.
+- À chaque connexion, la Cloud Function `verifyFamilyPassword` compare le hash et retourne un Custom Token Firebase contenant un claim `familyId`.
+- Ce token est utilisé par les règles Firestore et Storage pour n'autoriser l'accès qu'aux membres de la bonne famille.
+- Les familles sans mot de passe reçoivent automatiquement un token au chargement de la page.
+
+Aucun compte utilisateur n'est créé — le token est partagé entre tous les membres de la famille.
+
+#### Déploiement hosting
+
+```bash
+npm run build
+firebase deploy --only hosting
 ```
 
 ---
@@ -116,8 +136,9 @@ Téléchargez les modèles depuis [face-api.js weights](https://github.com/justa
 npm run dev      # Développement
 npm run build    # Build production
 npm run preview  # Prévisualisation du build
-npm run deploy   # Déploiement GitHub Pages
 ```
+
+---
 
 ## 🐛 Problèmes courants
 
@@ -129,3 +150,5 @@ rm -rf node_modules package-lock.json && npm install && npm run dev
 **Images invisibles** → vérifiez `public/images/` et la présence de `default.png`
 
 **Reconnaissance faciale** → vérifiez que les modèles sont bien dans `public/models/`
+
+**Erreur `permission-denied` Firestore** → vérifiez que les Cloud Functions sont déployées et que l'utilisateur est bien authentifié (token valide)

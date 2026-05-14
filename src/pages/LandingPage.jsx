@@ -1,32 +1,42 @@
-﻿import { useState } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
   VStack,
   HStack,
-  Input,
   Button,
   Text,
   Heading,
   Container,
   Divider,
+  Spinner,
 } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { THEME } from '../config/config.js';
+import { fetchAllFamilies } from '../services/familyService.js';
+
+const maskName = (name = '') =>
+  name
+    .split(' ')
+    .map((word) => {
+      if (word.length <= 1) return word;
+      const visible = Math.ceil(word.length / 2);
+      return word.slice(0, visible) + '•'.repeat(word.length - visible);
+    })
+    .join(' ');
 
 export default function LandingPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [familyId, setFamilyId] = useState('');
+  const [families, setFamilies] = useState([]);
+  const [loadingFamilies, setLoadingFamilies] = useState(true);
 
-  const handleOpen = (e) => {
-    e.preventDefault();
-    const id = familyId.trim();
-    if (!id) return;
-    // Support pasting a full URL or just the raw ID
-    const match = id.match(/\/f\/([^/?#]+)/);
-    navigate(`/f/${match ? match[1] : id}`);
-  };
+  useEffect(() => {
+    fetchAllFamilies()
+      .then(setFamilies)
+      .catch(() => setFamilies([]))
+      .finally(() => setLoadingFamilies(false));
+  }, []);
 
   return (
     <Box
@@ -51,34 +61,46 @@ export default function LandingPage() {
 
           <Box bg="white" borderRadius="2xl" p={8} shadow="2xl">
             <VStack spacing={6} align="stretch">
-              {/* Open existing family */}
-              <VStack spacing={3} align="stretch">
-                <Text fontWeight="semibold" color="gray.700">
-                  {t('openFamily', 'Open a family tree')}
-                </Text>
-                <form onSubmit={handleOpen}>
-                  <VStack spacing={3} align="stretch">
-                    <Input
-                      value={familyId}
-                      onChange={(e) => setFamilyId(e.target.value)}
-                      placeholder={t('familyIdPlaceholder', 'Paste family ID or link...')}
-                      size="lg"
-                      borderColor="gray.300"
-                      _focus={{ borderColor: 'var(--theme-primary)', boxShadow: `0 0 0 1px var(--theme-primary)` }}
-                    />
-                    <Button
-                      type="submit"
-                      size="lg"
-                      bg={'var(--theme-primary)'}
-                      color="white"
-                      _hover={{ bg: 'var(--theme-primary-dark)' }}
-                      isDisabled={!familyId.trim()}
-                    >
-                      {t('openFamilyBtn', 'Open')}
-                    </Button>
-                  </VStack>
-                </form>
-              </VStack>
+              {/* Available families */}
+              {loadingFamilies ? (
+                <HStack justify="center" py={2}>
+                  <Spinner size="sm" color="var(--theme-primary)" />
+                  <Text fontSize="sm" color="gray.500">{t('loadingFamilies', 'Loading families…')}</Text>
+                </HStack>
+              ) : families.length > 0 && (
+                <VStack spacing={2} align="stretch">
+                  <Text fontWeight="semibold" color="gray.700" fontSize="sm">
+                    {t('availableFamilies', 'Available families')}
+                  </Text>
+                  <Box
+                    maxH="144px"
+                    overflowY="auto"
+                    pr={1}
+                    sx={{
+                      '&::-webkit-scrollbar': { width: '4px' },
+                      '&::-webkit-scrollbar-thumb': { background: 'var(--theme-primary)', borderRadius: '4px' },
+                      '&::-webkit-scrollbar-track': { background: 'transparent' },
+                    }}
+                  >
+                    <VStack spacing={2} align="stretch">
+                      {families.map((fam) => (
+                        <Button
+                          key={fam.id}
+                          variant="outline"
+                          borderColor="gray.200"
+                          justifyContent="flex-start"
+                          fontFamily="serif"
+                          color="gray.700"
+                          _hover={{ bg: 'var(--theme-primary)', color: 'white', borderColor: 'var(--theme-primary)' }}
+                          onClick={() => navigate(`/f/${fam.id}`)}
+                        >
+                          🌳 {maskName(fam.name || fam.id)}
+                        </Button>
+                      ))}
+                    </VStack>
+                  </Box>
+                </VStack>
+              )}
 
               <HStack>
                 <Divider />

@@ -16,8 +16,10 @@ const notifyCacheUpdate = (cacheKey) => cacheListeners.forEach(fn => fn(cacheKey
 let _storageDeps = null;
 const getStorageDeps = async () => {
   if (_storageDeps) return _storageDeps;
-  const [{ getApp }, { getStorage, ref, uploadBytes, getDownloadURL, deleteObject }] =
-    await Promise.all([import('firebase/app'), import('firebase/storage')]);
+  const [configModule, { getStorage, ref, uploadBytes, getDownloadURL, deleteObject }] =
+    await Promise.all([import('../config/config.js'), import('firebase/storage')]);
+  await configModule.initFirebase();
+  const { getApp } = await import('firebase/app');
   const storage = getStorage(getApp());
   _storageDeps = { storage, ref, uploadBytes, getDownloadURL, deleteObject };
   return _storageDeps;

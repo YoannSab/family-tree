@@ -8,12 +8,15 @@ import {
 } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { THEME, DATA_SOURCE } from '../../config/config';
+import ImageCropModal from '../ImageCropModal';
+import { useCropModal } from '../../hooks/useCropModal';
 
 const EMPTY_FORM = { firstName: '', lastName: '', birthday: '', death: '', gender: 'M', imageFile: null, imagePreview: null };
 
 const CreateFirstMemberModal = ({ isOpen, onClose, onSubmit, isLoading }) => {
   const { t } = useTranslation();
   const fileInputRef = useRef(null);
+  const { pendingFile, cropIsOpen, openCrop, onCropConfirm, onCropCancel } = useCropModal();
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
 
@@ -29,12 +32,14 @@ const CreateFirstMemberModal = ({ isOpen, onClose, onSubmit, isLoading }) => {
     return errs;
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (form.imagePreview) URL.revokeObjectURL(form.imagePreview);
-    setForm(prev => ({ ...prev, imageFile: file, imagePreview: URL.createObjectURL(file) }));
     e.target.value = '';
+    const croppedFile = await openCrop(file);
+    if (!croppedFile) return;
+    if (form.imagePreview) URL.revokeObjectURL(form.imagePreview);
+    setForm(prev => ({ ...prev, imageFile: croppedFile, imagePreview: URL.createObjectURL(croppedFile) }));
   };
 
   const handleSubmit = () => {
@@ -59,6 +64,7 @@ const CreateFirstMemberModal = ({ isOpen, onClose, onSubmit, isLoading }) => {
   };
 
   return (
+    <>
     <Modal isOpen={isOpen} onClose={handleClose} isCentered motionPreset="none">
       <ModalOverlay />
       <ModalContent borderRadius="xl" mx={4}>
@@ -172,7 +178,14 @@ const CreateFirstMemberModal = ({ isOpen, onClose, onSubmit, isLoading }) => {
           </Button>
         </ModalFooter>
       </ModalContent>
-    </Modal>
+      </Modal>
+      <ImageCropModal
+        file={pendingFile}
+        isOpen={cropIsOpen}
+        onConfirm={onCropConfirm}
+        onCancel={onCropCancel}
+      />
+    </>
   );
 };
 
