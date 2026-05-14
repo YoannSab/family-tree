@@ -72,8 +72,10 @@ createRoot(document.getElementById('root')).render(
     <ErrorBoundary>
       <ChakraProvider theme={chakraTheme} colorModeManager={forceLightManager}>
         {DATA_SOURCE === 'local' ? (
-          // Local mode: single family from public/data/data.json, no router needed
-          <App familyConfig={FAMILY_CONFIG} />
+          // Local mode: wrap in BrowserRouter so hooks like useNavigate() work
+          <BrowserRouter>
+            <App familyConfig={FAMILY_CONFIG} />
+          </BrowserRouter>
         ) : (
           <BrowserRouter>
             <Routes>

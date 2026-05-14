@@ -1,4 +1,10 @@
 {
+  "cropPhoto": "Recadrer la photo",
+  "cropConfirm": "Recadrer",
+  "cropSkip": "Envoyer sans recadrer",
+  "cropHint": "Faites glisser pour déplacer · pincez ou utilisez le curseur pour zoomer",
+  "cropUnsupportedFormat": "Format non supporté par le navigateur. Convertissez l'image en JPEG ou PNG avant de l'importer.",
+  "zoom": "Zoom",
   "living": "Vivants",
   "remembered": "Souvenirs",
   "generations": "Générations",

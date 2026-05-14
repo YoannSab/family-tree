@@ -1,4 +1,10 @@
 {
+  "cropPhoto": "Ritaglia la foto",
+  "cropConfirm": "Ritaglia",
+  "cropSkip": "Invia senza ritagliare",
+  "cropHint": "Trascina per spostare · pizzica o usa il cursore per lo zoom",
+  "cropUnsupportedFormat": "Formato non supportato dal browser. Converti l'immagine in JPEG o PNG prima di importarla.",
+  "zoom": "Zoom",
   "living": "Viventi",
   "remembered": "Ricordati",
   "generations": "Generazioni",

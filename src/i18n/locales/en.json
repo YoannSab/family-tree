@@ -1,4 +1,10 @@
 {
+  "cropPhoto": "Crop photo",
+  "cropConfirm": "Crop",
+  "cropSkip": "Send without cropping",
+  "cropHint": "Drag to reposition · pinch or use the slider to zoom",
+  "cropUnsupportedFormat": "Format not supported by the browser. Please convert to JPEG or PNG before uploading.",
+  "zoom": "Zoom",
   "living": "Living",
   "remembered": "Remembered", 
   "generations": "Generations",

@@ -31,7 +31,7 @@ const THEME = { // For local or default firebase mode
 // 'firebase' or 'local'. 
 // If local, it will use public/data/data.json file.
 // If firebase, it will use Firebase Firestore, make sure to set up Firebase config.
-const DATA_SOURCE = "firebase";
+const DATA_SOURCE = "local";
 
 // ── Legacy single-family config (used only when DATA_SOURCE === 'local') ──────
 // For Firebase, all of these live in Firestore under families/{familyId}
